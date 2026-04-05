@@ -1,36 +1,93 @@
- N4798E Aircraft Health Assistant
+# aircraft-health-cag-demo
 # Portfolio project for Cognite Senior Field AI Engineer interview
 
-## Project purpose
-Demonstrate understanding of Cognite Data Fusion (CDF) architecture:
-- IT/OT/ET data ingestion and contextualization
-- Industrial Knowledge Graph
-- CAG (Context Augmented Generation) — NOT RAG
-- AI agent with function calling over knowledge graph
+## Purpose
+Demonstrate Cognite Data Fusion (CDF) architecture at small scale:
+IT/OT/ET ingestion → Industrial Knowledge Graph → CAG agent
 
-## Architecture — never deviate from these decisions
-- Mock CDF server: Express implementing real CDF REST API endpoints
-- Knowledge graph queries: always via @cognite/sdk, never direct JSON reads
-- Context assembly: graph traversal only, no vector store, no semantic search
-- Agent pattern: ReAct loop with explicit tool calls
-- CAG not RAG: context comes from traversing connected graph nodes
+## Stack
+- Frontend: React + TypeScript (Vite, Tailwind CSS, shadcn/ui)
+- Backend: Python (FastAPI, uvicorn)
+- CDF queries: cognite-sdk Python client → mock server
+- LLM: Anthropic SDK (claude-sonnet-4-20250514)
+- No TypeScript in backend
+
+## Architecture — never deviate
+- Mock CDF server: FastAPI implementing real CDF REST API patterns
+- Standard CDF resources (Assets, TimeSeries, Datapoints, Events,
+  Relationships, Files): always via cognite-sdk Python client
+- Extended fleet resources (symptoms, policies, fleet_owners):
+  via httpx HTTP calls to mock CDF base URL — same auth, same
+  {"items": [...]} envelope, never direct JSON file reads
+- Context assembly: graph traversal only — no vector store, no embeddings
+- Agent: ReAct loop with function calling, streaming via SSE
+- CAG not RAG
+- All CDF routes POST, response envelope always { "items": [...] }
+
+## Fleet
+Four 1978 Cessna 172N aircraft, Desert Sky Aviation, KPHX
+- N4798E: AIRWORTHY
+- N2251K: FERRY ONLY (oil 1hr overdue)
+- N8834Q: CAUTION (in-flight symptom pattern)
+- N1156P: GROUNDED (catastrophic engine failure)
+One unified knowledge graph. No demo mode switching.
+
+## Relationship types
+- HAS_COMPONENT: Aircraft → Component
+- IS_TYPE: Engine component → ENGINE_MODEL node
+  (enables cross-aircraft pattern discovery via graph traversal)
+- PERFORMED_ON: MaintenanceEvent → Component
+- EXHIBITED: Flight → SymptomNode (observation tag only, no causal claim)
+- GOVERNED_BY: Aircraft → FleetOwner (bidirectional traversable)
+- HAS_POLICY: FleetOwner → OperationalPolicy
+- REFERENCES_AD: MaintenanceEvent → AD document
+- LINKED_TO: Document → Aircraft or Component
+No PRECEDED, FOUND_CONDITION, or CAUSED_BY edges — causal patterns discovered via
+chronological event traversal and IS_TYPE graph structure,
+not hardcoded cause-effect edges.
+
+## Cross-aircraft pattern discovery
+The agent finds connections between N8834Q symptoms and N1156P
+history by:
+1. get_engine_type_history(aircraft_id): traverse IS_TYPE →
+   ENGINE_MODEL → all engines of same type → time-ordered events
+2. search_fleet_for_similar_events(description): keyword match
+   across pilot_notes, squawk descriptions, symptom text
+Never via hardcoded causal edges.
+
+## N1156P causal story
+Told through chronological timestamped events only:
+- Flight events with deteriorating pilot_notes over 6 months
+- Escalating squawk events
+- EngineFailure event at failure date
+- Post-accident inspection event with findings in description
+No graph edges assert causation — timeline is the causal chain.
 
 ## Code standards
-- TypeScript strict mode always
-- Explicit error handling — no silent failures
-- No placeholder functions or TODO comments — implement fully
-- Every function must have a JSDoc comment explaining what CDF concept it mirrors
-- Log which graph nodes were traversed for every agent query
+- Python: PEP 8, type hints, explicit error handling
+- TypeScript: strict mode, explicit error handling
+- No placeholders or TODOs — implement fully
+- Log every traversed node: [CAG] Traversed: {node_type}:{external_id}
+- Python functions: docstring explaining CDF concept mirrored
 
-## Domain knowledge
-- Aircraft: 1978 Cessna 172N, N4798E, Lycoming O-320-H2AD engine
-- Engine TBO: 2000 hours, currently 1100 SMOH
-- Annual inspection required every 12 calendar months
-- Oil change interval: 50 hours or 4 months
-- Based at KPRC (Prescott, AZ)
+## Ports
+- Mock CDF: 4000
+- API: 3000
+- Vite: 5173
+
+## CogniteClient (Python)
+config = ClientConfig(
+    client_name="aircraft-health-cag-demo",
+    project="desert_sky",
+    base_url="http://localhost:4000",
+    credentials=Token("mock-token")
+)
+client = CogniteClient(config)
 
 ## File ownership
-- mock-cdf/: Express server implementing CDF API — do not modify architecture
-- src/agent/: CAG context assembly and agent loop — core of the project
-- src/ingest/: Data pipeline from CSVs to mock CDF
-- data/: Generated sample data — do not manually edit
+- backend/mock_cdf/: mock server — do not modify architecture
+- backend/src/agent/: CAG context assembly and agent — core
+- backend/src/ingest/: CSV → mock CDF pipeline
+- backend/scripts/: dataset.py + transform scripts only
+- client/: React frontend only
+- data/: generated files — do not manually edit

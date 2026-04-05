@@ -2,8 +2,8 @@
   {
     "id": 1,
     "externalId": "N4798E",
-    "name": "N4798E \u2014 1978 Cessna 172N Skyhawk",
-    "description": "1978 Cessna 172N, S/N 17270798, 28V electrical, based KPHX",
+    "name": "N4798E \u2014 1978 Cessna 172N",
+    "description": "1978 Cessna 172N, S/N 17270798. AIRWORTHY. 380 SMOH. Based KPHX.",
     "parentId": null,
     "parentExternalId": null,
     "metadata": {
@@ -12,369 +12,521 @@
       "serial_number": "17270798",
       "tail_number": "N4798E",
       "base_airport": "KPHX",
+      "engine_type": "Lycoming O-320-H2AD",
+      "engine_tbo_hours": "2000",
+      "engine_smoh": "380",
       "max_gross_weight_lbs": "2300",
-      "engine_smoh": "1450"
+      "airworthiness_status": "AIRWORTHY",
+      "operator": "Desert Sky Aviation"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 2,
-    "externalId": "ENGINE-1",
-    "name": "ENGINE-1 \u2014 Lycoming O-320-H2AD",
-    "description": "Lycoming O-320-H2AD, 160hp, 2000hr TBO, ~1450 SMOH",
-    "parentId": 1,
+    "externalId": "N4798E-ENGINE",
+    "name": "N4798E \u2014 Engine (Lycoming O-320-H2AD)",
+    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBO, 380 SMOH",
+    "parentId": null,
     "parentExternalId": "N4798E",
     "metadata": {
       "model": "O-320-H2AD",
       "hp": "160",
       "tbo_hours": "2000",
-      "smoh": "1450",
+      "smoh": "380",
       "fuel_type": "100LL"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 3,
-    "externalId": "ENGINE-1-CAM-LIFTERS",
-    "name": "ENGINE-1-CAM-LIFTERS \u2014 Camshaft & Barrel Lifters",
-    "description": "H2AD-specific barrel lifters \u2014 AD 80-04-03 R2 recurring inspection",
-    "parentId": 2,
-    "parentExternalId": "ENGINE-1",
+    "externalId": "N4798E-ENGINE-CYLINDERS",
+    "name": "N4798E \u2014 Cylinders (4)",
+    "description": "Four cylinders, Champion REM40E spark plugs, hydraulic barrel lifters (H2AD variant)",
+    "parentId": null,
+    "parentExternalId": "N4798E-ENGINE",
     "metadata": {
-      "ad_applicable": "80-04-03 R2"
+      "count": "4",
+      "plug_model": "Champion REM40E"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 4,
-    "externalId": "ENGINE-1-MAGS",
-    "name": "ENGINE-1-MAGS \u2014 Slick 4370 Magnetos",
-    "description": "Left and right magnetos, 500hr inspection interval",
-    "parentId": 2,
-    "parentExternalId": "ENGINE-1",
+    "externalId": "N4798E-ENGINE-OIL",
+    "name": "N4798E \u2014 Oil System",
+    "description": "Wet sump, 8 qt capacity, 50-hr change interval per Lycoming SB 388C",
+    "parentId": null,
+    "parentExternalId": "N4798E-ENGINE",
     "metadata": {
-      "model": "Slick 4370",
-      "inspection_interval_hrs": "500"
+      "capacity_qts": "8",
+      "change_interval_hrs": "50"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 5,
-    "externalId": "ENGINE-1-CARB",
-    "name": "ENGINE-1-CARB \u2014 Marvel-Schebler MA-4SPA Carburetor",
-    "description": "Marvel-Schebler MA-4SPA float carburetor",
-    "parentId": 2,
-    "parentExternalId": "ENGINE-1",
-    "metadata": {
-      "model": "Marvel-Schebler MA-4SPA"
-    },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
-  },
-  {
-    "id": 6,
-    "externalId": "ENGINE-1-STARTER",
-    "name": "ENGINE-1-STARTER \u2014 Starter Motor",
-    "description": "Gear-driven starter motor",
-    "parentId": 2,
-    "parentExternalId": "ENGINE-1",
-    "metadata": {},
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
-  },
-  {
-    "id": 7,
-    "externalId": "ENGINE-1-ALTERNATOR",
-    "name": "ENGINE-1-ALTERNATOR \u2014 28V Alternator",
-    "description": "Engine-driven 28V DC alternator",
-    "parentId": 2,
-    "parentExternalId": "ENGINE-1",
-    "metadata": {
-      "voltage": "28"
-    },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
-  },
-  {
-    "id": 8,
-    "externalId": "ENGINE-1-OIL-FILTER",
-    "name": "ENGINE-1-OIL-FILTER \u2014 Spin-on Oil Filter",
-    "description": "Champion spin-on oil filter, 50hr/4mo change interval per SB 480F",
-    "parentId": 2,
-    "parentExternalId": "ENGINE-1",
-    "metadata": {
-      "change_interval_hrs": "50",
-      "sb_reference": "480F"
-    },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
-  },
-  {
-    "id": 9,
-    "externalId": "ENGINE-1-SPARK-PLUGS",
-    "name": "ENGINE-1-SPARK-PLUGS \u2014 Champion REM40E (\u00d78)",
-    "description": "8 Champion REM40E spark plugs, rotation at each oil change",
-    "parentId": 2,
-    "parentExternalId": "ENGINE-1",
-    "metadata": {
-      "model": "Champion REM40E",
-      "count": "8"
-    },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
-  },
-  {
-    "id": 10,
-    "externalId": "ENGINE-1-EXHAUST",
-    "name": "ENGINE-1-EXHAUST \u2014 Exhaust System & Muffler/Heat Exchanger",
-    "description": "AD 90-06-03 R1 recurring inspection for cracks",
-    "parentId": 2,
-    "parentExternalId": "ENGINE-1",
-    "metadata": {
-      "ad_applicable": "90-06-03 R1"
-    },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
-  },
-  {
-    "id": 11,
-    "externalId": "PROP-1",
-    "name": "PROP-1 \u2014 McCauley 1C235/DTM7557 Fixed-Pitch Propeller",
-    "description": "McCauley 2-blade fixed-pitch, 2000hr/6yr TBO",
-    "parentId": 1,
+    "externalId": "N4798E-PROPELLER",
+    "name": "N4798E \u2014 Propeller (McCauley 1C235/DTM7557)",
+    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBO",
+    "parentId": null,
     "parentExternalId": "N4798E",
     "metadata": {
-      "model": "McCauley 1C235/DTM7557",
+      "model": "1C235/DTM7557",
       "tbo_hours": "2000",
       "tbo_years": "6"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 6,
+    "externalId": "N4798E-AIRFRAME",
+    "name": "N4798E \u2014 Airframe",
+    "description": "Fuselage, wings, empennage, flight controls, landing gear",
+    "parentId": null,
+    "parentExternalId": "N4798E",
+    "metadata": {
+      "max_gross_weight_lbs": "2300",
+      "vne_kias": "163"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 7,
+    "externalId": "N4798E-AVIONICS",
+    "name": "N4798E \u2014 Avionics",
+    "description": "Comm radio, nav/VOR, transponder (24-mo inspection), ELT (12-mo battery)",
+    "parentId": null,
+    "parentExternalId": "N4798E",
+    "metadata": {
+      "transponder_inspection_months": "24",
+      "elt_battery_months": "12"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 8,
+    "externalId": "N4798E-FUEL-SYSTEM",
+    "name": "N4798E \u2014 Fuel System",
+    "description": "Gravity-feed from two wing tanks, 43 gal usable, 100LL avgas",
+    "parentId": null,
+    "parentExternalId": "N4798E",
+    "metadata": {
+      "capacity_gal_usable": "43",
+      "fuel_type": "100LL"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 11,
+    "externalId": "N2251K",
+    "name": "N2251K \u2014 1978 Cessna 172N",
+    "description": "1978 Cessna 172N, S/N 17271243. FERRY ONLY \u2014 oil overdue 1.2 hrs. Based KPHX.",
+    "parentId": null,
+    "parentExternalId": null,
+    "metadata": {
+      "aircraft_type": "Cessna 172N",
+      "year": "1978",
+      "serial_number": "17271243",
+      "tail_number": "N2251K",
+      "base_airport": "KPHX",
+      "engine_type": "Lycoming O-320-H2AD",
+      "engine_tbo_hours": "2000",
+      "engine_smoh": "290",
+      "max_gross_weight_lbs": "2300",
+      "airworthiness_status": "FERRY_ONLY",
+      "operator": "Desert Sky Aviation"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 12,
-    "externalId": "AIRFRAME-1",
-    "name": "AIRFRAME-1 \u2014 Fuselage, Wings, Empennage",
-    "description": "1978 Cessna 172N airframe",
-    "parentId": 1,
-    "parentExternalId": "N4798E",
-    "metadata": {},
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "externalId": "N2251K-ENGINE",
+    "name": "N2251K \u2014 Engine (Lycoming O-320-H2AD)",
+    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBO, 290 SMOH",
+    "parentId": null,
+    "parentExternalId": "N2251K",
+    "metadata": {
+      "model": "O-320-H2AD",
+      "hp": "160",
+      "tbo_hours": "2000",
+      "smoh": "290",
+      "fuel_type": "100LL"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 13,
-    "externalId": "AIRFRAME-1-FUEL-SYSTEM",
-    "name": "AIRFRAME-1-FUEL-SYSTEM \u2014 Fuel System",
-    "description": "Gravity-feed, two wing tanks, 43 gal usable",
-    "parentId": 12,
-    "parentExternalId": "AIRFRAME-1",
+    "externalId": "N2251K-ENGINE-CYLINDERS",
+    "name": "N2251K \u2014 Cylinders (4)",
+    "description": "Four cylinders, Champion REM40E spark plugs, hydraulic barrel lifters (H2AD variant)",
+    "parentId": null,
+    "parentExternalId": "N2251K-ENGINE",
     "metadata": {
-      "capacity_gal": "43",
-      "feed": "gravity"
+      "count": "4",
+      "plug_model": "Champion REM40E"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 14,
-    "externalId": "AIRFRAME-1-FUEL-CAPS",
-    "name": "AIRFRAME-1-FUEL-CAPS \u2014 Fuel Caps (L+R)",
-    "description": "Left and right wing tank fuel caps with sealing gaskets",
-    "parentId": 13,
-    "parentExternalId": "AIRFRAME-1-FUEL-SYSTEM",
-    "metadata": {},
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "externalId": "N2251K-ENGINE-OIL",
+    "name": "N2251K \u2014 Oil System",
+    "description": "Wet sump, 8 qt capacity, 50-hr change interval per Lycoming SB 388C",
+    "parentId": null,
+    "parentExternalId": "N2251K-ENGINE",
+    "metadata": {
+      "capacity_qts": "8",
+      "change_interval_hrs": "50"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 15,
-    "externalId": "AIRFRAME-1-FUEL-SELECTOR",
-    "name": "AIRFRAME-1-FUEL-SELECTOR \u2014 Fuel Selector Valve",
-    "description": "Left/Right/Both/Off selector valve",
-    "parentId": 13,
-    "parentExternalId": "AIRFRAME-1-FUEL-SYSTEM",
-    "metadata": {},
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "externalId": "N2251K-PROPELLER",
+    "name": "N2251K \u2014 Propeller (McCauley 1C235/DTM7557)",
+    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBO",
+    "parentId": null,
+    "parentExternalId": "N2251K",
+    "metadata": {
+      "model": "1C235/DTM7557",
+      "tbo_hours": "2000",
+      "tbo_years": "6"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 16,
-    "externalId": "AIRFRAME-1-FUEL-STRAINER",
-    "name": "AIRFRAME-1-FUEL-STRAINER \u2014 Gascolator (Fuel Strainer)",
-    "description": "Main fuel strainer / gascolator, sumped at preflight",
-    "parentId": 13,
-    "parentExternalId": "AIRFRAME-1-FUEL-SYSTEM",
-    "metadata": {},
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "externalId": "N2251K-AIRFRAME",
+    "name": "N2251K \u2014 Airframe",
+    "description": "Fuselage, wings, empennage, flight controls, landing gear",
+    "parentId": null,
+    "parentExternalId": "N2251K",
+    "metadata": {
+      "max_gross_weight_lbs": "2300",
+      "vne_kias": "163"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 17,
-    "externalId": "AIRFRAME-1-LANDING-GEAR",
-    "name": "AIRFRAME-1-LANDING-GEAR \u2014 Tricycle Fixed Gear",
-    "description": "Fixed tricycle gear \u2014 nose, left main, right main",
-    "parentId": 12,
-    "parentExternalId": "AIRFRAME-1",
+    "externalId": "N2251K-AVIONICS",
+    "name": "N2251K \u2014 Avionics",
+    "description": "Comm radio, nav/VOR, transponder (24-mo inspection), ELT (12-mo battery)",
+    "parentId": null,
+    "parentExternalId": "N2251K",
     "metadata": {
-      "type": "fixed tricycle"
+      "transponder_inspection_months": "24",
+      "elt_battery_months": "12"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 18,
-    "externalId": "AIRFRAME-1-NOSE-STRUT",
-    "name": "AIRFRAME-1-NOSE-STRUT \u2014 Nose Gear Oleo Strut",
-    "description": "Nose gear oleo strut, serviced with MIL-H-5606",
-    "parentId": 17,
-    "parentExternalId": "AIRFRAME-1-LANDING-GEAR",
+    "externalId": "N2251K-FUEL-SYSTEM",
+    "name": "N2251K \u2014 Fuel System",
+    "description": "Gravity-feed from two wing tanks, 43 gal usable, 100LL avgas",
+    "parentId": null,
+    "parentExternalId": "N2251K",
     "metadata": {
-      "fluid": "MIL-H-5606"
+      "capacity_gal_usable": "43",
+      "fuel_type": "100LL"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
-  },
-  {
-    "id": 19,
-    "externalId": "AIRFRAME-1-BRAKE-SYSTEM",
-    "name": "AIRFRAME-1-BRAKE-SYSTEM \u2014 Hydraulic Disc Brakes",
-    "description": "Hydraulic toe brakes, left and right Cleveland assemblies",
-    "parentId": 17,
-    "parentExternalId": "AIRFRAME-1-LANDING-GEAR",
-    "metadata": {
-      "type": "hydraulic disc"
-    },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
-  },
-  {
-    "id": 20,
-    "externalId": "AIRFRAME-1-FLIGHT-CONTROLS",
-    "name": "AIRFRAME-1-FLIGHT-CONTROLS \u2014 Flight Controls",
-    "description": "Cable-actuated ailerons, elevator, rudder, manual flaps (Johnson bar), trim",
-    "parentId": 12,
-    "parentExternalId": "AIRFRAME-1",
-    "metadata": {
-      "actuation": "cable"
-    },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 21,
-    "externalId": "AIRFRAME-1-SEATS-BELTS",
-    "name": "AIRFRAME-1-SEATS-BELTS \u2014 Seats & Harnesses",
-    "description": "Front and rear seat belts/harnesses; seat rails per AD 2011-10-09",
-    "parentId": 12,
-    "parentExternalId": "AIRFRAME-1",
+    "externalId": "N8834Q",
+    "name": "N8834Q \u2014 1978 Cessna 172N",
+    "description": "1978 Cessna 172N, S/N 17273047. CAUTION \u2014 elevated CHT #3, rough mag. Based KPHX.",
+    "parentId": null,
+    "parentExternalId": null,
     "metadata": {
-      "ad_applicable": "2011-10-09"
+      "aircraft_type": "Cessna 172N",
+      "year": "1978",
+      "serial_number": "17273047",
+      "tail_number": "N8834Q",
+      "base_airport": "KPHX",
+      "engine_type": "Lycoming O-320-H2AD",
+      "engine_tbo_hours": "2000",
+      "engine_smoh": "198",
+      "max_gross_weight_lbs": "2300",
+      "airworthiness_status": "CAUTION",
+      "operator": "Desert Sky Aviation"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 22,
-    "externalId": "AVIONICS-1",
-    "name": "AVIONICS-1 \u2014 Avionics Stack",
-    "description": "Comm, Nav, transponder, ELT, encoder",
-    "parentId": 1,
-    "parentExternalId": "N4798E",
-    "metadata": {},
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "externalId": "N8834Q-ENGINE",
+    "name": "N8834Q \u2014 Engine (Lycoming O-320-H2AD)",
+    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBO, 198 SMOH",
+    "parentId": null,
+    "parentExternalId": "N8834Q",
+    "metadata": {
+      "model": "O-320-H2AD",
+      "hp": "160",
+      "tbo_hours": "2000",
+      "smoh": "198",
+      "fuel_type": "100LL"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 23,
-    "externalId": "AVIONICS-1-COMM",
-    "name": "AVIONICS-1-COMM \u2014 Comm Radio",
-    "description": "VHF comm radio",
-    "parentId": 22,
-    "parentExternalId": "AVIONICS-1",
-    "metadata": {},
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "externalId": "N8834Q-ENGINE-CYLINDERS",
+    "name": "N8834Q \u2014 Cylinders (4)",
+    "description": "Four cylinders, Champion REM40E spark plugs, hydraulic barrel lifters (H2AD variant)",
+    "parentId": null,
+    "parentExternalId": "N8834Q-ENGINE",
+    "metadata": {
+      "count": "4",
+      "plug_model": "Champion REM40E"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 24,
-    "externalId": "AVIONICS-1-NAV",
-    "name": "AVIONICS-1-NAV \u2014 NAV/VOR Radio",
-    "description": "VHF navigation radio / VOR receiver",
-    "parentId": 22,
-    "parentExternalId": "AVIONICS-1",
-    "metadata": {},
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "externalId": "N8834Q-ENGINE-OIL",
+    "name": "N8834Q \u2014 Oil System",
+    "description": "Wet sump, 8 qt capacity, 50-hr change interval per Lycoming SB 388C",
+    "parentId": null,
+    "parentExternalId": "N8834Q-ENGINE",
+    "metadata": {
+      "capacity_qts": "8",
+      "change_interval_hrs": "50"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 25,
-    "externalId": "AVIONICS-1-XPDR",
-    "name": "AVIONICS-1-XPDR \u2014 Transponder",
-    "description": "Mode C transponder \u2014 24-month inspection per 14 CFR 91.413",
-    "parentId": 22,
-    "parentExternalId": "AVIONICS-1",
+    "externalId": "N8834Q-PROPELLER",
+    "name": "N8834Q \u2014 Propeller (McCauley 1C235/DTM7557)",
+    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBO",
+    "parentId": null,
+    "parentExternalId": "N8834Q",
     "metadata": {
-      "inspection_interval_months": "24",
-      "regulation": "14 CFR 91.413"
+      "model": "1C235/DTM7557",
+      "tbo_hours": "2000",
+      "tbo_years": "6"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 26,
-    "externalId": "AVIONICS-1-ELT",
-    "name": "AVIONICS-1-ELT \u2014 Emergency Locator Transmitter",
-    "description": "ELT \u2014 12-month battery/inspection per 14 CFR 91.207",
-    "parentId": 22,
-    "parentExternalId": "AVIONICS-1",
+    "externalId": "N8834Q-AIRFRAME",
+    "name": "N8834Q \u2014 Airframe",
+    "description": "Fuselage, wings, empennage, flight controls, landing gear",
+    "parentId": null,
+    "parentExternalId": "N8834Q",
     "metadata": {
-      "inspection_interval_months": "12",
-      "regulation": "14 CFR 91.207"
+      "max_gross_weight_lbs": "2300",
+      "vne_kias": "163"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 27,
-    "externalId": "AVIONICS-1-ENCODER",
-    "name": "AVIONICS-1-ENCODER \u2014 Altitude Encoder",
-    "description": "Gray code altitude encoder for Mode C transponder",
-    "parentId": 22,
-    "parentExternalId": "AVIONICS-1",
-    "metadata": {},
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "externalId": "N8834Q-AVIONICS",
+    "name": "N8834Q \u2014 Avionics",
+    "description": "Comm radio, nav/VOR, transponder (24-mo inspection), ELT (12-mo battery)",
+    "parentId": null,
+    "parentExternalId": "N8834Q",
+    "metadata": {
+      "transponder_inspection_months": "24",
+      "elt_battery_months": "12"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
     "id": 28,
-    "externalId": "PITOT-STATIC-1",
-    "name": "PITOT-STATIC-1 \u2014 Pitot-Static System",
-    "description": "24-month IFR certification per 14 CFR 91.411",
-    "parentId": 1,
-    "parentExternalId": "N4798E",
+    "externalId": "N8834Q-FUEL-SYSTEM",
+    "name": "N8834Q \u2014 Fuel System",
+    "description": "Gravity-feed from two wing tanks, 43 gal usable, 100LL avgas",
+    "parentId": null,
+    "parentExternalId": "N8834Q",
     "metadata": {
-      "inspection_interval_months": "24",
-      "regulation": "14 CFR 91.411"
+      "capacity_gal_usable": "43",
+      "fuel_type": "100LL"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   },
   {
-    "id": 29,
-    "externalId": "VACUUM-1",
-    "name": "VACUUM-1 \u2014 Vacuum Pump & Gyro Instruments",
-    "description": "Engine-driven vacuum pump, AI and HI. ~500-1000hr pump life.",
-    "parentId": 1,
-    "parentExternalId": "N4798E",
+    "id": 31,
+    "externalId": "N1156P",
+    "name": "N1156P \u2014 1978 Cessna 172N",
+    "description": "1978 Cessna 172N, S/N 17271891. NOT AIRWORTHY \u2014 catastrophic engine failure Oct 2025. Grounded.",
+    "parentId": null,
+    "parentExternalId": null,
     "metadata": {
-      "typical_life_hrs": "500-1000"
+      "aircraft_type": "Cessna 172N",
+      "year": "1978",
+      "serial_number": "17271891",
+      "tail_number": "N1156P",
+      "base_airport": "KPHX",
+      "engine_type": "Lycoming O-320-H2AD",
+      "engine_tbo_hours": "2000",
+      "engine_smoh": "520",
+      "max_gross_weight_lbs": "2300",
+      "airworthiness_status": "NOT_AIRWORTHY",
+      "operator": "Desert Sky Aviation"
     },
-    "createdTime": 1775286521099,
-    "lastUpdatedTime": 1775286521099
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 32,
+    "externalId": "N1156P-ENGINE",
+    "name": "N1156P \u2014 Engine (Lycoming O-320-H2AD)",
+    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBO, 520 SMOH",
+    "parentId": null,
+    "parentExternalId": "N1156P",
+    "metadata": {
+      "model": "O-320-H2AD",
+      "hp": "160",
+      "tbo_hours": "2000",
+      "smoh": "520",
+      "fuel_type": "100LL"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 33,
+    "externalId": "N1156P-ENGINE-CYLINDERS",
+    "name": "N1156P \u2014 Cylinders (4)",
+    "description": "Four cylinders, Champion REM40E spark plugs, hydraulic barrel lifters (H2AD variant)",
+    "parentId": null,
+    "parentExternalId": "N1156P-ENGINE",
+    "metadata": {
+      "count": "4",
+      "plug_model": "Champion REM40E"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 34,
+    "externalId": "N1156P-ENGINE-OIL",
+    "name": "N1156P \u2014 Oil System",
+    "description": "Wet sump, 8 qt capacity, 50-hr change interval per Lycoming SB 388C",
+    "parentId": null,
+    "parentExternalId": "N1156P-ENGINE",
+    "metadata": {
+      "capacity_qts": "8",
+      "change_interval_hrs": "50"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 35,
+    "externalId": "N1156P-PROPELLER",
+    "name": "N1156P \u2014 Propeller (McCauley 1C235/DTM7557)",
+    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBO",
+    "parentId": null,
+    "parentExternalId": "N1156P",
+    "metadata": {
+      "model": "1C235/DTM7557",
+      "tbo_hours": "2000",
+      "tbo_years": "6"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 36,
+    "externalId": "N1156P-AIRFRAME",
+    "name": "N1156P \u2014 Airframe",
+    "description": "Fuselage, wings, empennage, flight controls, landing gear",
+    "parentId": null,
+    "parentExternalId": "N1156P",
+    "metadata": {
+      "max_gross_weight_lbs": "2300",
+      "vne_kias": "163"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 37,
+    "externalId": "N1156P-AVIONICS",
+    "name": "N1156P \u2014 Avionics",
+    "description": "Comm radio, nav/VOR, transponder (24-mo inspection), ELT (12-mo battery)",
+    "parentId": null,
+    "parentExternalId": "N1156P",
+    "metadata": {
+      "transponder_inspection_months": "24",
+      "elt_battery_months": "12"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 38,
+    "externalId": "N1156P-FUEL-SYSTEM",
+    "name": "N1156P \u2014 Fuel System",
+    "description": "Gravity-feed from two wing tanks, 43 gal usable, 100LL avgas",
+    "parentId": null,
+    "parentExternalId": "N1156P",
+    "metadata": {
+      "capacity_gal_usable": "43",
+      "fuel_type": "100LL"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 101,
+    "externalId": "ENGINE_MODEL_LYC_O320_H2AD",
+    "name": "Lycoming O-320-H2AD",
+    "description": "4-cylinder horizontally opposed aircraft engine, 160hp, 2000hr TBO",
+    "parentId": null,
+    "parentExternalId": null,
+    "metadata": {
+      "type": "EngineModel",
+      "horsepower": "160",
+      "tbo_hours": "2000"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
+  },
+  {
+    "id": 100,
+    "externalId": "Desert_Sky_Aviation",
+    "name": "Desert Sky Aviation",
+    "description": "Flight school and aircraft rental operation at KPHX. Operates four 1978 Cessna 172N aircraft.",
+    "parentId": null,
+    "parentExternalId": null,
+    "metadata": {
+      "location": "KPHX \u2014 Phoenix Sky Harbor International Airport",
+      "contact": "ops@desertsky.aero",
+      "type": "FleetOperator"
+    },
+    "createdTime": 1775352702042,
+    "lastUpdatedTime": 1775352702042
   }
 ]

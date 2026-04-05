@@ -1,37 +1,41 @@
 /**
  * TraversalGraph — shared force-directed knowledge graph visualization.
  *
- * Used by:
- *   - KnowledgeGraph tab (full-width, static graph of all CDF nodes)
- *   - QueryInterface inline expanded view (same graph, traversed nodes highlighted live)
+ * Node types map to CDF resource types (aligned with GraphTraversalPanel):
+ *   asset       → #38bdf8
+ *   EngineModel → #f1f5f9 (larger radius — hub for IS_TYPE)
+ *   timeseries  → #4ade80
+ *   event       → #fb923c
+ *   file        → #c084fc
  *
- * Node types map to CDF resource types (same color scheme as GraphTraversalPanel):
- *   asset      → #38bdf8  (sky-400)
- *   timeseries → #4ade80  (green-400)
- *   event      → #fb923c  (orange-400)
- *   file       → #c084fc  (purple-400)
- *
- * Node radius proportional to linkCount (min 4, max 14).
- * Highlighted nodes get a glowing ring when their id appears in traversedIds.
+ * IS_TYPE edges use color from API (#e0f2fe) and a dashed stroke.
  */
 
 import { useRef, useEffect, useCallback, useState } from "react";
 import ForceGraph2D from "react-force-graph-2d";
-import type { GraphData, GraphNode } from "../lib/types";
+import type { GraphData, GraphLink, GraphNode } from "../lib/types";
 
 const NODE_COLOR: Record<string, string> = {
   asset: "#38bdf8",
+  EngineModel: "#f1f5f9",
+  SymptomNode: "#f97316",
+  OperationalPolicy: "#a855f7",
+  FleetOwner: "#c084fc",
   timeseries: "#4ade80",
   event: "#fb923c",
   file: "#c084fc",
 };
 
-const LINK_COLOR = "rgba(113,113,122,0.3)"; // zinc-500/30
-const HIGHLIGHT_COLOR = "#facc15"; // yellow-400 glow for traversed nodes
+const DEFAULT_LINK = "rgba(113,113,122,0.3)";
+const HIGHLIGHT_COLOR = "#facc15";
 
 function nodeRadius(node: GraphNode): number {
   const base = 3 + Math.min(10, node.linkCount ?? 0) * 0.8;
-  return Math.max(4, Math.min(14, base));
+  let r = Math.max(4, Math.min(14, base));
+  if (node.type === "EngineModel") {
+    r = Math.min(22, Math.max(12, r + 6));
+  }
+  return r;
 }
 
 interface SelectedNode extends GraphNode {
@@ -55,7 +59,6 @@ export default function TraversalGraph({
   const fgRef = useRef<any>(null);
   const [selectedNode, setSelectedNode] = useState<SelectedNode | null>(null);
 
-  // Auto-fit after data loads
   useEffect(() => {
     if (fgRef.current && data.nodes.length > 0) {
       setTimeout(() => {
@@ -71,7 +74,6 @@ export default function TraversalGraph({
       const isHighlighted = traversedIds.has(gNode.id);
       const isSelected = selectedNode?.id === gNode.id;
 
-      // Glow ring for traversed / selected nodes
       if (isHighlighted || isSelected) {
         ctx.beginPath();
         ctx.arc(gNode.x, gNode.y, r + 3, 0, 2 * Math.PI);
@@ -82,20 +84,23 @@ export default function TraversalGraph({
         ctx.stroke();
       }
 
-      // Node circle
       ctx.beginPath();
       ctx.arc(gNode.x, gNode.y, r, 0, 2 * Math.PI);
       ctx.fillStyle = NODE_COLOR[gNode.type] || "#71717a";
-      ctx.globalAlpha = isHighlighted ? 1 : 0.75;
+      ctx.globalAlpha = isHighlighted ? 1 : 0.85;
       ctx.fill();
       ctx.globalAlpha = 1;
+      if (gNode.type === "EngineModel") {
+        ctx.strokeStyle = "rgba(148,163,184,0.5)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
 
-      // Label — only at sufficient zoom or for large nodes
       const fontSize = 10 / globalScale;
       if (globalScale > 1.5 || r >= 10) {
         const label = gNode.label.length > 16 ? gNode.label.slice(0, 14) + "…" : gNode.label;
         ctx.font = `${fontSize}px monospace`;
-        ctx.fillStyle = "rgba(255,255,255,0.8)";
+        ctx.fillStyle = gNode.type === "EngineModel" ? "rgba(15,23,42,0.9)" : "rgba(255,255,255,0.8)";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(label, gNode.x, gNode.y + r + fontSize * 0.8);
@@ -112,6 +117,14 @@ export default function TraversalGraph({
     [onNodeClick]
   );
 
+  const linkColor = useCallback((link: GraphLink) => (link as GraphLink).color || DEFAULT_LINK, []);
+
+  const linkLineDash = useCallback((link: GraphLink) => {
+    return link.type === "IS_TYPE" ? [4, 4] : undefined;
+  }, []);
+
+  const linkWidth = useCallback((link: GraphLink) => (link.type === "IS_TYPE" ? 1 : 0.5), []);
+
   return (
     <div className="relative w-full" style={{ height }}>
       <ForceGraph2D
@@ -119,21 +132,21 @@ export default function TraversalGraph({
         graphData={data as any}
         width={undefined}
         height={height}
-        backgroundColor="#09090b" // zinc-950
+        backgroundColor="#09090b"
         nodeCanvasObject={drawNode}
         nodeCanvasObjectMode={() => "replace"}
-        linkColor={() => LINK_COLOR}
-        linkWidth={0.5}
+        linkColor={linkColor as any}
+        linkWidth={linkWidth as any}
+        linkLineDash={linkLineDash as any}
         linkDirectionalParticles={2}
         linkDirectionalParticleWidth={1}
-        linkDirectionalParticleColor={() => "rgba(113,113,122,0.5)"}
+        linkDirectionalParticleColor={linkColor as any}
         onNodeClick={handleNodeClick}
         cooldownTicks={100}
         d3AlphaDecay={0.03}
         d3VelocityDecay={0.3}
       />
 
-      {/* Selected node info panel */}
       {selectedNode && (
         <div className="absolute top-3 right-3 bg-zinc-900/95 border border-zinc-700 rounded-xl p-4 max-w-xs text-xs shadow-xl backdrop-blur-sm">
           <div className="flex items-center gap-2 mb-2">

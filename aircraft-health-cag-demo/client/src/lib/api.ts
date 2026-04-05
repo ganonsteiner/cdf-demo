@@ -1,13 +1,14 @@
 import type {
   HealthStatus,
   AircraftStatus,
+  FleetAircraft,
   Squawk,
   MaintenanceItem,
   MaintenanceHistoryPage,
   FlightHistoryPage,
   ComponentNode,
   GraphData,
-  DemoMode,
+  OperationalPolicy,
 } from "./types";
 
 const BASE = "/api";
@@ -21,47 +22,63 @@ async function get<T>(path: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-async function post<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`${res.status} ${res.statusText}: ${text}`);
+function withTail(path: string, tail: string | null, extra?: Record<string, string | number | undefined>): string {
+  const params = new URLSearchParams();
+  if (tail) params.set("aircraft", tail);
+  if (extra) {
+    for (const [k, v] of Object.entries(extra)) {
+      if (v !== undefined) params.set(k, String(v));
+    }
   }
-  return res.json() as Promise<T>;
+  const qs = params.toString();
+  return `${path}${qs ? "?" + qs : ""}`;
 }
 
 export const api = {
   health: () => get<HealthStatus>("/health"),
-  status: () => get<AircraftStatus>("/status"),
-  squawks: () => get<Squawk[]>("/squawks"),
-  upcomingMaintenance: () => get<MaintenanceItem[]>("/maintenance/upcoming"),
 
-  maintenanceHistory: (opts: { page?: number; per_page?: number; component?: string; year?: number } = {}) => {
-    const params = new URLSearchParams();
-    if (opts.page) params.set("page", String(opts.page));
-    if (opts.per_page) params.set("per_page", String(opts.per_page));
-    if (opts.component) params.set("component", opts.component);
-    if (opts.year) params.set("year", String(opts.year));
-    return get<MaintenanceHistoryPage>(`/maintenance/history?${params}`);
-  },
+  fleet: () => get<FleetAircraft[]>("/fleet"),
 
-  flights: (opts: { page?: number; per_page?: number; route?: string; year?: number } = {}) => {
-    const params = new URLSearchParams();
-    if (opts.page) params.set("page", String(opts.page));
-    if (opts.per_page) params.set("per_page", String(opts.per_page));
-    if (opts.route) params.set("route", opts.route);
-    if (opts.year) params.set("year", String(opts.year));
-    return get<FlightHistoryPage>(`/flights?${params}`);
-  },
+  policies: () => get<OperationalPolicy[]>("/policies"),
 
-  components: () => get<ComponentNode[]>("/components"),
+  status: (tail: string) =>
+    get<AircraftStatus>(withTail("/status", tail)),
+
+  squawks: (tail: string) =>
+    get<Squawk[]>(withTail("/squawks", tail)),
+
+  upcomingMaintenance: (tail: string) =>
+    get<MaintenanceItem[]>(withTail("/maintenance/upcoming", tail)),
+
+  maintenanceHistory: (
+    tail: string,
+    opts: { page?: number; per_page?: number; component?: string; year?: number; maint_type?: string } = {}
+  ) =>
+    get<MaintenanceHistoryPage>(
+      withTail("/maintenance/history", tail, {
+        page: opts.page,
+        per_page: opts.per_page,
+        component: opts.component,
+        year: opts.year,
+        maint_type: opts.maint_type,
+      })
+    ),
+
+  flights: (
+    tail: string,
+    opts: { page?: number; per_page?: number; route?: string; year?: number } = {}
+  ) =>
+    get<FlightHistoryPage>(
+      withTail("/flights", tail, {
+        page: opts.page,
+        per_page: opts.per_page,
+        route: opts.route,
+        year: opts.year,
+      })
+    ),
+
+  components: (tail: string) =>
+    get<ComponentNode[]>(withTail("/components", tail)),
 
   graph: () => get<GraphData>("/graph"),
-
-  setDemoState: (state: DemoMode) =>
-    post<{ status: string; active_state: string }>("/demo-state", { state }),
 };

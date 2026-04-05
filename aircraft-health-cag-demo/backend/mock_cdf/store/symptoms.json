@@ -1,0 +1,62 @@
+[
+  {
+    "externalId": "Symptom_N8834Q_ElevatedCHT",
+    "aircraft_id": "N8834Q",
+    "title": "Elevated CHT #3",
+    "description": "Cylinder head temperature on #3 cylinder running 40-60\u00b0F above the other cylinders during cruise. First observed three flights ago and trending upward.",
+    "observation": "CHT #3 consistently reaching 430-450\u00b0F while CHT #1, #2, #4 remain 360-380\u00b0F at same power setting.",
+    "severity": "caution",
+    "first_observed": "2026-02-15",
+    "type": "SymptomNode"
+  },
+  {
+    "externalId": "Symptom_N8834Q_RoughMag",
+    "aircraft_id": "N8834Q",
+    "title": "Rough Running on Left Mag",
+    "description": "Engine runs noticeably rough during mag check on left magneto. Right mag check is smooth. RPM drop on left mag is 150 RPM versus 50 RPM on right.",
+    "observation": "Mag check at runup: right mag 50 RPM drop (normal), left mag 150 RPM drop with roughness. Cleared after extended runup.",
+    "severity": "caution",
+    "first_observed": "2026-02-20",
+    "type": "SymptomNode"
+  },
+  {
+    "externalId": "Symptom_N1156P_ElevatedCHT",
+    "aircraft_id": "N1156P",
+    "title": "Persistently Elevated CHT",
+    "description": "CHT readings trending upward over the previous 10 flights before failure. Reached 460-480\u00b0F on final flights.",
+    "observation": "Pilot notes documented persistent high CHT during cruise, particularly on longer flights. Engine leaned aggressively to manage temperatures.",
+    "severity": "warning",
+    "first_observed": "2025-08-01",
+    "type": "SymptomNode"
+  },
+  {
+    "externalId": "Symptom_N1156P_OilConsumption",
+    "aircraft_id": "N1156P",
+    "title": "Increased Oil Consumption",
+    "description": "Oil consumption increasing over the 3 months preceding failure. Required adding 1 qt oil every 8-10 flight hours versus normal 15-20 hours.",
+    "observation": "Pre-flight checks documented oil level dropping faster than historical baseline. No visible external leaks found.",
+    "severity": "warning",
+    "first_observed": "2025-07-15",
+    "type": "SymptomNode"
+  },
+  {
+    "externalId": "Symptom_N1156P_RoughRunning",
+    "aircraft_id": "N1156P",
+    "title": "Intermittent Rough Running",
+    "description": "Rough engine operation noted intermittently during cruise flight, particularly at lean mixture settings. Cleared when mixture enriched.",
+    "observation": "Pilot notes on multiple flights mention roughness that cleared with mixture enrichment. Attributed to improper leaning technique at the time.",
+    "severity": "warning",
+    "first_observed": "2025-09-01",
+    "type": "SymptomNode"
+  },
+  {
+    "externalId": "Symptom_N1156P_PowerLoss",
+    "aircraft_id": "N1156P",
+    "title": "Reduced Power Output",
+    "description": "Climb performance noticeably reduced on final flights before failure. Unable to maintain normal cruise RPM at full throttle.",
+    "observation": "Pilot reported inability to reach normal cruise RPM. Takeoff roll longer than normal. Climb rate approximately 400 FPM versus normal 770 FPM.",
+    "severity": "critical",
+    "first_observed": "2025-09-20",
+    "type": "SymptomNode"
+  }
+]

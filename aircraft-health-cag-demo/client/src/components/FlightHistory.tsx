@@ -10,19 +10,12 @@ import {
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { api } from "../lib/api";
-import { useStore } from "../lib/store";
+import { useStore, TAILS } from "../lib/store";
 import type { FlightRecord } from "../lib/types";
 
-const YEARS = Array.from({ length: 3 }, (_, i) => 2026 - i); // 2026 → 2024
+const YEARS = Array.from({ length: 3 }, (_, i) => 2026 - i);
 
-type SortField =
-  | "timestamp"
-  | "duration"
-  | "cht_max"
-  | "oil_temp_max"
-  | "egt_max"
-  | "oil_pressure_min"
-  | "fuel_used_gal";
+type SortField = "timestamp" | "duration" | "cht_max" | "oil_temp_max" | "egt_max" | "fuel_used_gal";
 type SortDir = "asc" | "desc";
 
 interface Props {
@@ -30,14 +23,15 @@ interface Props {
 }
 
 function getValue(rec: FlightRecord, field: SortField): number {
-  const v = rec[field];
-  if (v === null || v === undefined) return -Infinity;
-  if (field === "timestamp") return new Date(v as string).getTime();
+  if (field === "timestamp") return new Date(rec.timestamp).getTime();
+  const v = rec[field as keyof FlightRecord];
+  if (v === null || v === undefined || typeof v === "string" || typeof v === "boolean") return -Infinity;
   return v as number;
 }
 
 export default function FlightHistory({ active }: Props) {
-  const { demoMode } = useStore();
+  const { selectedAircraft, setSelectedAircraft } = useStore();
+  const tail = selectedAircraft ?? "N4798E";
   const [records, setRecords] = useState<FlightRecord[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -54,7 +48,7 @@ export default function FlightHistory({ active }: Props) {
     setLoading(true);
     setError(null);
     api
-      .flights({ page, per_page: 25, year: yearFilter })
+      .flights(tail, { page, per_page: 25, year: yearFilter })
       .then((res) => {
         setRecords(res.records);
         setTotal(res.total);
@@ -63,7 +57,7 @@ export default function FlightHistory({ active }: Props) {
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [active, demoMode, page, yearFilter]);
+  }, [active, tail, page, yearFilter]);
 
   const sortedRecords = useMemo(() => {
     return [...records].sort((a, b) => {
@@ -89,11 +83,25 @@ export default function FlightHistory({ active }: Props) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="h-full overflow-y-auto">
+    <div className="max-w-5xl mx-auto py-6 px-2 space-y-4">
+      {/* Aircraft selector */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-zinc-500">Aircraft:</span>
+        <div className="flex gap-1">
+          {TAILS.map((t) => (
+            <button key={t} onClick={() => setSelectedAircraft(t)}
+              className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors ${
+                t === tail ? "bg-sky-600 text-white border-sky-500" : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500"
+              }`}>{t}</button>
+          ))}
+        </div>
+      </div>
+
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide flex items-center gap-2">
           <History className="w-4 h-4" />
-          Flight History
+          Flight History — {tail}
           {total > 0 && (
             <span className="text-zinc-600 normal-case font-normal">
               — {total} flights
@@ -247,6 +255,7 @@ export default function FlightHistory({ active }: Props) {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

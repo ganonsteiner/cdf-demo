@@ -1,243 +1,180 @@
 """
-Maintenance Log Ingestion — mirrors src/ingest/ingestMaintenance.ts.
+Maintenance Log Ingestion — Desert Sky Aviation Fleet.
 
-Parses data/maintenance_log_{state}.csv (IT source) and creates:
-  - CdfEvent records for each maintenance entry (MaintenanceRecord, Squawk, Inspection)
-  - Relationships: PERFORMED_ON, REFERENCES_AD, RESOLVED_BY, IDENTIFIED_ON
+Parses data/maintenance_{TAIL}.csv (IT source) for each of the four
+aircraft and creates:
+  - CDF Events (type=MaintenanceRecord, Squawk, or Inspection)
+  - CDF Relationships: PERFORMED_ON, REFERENCES_AD, IDENTIFIED_ON
 
-These are state-specific: each demo state has different post-divergence records.
-Relationships are derived from events and re-ingested per state (they share the
-same relationship store since they reference the same asset externalIds).
-
-This is the IT (Information Technology) layer: structured records from the
-aircraft logbook — equivalent to work orders in an SAP/ERP system.
+Squawk events store description + severity + status in metadata, enabling
+full-text search by the agent's searchFleetForSimilarEvents tool.
 """
 
 from __future__ import annotations
 
-import os
 import time
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional
 
 import pandas as pd
-from dotenv import load_dotenv
-
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
 
 DATA_DIR = Path(__file__).parent.parent.parent.parent / "data"
 NOW_MS = int(time.time() * 1000)
 
 
-# Mapping from component_id in CSV to CDF asset externalId
-COMPONENT_TO_ASSET: dict[str, str] = {
-    "AIRCRAFT": "N4798E",
-    "ENGINE-1": "ENGINE-1",
-    "ENGINE-1-CAM-LIFTERS": "ENGINE-1-CAM-LIFTERS",
-    "ENGINE-1-MAGS": "ENGINE-1-MAGS",
-    "ENGINE-1-CARB": "ENGINE-1-CARB",
-    "ENGINE-1-STARTER": "ENGINE-1-STARTER",
-    "ENGINE-1-ALTERNATOR": "ENGINE-1-ALTERNATOR",
-    "ENGINE-1-OIL-FILTER": "ENGINE-1-OIL-FILTER",
-    "ENGINE-1-SPARK-PLUGS": "ENGINE-1-SPARK-PLUGS",
-    "ENGINE-1-EXHAUST": "ENGINE-1-EXHAUST",
-    "PROP-1": "PROP-1",
-    "AIRFRAME-1": "AIRFRAME-1",
-    "AIRFRAME-1-FUEL-SYSTEM": "AIRFRAME-1-FUEL-SYSTEM",
-    "AIRFRAME-1-FUEL-CAPS": "AIRFRAME-1-FUEL-CAPS",
-    "AIRFRAME-1-LANDING-GEAR": "AIRFRAME-1-LANDING-GEAR",
-    "AIRFRAME-1-NOSE-STRUT": "AIRFRAME-1-NOSE-STRUT",
-    "AIRFRAME-1-BRAKE-SYSTEM": "AIRFRAME-1-BRAKE-SYSTEM",
-    "AIRFRAME-1-FLIGHT-CONTROLS": "AIRFRAME-1-FLIGHT-CONTROLS",
-    "AIRFRAME-1-SEATS-BELTS": "AIRFRAME-1-SEATS-BELTS",
-    "AVIONICS-1": "AVIONICS-1",
-    "AVIONICS-1-COMM": "AVIONICS-1-COMM",
-    "AVIONICS-1-NAV": "AVIONICS-1-NAV",
-    "AVIONICS-1-XPDR": "AVIONICS-1-XPDR",
-    "AVIONICS-1-ELT": "AVIONICS-1-ELT",
-    "PITOT-STATIC-1": "PITOT-STATIC-1",
-    "VACUUM-1": "VACUUM-1",
-}
-
-# Component externalId → CDF asset numeric ID
-ASSET_IDS: dict[str, int] = {
-    "N4798E": 1, "ENGINE-1": 2, "ENGINE-1-CAM-LIFTERS": 3, "ENGINE-1-MAGS": 4,
-    "ENGINE-1-CARB": 5, "ENGINE-1-STARTER": 6, "ENGINE-1-ALTERNATOR": 7,
-    "ENGINE-1-OIL-FILTER": 8, "ENGINE-1-SPARK-PLUGS": 9, "ENGINE-1-EXHAUST": 10,
-    "PROP-1": 11, "AIRFRAME-1": 12, "AIRFRAME-1-FUEL-SYSTEM": 13,
-    "AIRFRAME-1-FUEL-CAPS": 14, "AIRFRAME-1-FUEL-SELECTOR": 15,
-    "AIRFRAME-1-FUEL-STRAINER": 16, "AIRFRAME-1-LANDING-GEAR": 17,
-    "AIRFRAME-1-NOSE-STRUT": 18, "AIRFRAME-1-BRAKE-SYSTEM": 19,
-    "AIRFRAME-1-FLIGHT-CONTROLS": 20, "AIRFRAME-1-SEATS-BELTS": 21,
-    "AVIONICS-1": 22, "AVIONICS-1-COMM": 23, "AVIONICS-1-NAV": 24,
-    "AVIONICS-1-XPDR": 25, "AVIONICS-1-ELT": 26, "AVIONICS-1-ENCODER": 27,
-    "PITOT-STATIC-1": 28, "VACUUM-1": 29,
-}
-
-
-def _safe_str(val: Any) -> str:
-    if pd.isna(val):
-        return ""
-    return str(val).strip()
-
-
 def _date_to_ms(date_str: str) -> int:
-    if not date_str:
-        return NOW_MS
+    """Parse YYYY-MM-DD date string to milliseconds."""
     try:
-        return int(pd.Timestamp(date_str).timestamp() * 1000)
-    except Exception:
+        dt = datetime.strptime(str(date_str), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        return int(dt.timestamp() * 1000)
+    except (ValueError, TypeError):
         return NOW_MS
 
 
-def ingest_maintenance(state: str = "clean", ingest_relationships: bool = True) -> None:
-    """
-    Parse maintenance_log_{state}.csv and upsert Events + Relationships.
-
-    Events are state-specific (each state has different post-divergence records).
-    Relationships are re-ingested with each state since they reference the same
-    asset externalIds. Set ingest_relationships=False to skip relationship re-ingestion.
-    """
+def ingest_maintenance_for_tail(tail: str, event_id_offset: int) -> int:
+    """Ingest maintenance records for one aircraft. Returns next available event ID."""
     from mock_cdf.store.store import store, CdfEvent, Relationship  # type: ignore[import]
 
-    csv_path = DATA_DIR / f"maintenance_log_{state}.csv"
+    csv_path = DATA_DIR / f"maintenance_{tail}.csv"
     if not csv_path.exists():
-        print(f"  [maintenance:{state}] ✗ {csv_path.name} not found — run 'npm run generate' first")
-        return
+        print(f"  [{tail}] ✗ {csv_path.name} not found — run 'npm run generate' first")
+        return event_id_offset
 
-    # Switch store to target state before writing
-    store.set_state(state)
+    df = pd.read_csv(csv_path).fillna("")
 
-    df = pd.read_csv(csv_path)
-    df = df.where(pd.notna(df), "")
-    print(f"  [maintenance:{state}] Loaded {len(df)} maintenance records")
+    aircraft_asset = store.get_asset(tail)
+    aircraft_db_id = aircraft_asset.id if aircraft_asset else None
 
     events: list[CdfEvent] = []
     relationships: list[Relationship] = []
-    event_id_counter = 200
+    event_id = event_id_offset
 
     for idx, row in df.iterrows():
-        component_id = _safe_str(row.get("component_id", "AIRCRAFT"))
-        asset_ext_id = COMPONENT_TO_ASSET.get(component_id, "N4798E")
-        asset_db_id = ASSET_IDS.get(asset_ext_id, 1)
+        maint_type = str(row.get("maintenance_type", "")).strip().lower()
+        date_str = str(row.get("date", "")).strip()
+        component_id = str(row.get("component_id", "")).strip() or tail
+        description = str(row.get("description", "")).strip()
+        squawk_id = str(row.get("squawk_id", "")).strip()
 
-        date_str = _safe_str(row.get("date", ""))
-        start_time_ms = _date_to_ms(date_str)
-        maint_type = _safe_str(row.get("maintenance_type", ""))
-        description = _safe_str(row.get("description", ""))
-        event_ext_id = f"MAINT-{idx:05d}"
+        ts_ms = _date_to_ms(date_str)
 
-        # Determine CDF event type
-        if maint_type.lower() == "squawk":
-            cdf_type = "Squawk"
-            cdf_subtype = _safe_str(row.get("signoff_type", ""))
-        elif maint_type.lower() in ("annual", "100hr", "progressive"):
-            cdf_type = "Inspection"
-            cdf_subtype = maint_type.lower()
+        # Determine CDF event type and external ID
+        if maint_type == "squawk":
+            event_type = "Squawk"
+            ext_id = squawk_id if squawk_id else f"SQ-{tail}-{idx:03d}"
+            subtype = "squawk"
+        elif maint_type in ("annual", "100hr", "progressive"):
+            event_type = "Inspection"
+            subtype = maint_type
+            ext_id = f"INSP-{tail}-{date_str}"
+        elif maint_type == "post_accident_inspection":
+            event_type = "MaintenanceRecord"
+            subtype = "post_accident_inspection"
+            ext_id = f"MAINT-{tail}-postaccident-{date_str}"
         else:
-            cdf_type = "MaintenanceRecord"
-            cdf_subtype = maint_type
+            event_type = "MaintenanceRecord"
+            subtype = maint_type
+            ext_id = f"MAINT-{tail}-{maint_type}-{date_str}"
 
-        metadata = {
-            "date": date_str,
+        # Resolve component asset for assetIds linking
+        comp_asset = store.get_asset(component_id)
+        asset_ids = []
+        if comp_asset:
+            asset_ids.append(comp_asset.id)
+        if aircraft_db_id and aircraft_db_id not in asset_ids:
+            asset_ids.append(aircraft_db_id)
+
+        meta: dict[str, str] = {
             "component_id": component_id,
             "maintenance_type": maint_type,
-            "hobbs_at_service": _safe_str(row.get("hobbs_at_service", "")),
-            "tach_at_service": _safe_str(row.get("tach_at_service", "")),
-            "next_due_hobbs": _safe_str(row.get("next_due_hobbs", "")),
-            "next_due_date": _safe_str(row.get("next_due_date", "")),
-            "mechanic": _safe_str(row.get("mechanic", "")),
-            "inspector": _safe_str(row.get("inspector", "")),
-            "ad_reference": _safe_str(row.get("ad_reference", "")),
-            "sb_reference": _safe_str(row.get("sb_reference", "")),
-            "squawk_id": _safe_str(row.get("squawk_id", "")),
-            "resolved_by": _safe_str(row.get("resolved_by", "")),
-            "parts_replaced": _safe_str(row.get("parts_replaced", "")),
-            "labor_hours": _safe_str(row.get("labor_hours", "")),
-            "signoff_type": _safe_str(row.get("signoff_type", "")),
+            "date": date_str,
+            "mechanic": str(row.get("mechanic", "")),
+            "inspector": str(row.get("inspector", "")),
+            "ad_reference": str(row.get("ad_reference", "")),
+            "sb_reference": str(row.get("sb_reference", "")),
+            "parts_replaced": str(row.get("parts_replaced", "")),
+            "labor_hours": str(row.get("labor_hours", "")),
+            "signoff_type": str(row.get("signoff_type", "")),
+            "hobbs_at_service": str(row.get("hobbs_at_service", "")),
+            "tach_at_service": str(row.get("tach_at_service", "")),
+            "next_due_hobbs": str(row.get("next_due_hobbs", "")),
+            "next_due_date": str(row.get("next_due_date", "")),
+            "tail": tail,
         }
-        if cdf_type == "Squawk":
-            metadata["severity"] = _safe_str(row.get("severity", "non-grounding"))
-            metadata["status"] = _safe_str(row.get("status", "open"))
-            metadata["date_identified"] = date_str
 
-        event = CdfEvent(
-            id=event_id_counter,
-            externalId=event_ext_id,
-            type=cdf_type,
-            subtype=cdf_subtype or None,
+        # Squawk-specific metadata
+        if event_type == "Squawk":
+            meta["severity"] = str(row.get("severity", "non-grounding"))
+            meta["status"] = str(row.get("status", "open"))
+
+        events.append(CdfEvent(
+            id=event_id,
+            externalId=ext_id,
+            type=event_type,
+            subtype=subtype,
             description=description,
-            startTime=start_time_ms,
-            assetIds=[asset_db_id, 1],
-            metadata=metadata,
-            source="maintenance_log",
+            startTime=ts_ms,
+            assetIds=asset_ids,
+            metadata=meta,
+            source="maintenance_log_it",
             createdTime=NOW_MS,
             lastUpdatedTime=NOW_MS,
-        )
-        events.append(event)
-        event_id_counter += 1
+        ))
 
-        if ingest_relationships:
-            # PERFORMED_ON relationship: event → component asset
+        # PERFORMED_ON relationship: event → component
+        if comp_asset:
             relationships.append(Relationship(
-                externalId=f"REL-PERFORMED-{idx:05d}",
-                sourceExternalId=event_ext_id,
+                externalId=f"REL-{ext_id}-PERFORMED_ON",
+                sourceExternalId=ext_id,
                 sourceType="event",
-                targetExternalId=asset_ext_id,
+                targetExternalId=component_id,
                 targetType="asset",
                 relationshipType="PERFORMED_ON",
                 createdTime=NOW_MS,
                 lastUpdatedTime=NOW_MS,
             ))
 
-            # REFERENCES_AD relationship: event → AD document
-            ad_ref = _safe_str(row.get("ad_reference", ""))
-            if ad_ref:
-                for ad in ad_ref.split(";"):
-                    ad = ad.strip()
-                    if ad:
-                        ad_ext_id = f"AD-{ad.replace(' ', '-').replace('/', '-')}"
-                        relationships.append(Relationship(
-                            externalId=f"REL-AD-{idx:05d}-{ad_ext_id}",
-                            sourceExternalId=event_ext_id,
-                            sourceType="event",
-                            targetExternalId=ad_ext_id,
-                            targetType="file",
-                            relationshipType="REFERENCES_AD",
-                            createdTime=NOW_MS,
-                            lastUpdatedTime=NOW_MS,
-                        ))
-
-            # RESOLVED_BY / IDENTIFIED_ON for squawks
-            squawk_id = _safe_str(row.get("squawk_id", ""))
-            if squawk_id and cdf_type != "Squawk":
+        # REFERENCES_AD relationships
+        ad_refs = str(row.get("ad_reference", ""))
+        for ad_num in ad_refs.split(";"):
+            ad_num = ad_num.strip()
+            if ad_num:
+                safe_ad = ad_num.replace(" ", "_").replace("/", "_")
                 relationships.append(Relationship(
-                    externalId=f"REL-RESOLVED-{idx:05d}",
-                    sourceExternalId=squawk_id,
+                    externalId=f"REL-{ext_id}-REFERENCES_AD-{safe_ad}",
+                    sourceExternalId=ext_id,
                     sourceType="event",
-                    targetExternalId=event_ext_id,
-                    targetType="event",
-                    relationshipType="RESOLVED_BY",
-                    createdTime=NOW_MS,
-                    lastUpdatedTime=NOW_MS,
-                ))
-            if cdf_type == "Squawk":
-                relationships.append(Relationship(
-                    externalId=f"REL-IDENTIFIED-{idx:05d}",
-                    sourceExternalId=event_ext_id,
-                    sourceType="event",
-                    targetExternalId=asset_ext_id,
+                    targetExternalId=f"AD-{safe_ad}",
                     targetType="asset",
-                    relationshipType="IDENTIFIED_ON",
+                    relationshipType="REFERENCES_AD",
                     createdTime=NOW_MS,
                     lastUpdatedTime=NOW_MS,
                 ))
+
+        # IDENTIFIED_ON for squawks
+        if event_type == "Squawk" and comp_asset:
+            relationships.append(Relationship(
+                externalId=f"REL-{ext_id}-IDENTIFIED_ON",
+                sourceExternalId=ext_id,
+                sourceType="event",
+                targetExternalId=component_id,
+                targetType="asset",
+                relationshipType="IDENTIFIED_ON",
+                createdTime=NOW_MS,
+                lastUpdatedTime=NOW_MS,
+            ))
+
+        event_id += 1
 
     store.upsert_events(events)
-    if ingest_relationships:
-        store.upsert_relationships(relationships)
-    print(f"  [maintenance:{state}] ✓ {len(events)} events, {len(relationships)} relationships ingested")
+    store.upsert_relationships(relationships)
+    print(f"  [{tail}] {len(events)} maintenance events, {len(relationships)} relationships")
+    return event_id
 
 
-if __name__ == "__main__":
-    ingest_maintenance()
+def ingest_maintenance() -> None:
+    """Ingest maintenance for all four aircraft."""
+    from dataset import TAILS  # type: ignore[import]
+    event_id = 10_000
+    for tail in TAILS:
+        event_id = ingest_maintenance_for_tail(tail, event_id)

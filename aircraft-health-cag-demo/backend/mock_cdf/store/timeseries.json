@@ -1,128 +1,434 @@
 [
   {
-    "id": 101,
-    "externalId": "aircraft.hobbs",
-    "name": "Aircraft Hobbs Time",
-    "description": null,
+    "id": 200,
+    "externalId": "N4798E.aircraft.hobbs",
+    "name": "N4798E Hobbs Time",
+    "description": "Hobbs Time for N4798E",
     "assetId": 1,
     "unit": "hours",
     "isString": false,
-    "metadata": {
-      "assetExternalId": "N4798E"
-    },
-    "createdTime": 1775286521446,
-    "lastUpdatedTime": 1775286521446
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
   },
   {
-    "id": 102,
-    "externalId": "aircraft.tach",
-    "name": "Aircraft Tach Time",
-    "description": null,
+    "id": 201,
+    "externalId": "N4798E.aircraft.tach",
+    "name": "N4798E Tach Time",
+    "description": "Tach Time for N4798E",
     "assetId": 1,
     "unit": "hours",
     "isString": false,
-    "metadata": {
-      "assetExternalId": "N4798E"
-    },
-    "createdTime": 1775286521446,
-    "lastUpdatedTime": 1775286521446
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
   },
   {
-    "id": 103,
-    "externalId": "aircraft.cycles",
-    "name": "Aircraft Landing Cycles",
-    "description": null,
+    "id": 202,
+    "externalId": "N4798E.aircraft.cycles",
+    "name": "N4798E Landing Cycles",
+    "description": "Landing Cycles for N4798E",
     "assetId": 1,
     "unit": "cycles",
     "isString": false,
-    "metadata": {
-      "assetExternalId": "N4798E"
-    },
-    "createdTime": 1775286521446,
-    "lastUpdatedTime": 1775286521446
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
   },
   {
-    "id": 104,
-    "externalId": "aircraft.fuel_used",
-    "name": "Fuel Used Per Flight",
-    "description": null,
+    "id": 203,
+    "externalId": "N4798E.aircraft.fuel_used",
+    "name": "N4798E Fuel Used Per Flight",
+    "description": "Fuel Used Per Flight for N4798E",
     "assetId": 1,
     "unit": "gal",
     "isString": false,
-    "metadata": {
-      "assetExternalId": "N4798E"
-    },
-    "createdTime": 1775286521446,
-    "lastUpdatedTime": 1775286521446
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
   },
   {
-    "id": 105,
-    "externalId": "engine.oil_pressure_min",
-    "name": "Engine Oil Pressure Min",
-    "description": null,
+    "id": 204,
+    "externalId": "N4798E.engine.oil_pressure_min",
+    "name": "N4798E Oil Pressure Min",
+    "description": "Oil Pressure Min for N4798E",
     "assetId": 2,
     "unit": "psi",
     "isString": false,
-    "metadata": {
-      "assetExternalId": "ENGINE-1"
-    },
-    "createdTime": 1775286521446,
-    "lastUpdatedTime": 1775286521446
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
   },
   {
-    "id": 106,
-    "externalId": "engine.oil_pressure_max",
-    "name": "Engine Oil Pressure Max",
-    "description": null,
+    "id": 205,
+    "externalId": "N4798E.engine.oil_pressure_max",
+    "name": "N4798E Oil Pressure Max",
+    "description": "Oil Pressure Max for N4798E",
     "assetId": 2,
     "unit": "psi",
     "isString": false,
-    "metadata": {
-      "assetExternalId": "ENGINE-1"
-    },
-    "createdTime": 1775286521446,
-    "lastUpdatedTime": 1775286521446
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
   },
   {
-    "id": 107,
-    "externalId": "engine.oil_temp_max",
-    "name": "Engine Oil Temp Max",
-    "description": null,
+    "id": 206,
+    "externalId": "N4798E.engine.oil_temp_max",
+    "name": "N4798E Oil Temp Max",
+    "description": "Oil Temp Max for N4798E",
     "assetId": 2,
     "unit": "\u00b0F",
     "isString": false,
-    "metadata": {
-      "assetExternalId": "ENGINE-1"
-    },
-    "createdTime": 1775286521446,
-    "lastUpdatedTime": 1775286521446
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
   },
   {
-    "id": 108,
-    "externalId": "engine.cht_max",
-    "name": "Engine CHT Max",
-    "description": null,
+    "id": 207,
+    "externalId": "N4798E.engine.cht_max",
+    "name": "N4798E CHT Max",
+    "description": "CHT Max for N4798E",
     "assetId": 2,
     "unit": "\u00b0F",
     "isString": false,
-    "metadata": {
-      "assetExternalId": "ENGINE-1"
-    },
-    "createdTime": 1775286521446,
-    "lastUpdatedTime": 1775286521446
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
   },
   {
-    "id": 109,
-    "externalId": "engine.egt_max",
-    "name": "Engine EGT Max",
-    "description": null,
+    "id": 208,
+    "externalId": "N4798E.engine.egt_max",
+    "name": "N4798E EGT Max",
+    "description": "EGT Max for N4798E",
     "assetId": 2,
     "unit": "\u00b0F",
     "isString": false,
-    "metadata": {
-      "assetExternalId": "ENGINE-1"
-    },
-    "createdTime": 1775286521446,
-    "lastUpdatedTime": 1775286521446
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 300,
+    "externalId": "N2251K.aircraft.hobbs",
+    "name": "N2251K Hobbs Time",
+    "description": "Hobbs Time for N2251K",
+    "assetId": 11,
+    "unit": "hours",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 301,
+    "externalId": "N2251K.aircraft.tach",
+    "name": "N2251K Tach Time",
+    "description": "Tach Time for N2251K",
+    "assetId": 11,
+    "unit": "hours",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 302,
+    "externalId": "N2251K.aircraft.cycles",
+    "name": "N2251K Landing Cycles",
+    "description": "Landing Cycles for N2251K",
+    "assetId": 11,
+    "unit": "cycles",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 303,
+    "externalId": "N2251K.aircraft.fuel_used",
+    "name": "N2251K Fuel Used Per Flight",
+    "description": "Fuel Used Per Flight for N2251K",
+    "assetId": 11,
+    "unit": "gal",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 304,
+    "externalId": "N2251K.engine.oil_pressure_min",
+    "name": "N2251K Oil Pressure Min",
+    "description": "Oil Pressure Min for N2251K",
+    "assetId": 12,
+    "unit": "psi",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 305,
+    "externalId": "N2251K.engine.oil_pressure_max",
+    "name": "N2251K Oil Pressure Max",
+    "description": "Oil Pressure Max for N2251K",
+    "assetId": 12,
+    "unit": "psi",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 306,
+    "externalId": "N2251K.engine.oil_temp_max",
+    "name": "N2251K Oil Temp Max",
+    "description": "Oil Temp Max for N2251K",
+    "assetId": 12,
+    "unit": "\u00b0F",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 307,
+    "externalId": "N2251K.engine.cht_max",
+    "name": "N2251K CHT Max",
+    "description": "CHT Max for N2251K",
+    "assetId": 12,
+    "unit": "\u00b0F",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 308,
+    "externalId": "N2251K.engine.egt_max",
+    "name": "N2251K EGT Max",
+    "description": "EGT Max for N2251K",
+    "assetId": 12,
+    "unit": "\u00b0F",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 400,
+    "externalId": "N8834Q.aircraft.hobbs",
+    "name": "N8834Q Hobbs Time",
+    "description": "Hobbs Time for N8834Q",
+    "assetId": 21,
+    "unit": "hours",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 401,
+    "externalId": "N8834Q.aircraft.tach",
+    "name": "N8834Q Tach Time",
+    "description": "Tach Time for N8834Q",
+    "assetId": 21,
+    "unit": "hours",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 402,
+    "externalId": "N8834Q.aircraft.cycles",
+    "name": "N8834Q Landing Cycles",
+    "description": "Landing Cycles for N8834Q",
+    "assetId": 21,
+    "unit": "cycles",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 403,
+    "externalId": "N8834Q.aircraft.fuel_used",
+    "name": "N8834Q Fuel Used Per Flight",
+    "description": "Fuel Used Per Flight for N8834Q",
+    "assetId": 21,
+    "unit": "gal",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 404,
+    "externalId": "N8834Q.engine.oil_pressure_min",
+    "name": "N8834Q Oil Pressure Min",
+    "description": "Oil Pressure Min for N8834Q",
+    "assetId": 22,
+    "unit": "psi",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 405,
+    "externalId": "N8834Q.engine.oil_pressure_max",
+    "name": "N8834Q Oil Pressure Max",
+    "description": "Oil Pressure Max for N8834Q",
+    "assetId": 22,
+    "unit": "psi",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 406,
+    "externalId": "N8834Q.engine.oil_temp_max",
+    "name": "N8834Q Oil Temp Max",
+    "description": "Oil Temp Max for N8834Q",
+    "assetId": 22,
+    "unit": "\u00b0F",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 407,
+    "externalId": "N8834Q.engine.cht_max",
+    "name": "N8834Q CHT Max",
+    "description": "CHT Max for N8834Q",
+    "assetId": 22,
+    "unit": "\u00b0F",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 408,
+    "externalId": "N8834Q.engine.egt_max",
+    "name": "N8834Q EGT Max",
+    "description": "EGT Max for N8834Q",
+    "assetId": 22,
+    "unit": "\u00b0F",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 500,
+    "externalId": "N1156P.aircraft.hobbs",
+    "name": "N1156P Hobbs Time",
+    "description": "Hobbs Time for N1156P",
+    "assetId": 31,
+    "unit": "hours",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 501,
+    "externalId": "N1156P.aircraft.tach",
+    "name": "N1156P Tach Time",
+    "description": "Tach Time for N1156P",
+    "assetId": 31,
+    "unit": "hours",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 502,
+    "externalId": "N1156P.aircraft.cycles",
+    "name": "N1156P Landing Cycles",
+    "description": "Landing Cycles for N1156P",
+    "assetId": 31,
+    "unit": "cycles",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 503,
+    "externalId": "N1156P.aircraft.fuel_used",
+    "name": "N1156P Fuel Used Per Flight",
+    "description": "Fuel Used Per Flight for N1156P",
+    "assetId": 31,
+    "unit": "gal",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 504,
+    "externalId": "N1156P.engine.oil_pressure_min",
+    "name": "N1156P Oil Pressure Min",
+    "description": "Oil Pressure Min for N1156P",
+    "assetId": 32,
+    "unit": "psi",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 505,
+    "externalId": "N1156P.engine.oil_pressure_max",
+    "name": "N1156P Oil Pressure Max",
+    "description": "Oil Pressure Max for N1156P",
+    "assetId": 32,
+    "unit": "psi",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 506,
+    "externalId": "N1156P.engine.oil_temp_max",
+    "name": "N1156P Oil Temp Max",
+    "description": "Oil Temp Max for N1156P",
+    "assetId": 32,
+    "unit": "\u00b0F",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 507,
+    "externalId": "N1156P.engine.cht_max",
+    "name": "N1156P CHT Max",
+    "description": "CHT Max for N1156P",
+    "assetId": 32,
+    "unit": "\u00b0F",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
+  },
+  {
+    "id": 508,
+    "externalId": "N1156P.engine.egt_max",
+    "name": "N1156P EGT Max",
+    "description": "EGT Max for N1156P",
+    "assetId": 32,
+    "unit": "\u00b0F",
+    "isString": false,
+    "metadata": {},
+    "createdTime": 1775352702479,
+    "lastUpdatedTime": 1775352702479
   }
 ]

@@ -20,7 +20,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
-from typing import Any, AsyncGenerator
+from typing import Any, AsyncGenerator, Optional
 
 import anthropic
 from dotenv import load_dotenv
@@ -35,30 +35,39 @@ from .tools import (  # noqa: E402
 )
 
 MODEL = "claude-sonnet-4-5"
-MAX_ITERATIONS = 12
+MAX_ITERATIONS = 15
 
-SYSTEM_PROMPT = """You are an expert aviation mechanic and airworthiness advisor for N4798E, a 1978 Cessna 172N Skyhawk powered by a Lycoming O-320-H2AD engine. You have access to the aircraft's complete knowledge graph stored in Cognite Data Fusion (CDF), which includes:
+SYSTEM_PROMPT = """You are an expert aviation mechanic and airworthiness advisor for Desert Sky Aviation, a flight school at KPHX operating four 1978 Cessna 172N Skyhawks. You have access to the fleet's complete knowledge graph in Cognite Data Fusion (CDF).
 
-- **Asset hierarchy**: N4798E → ENGINE-1 → ENGINE-1-CAM-LIFTERS, ENGINE-1-MAGS, etc.
-- **Time series (OT)**: Real sensor readings — hobbs time, CHT, EGT, oil pressure, tach
-- **Events (IT)**: Full maintenance history since 1978, squawks, annual inspections
-- **Documents (ET)**: POH sections, applicable ADs (80-04-03 R2, 2001-23-03, 2011-10-09, 90-06-03 R1), Lycoming SB 480F
+**Fleet:**
+- N4798E: AIRWORTHY — 380 SMOH, 1 minor open squawk (oil seep), oil due in ~18 hrs
+- N2251K: FERRY ONLY — 290 SMOH, oil 1.2 hrs overdue, ferry flight authorized per fleet policy
+- N8834Q: CAUTION — 198 SMOH, elevated CHT #3 (40-60°F above others), rough left mag, requires A&P inspection
+- N1156P: NOT AIRWORTHY — catastrophic engine failure Oct 2025 at ~520 SMOH, connecting rod failure from lean detonation, grounded
 
-**Domain context:**
-- The O-320-H2AD has a known cam/lifter spalling issue — this is the H2AD's defining characteristic. Barrel-shaped hydraulic lifters were used instead of mushroom-type; they caused premature wear under higher loads. AD 80-04-03 R2 mandates recurring inspection intervals.
-- Engine TBO is 2000 hours. Current SMOH: ~1450 hours (72.5% of TBO).
-- Annual inspection required every 12 calendar months per 14 CFR 91.409.
-- Oil change interval: 50 hours per Lycoming SB 480F.
-- Based at KPHX (Phoenix Sky Harbor International Airport), Arizona.
+**Knowledge graph structure:**
+- Asset hierarchy: {TAIL} → {TAIL}-ENGINE → {TAIL}-ENGINE-CYLINDERS, {TAIL}-ENGINE-OIL, + PROPELLER, AIRFRAME, AVIONICS, FUEL-SYSTEM
+- Fleet owner: Desert_Sky_Aviation (connected to all aircraft via GOVERNED_BY)
+- Policies: Policy_OilChangeInterval, Policy_OilGracePeriod, Policy_AnnualInspection, Policy_FerryFlightOilOverdue
+- Symptoms: Symptom_N8834Q_ElevatedCHT, Symptom_N8834Q_RoughMag, Symptom_N1156P_CHT, _OilConsumption, _RoughRunning, _PowerLoss
+- Engine model: ENGINE_MODEL_LYC_O320_H2AD — each {{TAIL}}-ENGINE links via IS_TYPE (same Lycoming O-320-H2AD across fleet)
+- Time series: {TAIL}.aircraft.hobbs, {TAIL}.engine.cht_max, etc.
 
-**CAG approach:** Always traverse the knowledge graph to answer questions. Use specific tools to retrieve connected context — don't guess from memory. After each tool call, reason about what you learned and whether you need more context.
+**CAG approach:** Always traverse the knowledge graph. Use tools to retrieve connected context. For fleet-wide questions, start with get_fleet_overview() or assemble_fleet_context(). For one aircraft, use assemble_aircraft_context(aircraft_id="{TAIL}"). If that aircraft has symptoms, the tool response includes symptomDeepDive: pre-fetched get_engine_type_history-style peer timelines (IS_TYPE → ENGINE_MODEL_LYC_O320_H2AD) plus fleetSearchFromSymptoms from search_fleet_for_similar_events — read peer events chronologically; the temporal sequence before any failure is the causal chain (no explicit cause-effect edges). Use get_engine_type_history() or search_fleet_for_similar_events() again when you need a different tail or query string.
+
+**Airworthiness rules (Desert Sky Aviation policy):**
+- AIRWORTHY: annual current, no grounding squawks, oil not overdue
+- FERRY ONLY: oil overdue 1-5 hrs, direct flight to maintenance only
+- CAUTION: open grounding squawk requiring A&P inspection before flight
+- NOT AIRWORTHY: annual expired, oil >5 hrs overdue, grounding squawk, or catastrophic failure
 
 **Response format:**
-- Be specific and technical — cite actual values from the graph (hobbs times, dates, AD numbers)
-- Reference the graph nodes that informed each part of your answer
-- For airworthiness questions, explicitly state whether each relevant criterion is met
-- Use aviation standard terminology (SMOH, TBO, TT, A&P/IA, etc.)
-"""
+- Cite actual values from the graph (hobbs times, dates, AD numbers, policy IDs)
+- For airworthiness questions, explicitly state the status and reason
+- For N1156P questions, use chronological flight and maintenance events plus search_fleet_for_similar_events — there are no PRECEDED symptom edges
+- For cross-fleet patterns, use get_engine_type_history and search results
+- Use aviation terminology (SMOH, TBO, TT, A&P/IA, CHT, EGT, etc.)
+- Be concise — answer the question directly with supporting evidence"""
 
 
 def _summarize_result(tool_name: str, result: Any) -> str:
@@ -68,30 +77,47 @@ def _summarize_result(tool_name: str, result: Any) -> str:
     if tool_name == "get_asset":
         return f"Asset: {result.get('name', '')} ({result.get('externalId', '')})"
     if tool_name == "get_asset_children":
-        count = len(result.get("children", []))
-        return f"{count} child components"
+        return f"{len(result.get('children', []))} child components"
     if tool_name == "get_asset_subgraph":
-        count = len(result.get("nodes", []))
-        return f"{count} nodes in subgraph"
+        return f"{len(result.get('nodes', []))} nodes in subgraph"
     if tool_name == "get_time_series":
-        count = len(result.get("timeSeries", []))
-        return f"{count} time series found"
+        return f"{len(result.get('timeSeries', []))} time series found"
     if tool_name == "get_datapoints":
-        count = result.get("count", 0)
-        return f"{count} datapoints retrieved"
+        return f"{result.get('count', 0)} datapoints retrieved"
     if tool_name == "get_events":
-        count = result.get("count", 0)
-        return f"{count} events found"
+        return f"{result.get('count', 0)} events found"
     if tool_name == "get_relationships":
-        count = result.get("count", 0)
-        return f"{count} relationships traversed"
+        return f"{result.get('count', 0)} relationships traversed"
     if tool_name == "get_linked_documents":
-        count = result.get("count", 0)
-        return f"{count} documents retrieved"
+        return f"{result.get('count', 0)} documents retrieved"
     if tool_name == "assemble_aircraft_context":
         squawks = len(result.get("openSquawks", []))
         hobbs = result.get("currentHobbs", 0)
-        return f"Full context assembled — hobbs {hobbs:.1f}, {squawks} open squawks"
+        base = f"Full context assembled — hobbs {hobbs:.1f}, {squawks} open squawks"
+        dive = result.get("symptomDeepDive")
+        if dive:
+            peers = dive.get("engineTypePeerHistory") or {}
+            n_peer = len((peers.get("history_by_tail") or {}))
+            search = dive.get("fleetSearchFromSymptoms") or {}
+            n_match = search.get("matchCount", 0)
+            base += f"; symptom deep-dive: peer engine histories ({n_peer} tails), fleet search ({n_match} matches)"
+        return base
+    if tool_name == "assemble_fleet_context":
+        count = result.get("aircraftCount", 0)
+        return f"Fleet context assembled — {count} aircraft"
+    if tool_name == "get_fleet_overview":
+        return f"Fleet overview: {len(result.get('fleet', []))} aircraft"
+    if tool_name == "get_fleet_policies":
+        return f"{result.get('count', 0)} operational policies"
+    if tool_name == "get_aircraft_symptoms":
+        return f"{result.get('symptom_count', 0)} symptoms for {result.get('aircraft_id', '')}"
+    if tool_name == "get_engine_type_history":
+        n = len(result.get("history_by_tail", {}))
+        return f"Engine-type history: {n} peer aircraft with chronological events"
+    if tool_name == "search_fleet_for_similar_events":
+        return f"Fleet search: {result.get('matchCount', 0)} matches"
+    if tool_name == "check_fleet_policy_compliance":
+        return f"Policy compliance checked for {len(result.get('evaluatedTails', []))} aircraft"
     return "Result retrieved"
 
 
@@ -108,6 +134,7 @@ def _extract_text_blocks(content: list[Any]) -> str:
 
 async def run_agent_streaming(
     user_query: str,
+    aircraft_id: Optional[str] = None,
     max_iterations: int = MAX_ITERATIONS,
 ) -> AsyncGenerator[dict[str, Any], None]:
     """
@@ -131,8 +158,13 @@ async def run_agent_streaming(
     anthropic_client = anthropic.Anthropic(api_key=api_key)
     clear_traversal_log()
 
+    # Prepend aircraft context hint if a specific tail was selected
+    user_content = user_query
+    if aircraft_id:
+        user_content = f"[Context: focusing on aircraft {aircraft_id}]\n\n{user_query}"
+
     messages: list[dict[str, Any]] = [
-        {"role": "user", "content": user_query}
+        {"role": "user", "content": user_content}
     ]
 
     for iteration in range(max_iterations):

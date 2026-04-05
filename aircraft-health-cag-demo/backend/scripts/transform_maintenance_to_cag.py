@@ -1,58 +1,57 @@
 """
-Transform Maintenance Log to CAG-Ready CSVs.
+Transform maintenance data → per-tail CSVs in data/.
 
-Reads from dataset.py (single source of truth) and writes three state-specific
-CSV files for the ingestion pipeline:
-  data/maintenance_log_clean.csv
-  data/maintenance_log_caution.csv
-  data/maintenance_log_grounded.csv
-
-Each CSV uses MAINTENANCE_SHARED as the common base (1978 – Nov 1 2025), with
-state-specific recent records appended for the post-divergence period.
-
-Usage:
-  cd aircraft-health-cag-demo
-  python backend/scripts/transform_maintenance_to_cag.py
+Imports from dataset.py and writes maintenance_{TAIL}.csv for each of the
+four aircraft. The CSV columns mirror the CDF Events ingestion schema used
+by ingest_maintenance.py.
 """
+
 from __future__ import annotations
 
+import csv
 import sys
 from pathlib import Path
 
-import pandas as pd
+SCRIPT_DIR = Path(__file__).parent
+DATA_DIR = SCRIPT_DIR.parent.parent / "data"
 
-sys.path.insert(0, str(Path(__file__).parent))
-from dataset import (  # noqa: E402
-    MAINTENANCE_SHARED,
-    MAINTENANCE_CLEAN_RECENT,
-    MAINTENANCE_CAUTION_RECENT,
-    MAINTENANCE_GROUNDED_RECENT,
-)
-
-DATA_DIR = Path(__file__).parent.parent.parent / "data"
+sys.path.insert(0, str(SCRIPT_DIR))
+from dataset import TAILS, get_all_maintenance  # noqa: E402
 
 
-def write_maintenance(rows: list[dict], state: str) -> None:
-    """Write assembled maintenance records to data/maintenance_log_{state}.csv."""
-    df = pd.DataFrame(rows)
-    out = DATA_DIR / f"maintenance_log_{state}.csv"
-    df.to_csv(out, index=False)
-    print(f"  [{state}] ✓ {len(df)} maintenance records → {out.name}")
-    squawks = df[df["maintenance_type"] == "squawk"]
-    open_sq = squawks[squawks["status"] == "open"] if "status" in squawks.columns else squawks.head(0)
-    print(f"           Squawks: {len(squawks)} total, {len(open_sq)} open")
+FIELDNAMES = [
+    "date", "component_id", "maintenance_type", "description",
+    "hobbs_at_service", "tach_at_service", "next_due_hobbs", "next_due_date",
+    "mechanic", "inspector", "ad_reference", "sb_reference",
+    "squawk_id", "resolved_by", "parts_replaced", "labor_hours", "signoff_type",
+    "severity", "status",
+]
+
+
+def write_maintenance_csv(tail: str) -> Path:
+    """Write maintenance CSV for one aircraft."""
+    records = get_all_maintenance(tail)
+    output_path = DATA_DIR / f"maintenance_{tail}.csv"
+
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES, extrasaction="ignore")
+        writer.writeheader()
+        for r in records:
+            # Fill missing optional columns with empty string
+            row = {k: r.get(k, "") for k in FIELDNAMES}
+            writer.writerow(row)
+
+    print(f"  [{tail}] {len(records)} maintenance records → {output_path.name}")
+    return output_path
+
+
+def main() -> None:
+    print("Generating per-tail maintenance CSVs...")
+    for tail in TAILS:
+        write_maintenance_csv(tail)
+    print("Done.")
 
 
 if __name__ == "__main__":
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    print("\n✈  Transforming maintenance log for N4798E (three demo states, 1978–2026)...\n")
-
-    MAINTENANCE_CLEAN    = MAINTENANCE_SHARED + MAINTENANCE_CLEAN_RECENT
-    MAINTENANCE_CAUTION  = MAINTENANCE_SHARED + MAINTENANCE_CAUTION_RECENT
-    MAINTENANCE_GROUNDED = MAINTENANCE_SHARED + MAINTENANCE_GROUNDED_RECENT
-
-    write_maintenance(MAINTENANCE_CLEAN,    "clean")
-    write_maintenance(MAINTENANCE_CAUTION,  "caution")
-    write_maintenance(MAINTENANCE_GROUNDED, "grounded")
-
-    print(f"\n✓ Three maintenance CSV files written to {DATA_DIR}\n")
+    main()

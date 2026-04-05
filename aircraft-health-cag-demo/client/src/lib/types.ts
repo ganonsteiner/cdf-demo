@@ -1,4 +1,4 @@
-export type DemoMode = "clean" | "caution" | "grounded";
+export type Airworthiness = "AIRWORTHY" | "FERRY_ONLY" | "CAUTION" | "NOT_AIRWORTHY" | "UNKNOWN";
 
 export interface HealthStatus {
   status: "ok" | "degraded" | "mock_cdf_offline" | "api_key_missing" | "api_key_invalid";
@@ -8,7 +8,38 @@ export interface HealthStatus {
   checkedAt: string;
 }
 
+export interface FleetAircraft {
+  tail: string;
+  name: string;
+  smoh: number;
+  tbo: number;
+  smohPercent: number;
+  hobbs: number;
+  airworthiness: Airworthiness;
+  isAirworthy: boolean;
+  openSquawkCount: number;
+  groundingSquawkCount: number;
+  oilHoursOverdue: number;
+  annualDaysRemaining: number | null;
+  annualDueDate: string;
+  activeSymptoms: number;
+  activeConditions: number;
+  metadata: Record<string, string>;
+}
+
+export interface AircraftSymptom {
+  externalId: string;
+  aircraftId: string;
+  title: string;
+  description: string;
+  observation: string;
+  severity: string;
+  firstObserved: string;
+  type: string;
+}
+
 export interface AircraftStatus {
+  tail: string;
   hobbs: number;
   tach: number;
   engineSMOH: number;
@@ -18,9 +49,13 @@ export interface AircraftStatus {
   annualDaysRemaining: number | null;
   openSquawkCount: number;
   groundingSquawkCount: number;
+  airworthiness: Airworthiness;
   isAirworthy: boolean;
-  oilHoursOverdue?: number;
+  oilHoursOverdue: number;
+  oilNextDueHobbs: number;
   lastMaintenanceDate: string | null;
+  activeSymptoms: number;
+  symptoms: AircraftSymptom[];
   dataFreshAt: string;
 }
 
@@ -31,6 +66,7 @@ export interface Squawk {
   severity: "grounding" | "non-grounding" | "cosmetic" | string;
   status: "open" | "resolved" | "deferred" | string;
   dateIdentified: string;
+  tail: string;
   metadata: Record<string, string>;
 }
 
@@ -67,12 +103,15 @@ export interface FlightRecord {
   hobbs_start: number;
   hobbs_end: number;
   duration: number;
+  route: string;
   cht_max: number | null;
   egt_max: number | null;
   oil_pressure_min: number | null;
   oil_pressure_max: number | null;
   oil_temp_max: number | null;
   fuel_used_gal: number | null;
+  pilot_notes: string;
+  anomalous: boolean;
   year: number;
 }
 
@@ -99,10 +138,27 @@ export interface ComponentNode {
   maintenanceCount: number;
 }
 
+export interface OperationalPolicy {
+  externalId: string;
+  title: string;
+  description: string;
+  rule: string;
+  category: string;
+  references: string;
+}
+
 export interface GraphNode {
   id: string;
   label: string;
-  type: "asset" | "timeseries" | "event" | "file";
+  type:
+    | "asset"
+    | "timeseries"
+    | "event"
+    | "file"
+    | "SymptomNode"
+    | "EngineModel"
+    | "OperationalPolicy"
+    | "FleetOwner";
   group: number;
   linkCount: number;
   unit?: string;
@@ -113,6 +169,7 @@ export interface GraphLink {
   source: string;
   target: string;
   type: string;
+  color?: string;
 }
 
 export interface GraphData {

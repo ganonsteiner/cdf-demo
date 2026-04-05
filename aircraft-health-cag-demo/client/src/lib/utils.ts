@@ -30,6 +30,9 @@ export function severityColor(severity: string): string {
     case "grounding": return "text-red-400 bg-red-950/40 border-red-800/50";
     case "non-grounding": return "text-yellow-400 bg-yellow-950/40 border-yellow-800/50";
     case "cosmetic": return "text-zinc-400 bg-zinc-900/40 border-zinc-700/50";
+    case "caution": return "text-orange-400 bg-orange-950/40 border-orange-800/50";
+    case "warning": return "text-amber-400 bg-amber-950/40 border-amber-800/50";
+    case "critical": return "text-red-400 bg-red-950/40 border-red-900/50";
     default: return "text-zinc-400 bg-zinc-900/40 border-zinc-700/50";
   }
 }

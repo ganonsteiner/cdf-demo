@@ -10,7 +10,11 @@ IMPORTANT: The cognite-sdk Python client (v7.x) compresses all POST request
 bodies using gzip (Content-Encoding: gzip). The GzipRequestMiddleware handles
 decompression at the ASGI level before FastAPI sees the body.
 
-Runs on port 4000 (MOCK_CDF_PORT).
+Extended routes for fleet-specific resource types (symptoms, policies, fleet_owners) return { "items": [...] } and are
+called via httpx from agent tools — matching the same mock CDF pattern
+without requiring SDK changes.
+
+Runs on port 4000 (MOCK_CDF_PORT). Project: desert_sky.
 """
 
 import gzip
@@ -29,7 +33,7 @@ from .routes.relationships import router as relationships_router
 from .routes.files import router as files_router
 from .store.store import store
 
-PROJECT = "n4798e"
+PROJECT = "desert_sky"
 BASE = f"/api/v1/projects/{PROJECT}"
 
 
@@ -40,8 +44,6 @@ class GzipRequestMiddleware:
     The cognite-sdk Python client compresses all POST request bodies with gzip
     and sets Content-Encoding: gzip. FastAPI/Starlette does not handle this
     automatically (only gzip response encoding is built-in).
-
-    This middleware unwraps the body before it reaches the route handlers.
     """
 
     def __init__(self, app: ASGIApp) -> None:
@@ -55,7 +57,6 @@ class GzipRequestMiddleware:
                 for k, v in raw_headers
             )
             if is_gzip:
-                # Collect the full body
                 chunks: list[bytes] = []
                 while True:
                     event = await receive()
@@ -65,12 +66,10 @@ class GzipRequestMiddleware:
                 compressed = b"".join(chunks)
                 decompressed = gzip.decompress(compressed)
 
-                # Rebuild headers: remove content-encoding, update content-length
                 new_headers = [
                     (k, v) for k, v in raw_headers
                     if k.lower() != b"content-encoding"
                 ]
-                # Update or add content-length
                 new_headers = [
                     (k, str(len(decompressed)).encode() if k.lower() == b"content-length" else v)
                     for k, v in new_headers
@@ -80,7 +79,6 @@ class GzipRequestMiddleware:
 
                 new_scope = dict(scope)
                 new_scope["headers"] = new_headers
-
                 body_sent = False
 
                 async def decompressed_receive() -> dict:
@@ -100,8 +98,8 @@ def create_app() -> FastAPI:
     """Create and configure the FastAPI mock CDF server."""
     _app = FastAPI(
         title="Mock CDF Server",
-        description="Cognite Data Fusion REST API mock for aircraft-health-cag-demo",
-        version="1.0.0",
+        description="Cognite Data Fusion REST API mock for Desert Sky Aviation fleet",
+        version="2.0.0",
     )
 
     _app.add_middleware(
@@ -111,7 +109,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Mount all CDF resource routers under the CDF project prefix
+    # Standard CDF resource routers
     _app.include_router(assets_router, prefix=BASE)
     _app.include_router(timeseries_router, prefix=BASE)
     _app.include_router(datapoints_router, prefix=BASE)
@@ -119,7 +117,53 @@ def create_app() -> FastAPI:
     _app.include_router(relationships_router, prefix=BASE)
     _app.include_router(files_router, prefix=BASE)
 
-    # Document download endpoint at root (no project prefix)
+    # ------------------------------------------------------------------
+    # Extended fleet routes — POST list pattern returning { "items": [...] }
+    # ------------------------------------------------------------------
+
+    @_app.post(f"{BASE}/symptoms/list")
+    def list_symptoms(body: dict[str, Any] = {}) -> dict[str, Any]:
+        """List symptom nodes, optionally filtered by aircraft_id."""
+        aircraft_id = (body.get("filter") or {}).get("aircraft_id")
+        items = store.get_symptoms(aircraft_id=aircraft_id)
+        return {"items": [s.model_dump() for s in items]}
+
+    @_app.post(f"{BASE}/policies/list")
+    def list_policies(body: dict[str, Any] = {}) -> dict[str, Any]:
+        """List operational policy nodes."""
+        items = store.get_policies()
+        return {"items": [p.model_dump() for p in items]}
+
+    @_app.post(f"{BASE}/fleet_owners/list")
+    def list_fleet_owners(body: dict[str, Any] = {}) -> dict[str, Any]:
+        """List fleet owner nodes."""
+        items = store.get_fleet_owners()
+        return {"items": [fo.model_dump() for fo in items]}
+
+    # ------------------------------------------------------------------
+    # Bidirectional relationship query
+    # ------------------------------------------------------------------
+
+    @_app.post(f"{BASE}/relationships/bidirectional")
+    def relationships_bidirectional(body: dict[str, Any] = {}) -> dict[str, Any]:
+        """
+        Return relationships where the node is source OR target.
+        Supports Aircraft → FleetOwner → Policy traversal in both directions.
+        """
+        external_id = body.get("externalId", "")
+        relationship_type = body.get("relationshipType")
+        direction = body.get("direction", "both")
+        rels = store.get_relationships_for_node(
+            external_id=external_id,
+            relationship_type=relationship_type,
+            direction=direction,
+        )
+        return {"items": [r.model_dump() for r in rels]}
+
+    # ------------------------------------------------------------------
+    # Document serving
+    # ------------------------------------------------------------------
+
     from pathlib import Path  # noqa: PLC0415
     from fastapi.responses import PlainTextResponse  # noqa: PLC0415
     from fastapi import HTTPException  # noqa: PLC0415
@@ -134,6 +178,10 @@ def create_app() -> FastAPI:
             raise HTTPException(status_code=404, detail=f"Document not found: {filename}")
         return doc_path.read_text()
 
+    # ------------------------------------------------------------------
+    # Admin / health
+    # ------------------------------------------------------------------
+
     @_app.get("/health")
     def health() -> dict[str, Any]:
         """Health check — returns store record counts."""
@@ -142,6 +190,7 @@ def create_app() -> FastAPI:
             "status": "ok",
             "store": counts,
             "port": int(os.getenv("MOCK_CDF_PORT", "4000")),
+            "project": PROJECT,
         }
 
     @_app.post("/admin/reload")
@@ -152,38 +201,16 @@ def create_app() -> FastAPI:
         print(f"[mock-cdf] Store reloaded from disk: {counts}")
         return {"status": "reloaded", "store": counts}
 
-    @_app.post("/admin/set-state")
-    def set_demo_state(body: dict[str, Any]) -> dict[str, Any]:
-        """
-        Switch the active demo state for events and datapoints.
-
-        The three states (clean, caution, grounded) have identical shared history
-        up to Nov 1 2025, then diverge into different post-divergence datasets.
-        Calling this endpoint switches which state's events/datapoints the mock
-        CDF returns — enabling the frontend demo mode selector.
-        """
-        state = body.get("state", "clean")
-        try:
-            store.set_state(state)
-            counts = store.get_counts()
-            print(f"[mock-cdf] Active state switched to: {state} — events: {counts['events']}, datapoints: {counts['datapoints']}")
-            return {"status": "ok", "active_state": state, "store": counts}
-        except ValueError as e:
-            from fastapi import HTTPException  # noqa: PLC0415
-            raise HTTPException(status_code=400, detail=str(e))
-
     @_app.on_event("startup")
     def on_startup() -> None:
         port = os.getenv("MOCK_CDF_PORT", "4000")
         counts = store.get_counts()
-        print(f"\n✈  Mock CDF server running on port {port}")
-        print(f"   Project: {PROJECT}")
-        print(f"   Store: {counts}")
-        print(f"   Endpoints: {BASE}/assets, /timeseries, /events, /relationships, /files\n")
+        print(f"\n✈  Mock CDF server — Desert Sky Aviation Fleet")
+        print(f"   Port: {port}  Project: {PROJECT}")
+        print(f"   Store: {counts}\n")
 
     return _app
 
 
-# Create base FastAPI app, then wrap with ASGI gzip middleware
 _base_app = create_app()
 app = GzipRequestMiddleware(_base_app)

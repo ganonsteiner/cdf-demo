@@ -1,15 +1,14 @@
 """
-CDF Store — Python equivalent of mock-cdf/store/index.ts.
+CDF Store — single in-memory store for the Desert Sky Aviation fleet.
 
 Mirrors the Cognite Data Fusion resource model with JSON file persistence.
-Each resource type corresponds to a CDF resource: Assets, TimeSeries, Datapoints,
-Events, Relationships, and Files. Thread-safe via threading.Lock for concurrent
-FastAPI request handling.
+Each resource type corresponds to a CDF resource: Assets, TimeSeries,
+Datapoints, Events, Relationships, and Files.
 
-State routing: Events and Datapoints are stored in three state-specific files
-(events_clean.json, events_caution.json, events_grounded.json) to support the
-demo mode selector. Assets, TimeSeries, Relationships, and Files are shared
-across all states and stored in single files.
+Extended with fleet-specific resource types (SymptomNode, OperationalPolicy, FleetOwner) that are served via custom
+POST list routes using httpx in agent tools.
+
+Thread-safe via threading.Lock for concurrent FastAPI request handling.
 """
 
 from __future__ import annotations
@@ -25,12 +24,11 @@ STORE_DIR = Path(__file__).parent
 
 
 # ---------------------------------------------------------------------------
-# Pydantic models — mirror TypeScript interfaces in mock-cdf/store/index.ts
+# Pydantic models — standard CDF resource types
 # ---------------------------------------------------------------------------
 
 class Asset(BaseModel):
     """Mirrors CDF Asset resource type — node in the asset hierarchy."""
-
     id: int
     externalId: str
     name: str
@@ -44,7 +42,6 @@ class Asset(BaseModel):
 
 class TimeSeries(BaseModel):
     """Mirrors CDF TimeSeries resource — sensor/metric metadata."""
-
     id: int
     externalId: str
     name: str
@@ -59,14 +56,12 @@ class TimeSeries(BaseModel):
 
 class Datapoint(BaseModel):
     """Single time series data point — OT sensor reading."""
-
     timestamp: int
     value: float
 
 
 class CdfEvent(BaseModel):
-    """Mirrors CDF Event resource — maintenance records, squawks, inspections."""
-
+    """Mirrors CDF Event resource — maintenance records, squawks, inspections, flights."""
     id: int
     externalId: str
     type: str
@@ -83,7 +78,6 @@ class CdfEvent(BaseModel):
 
 class Relationship(BaseModel):
     """Mirrors CDF Relationship resource — directed graph edge between resources."""
-
     externalId: str
     sourceExternalId: str
     sourceType: str
@@ -97,7 +91,6 @@ class Relationship(BaseModel):
 
 class CdfFile(BaseModel):
     """Mirrors CDF File resource — linked documents (POH, ADs, SBs)."""
-
     id: int
     externalId: str
     name: str
@@ -110,6 +103,44 @@ class CdfFile(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Extended fleet resource types — served via custom POST list routes
+# ---------------------------------------------------------------------------
+
+class SymptomNode(BaseModel):
+    """Observed symptom on an aircraft — pre-failure or current anomaly."""
+    externalId: str
+    aircraft_id: str
+    title: str
+    description: str
+    observation: str = ""
+    severity: str = "caution"
+    first_observed: str = ""
+    type: str = "SymptomNode"
+
+
+
+class OperationalPolicy(BaseModel):
+    """Fleet policy governing maintenance intervals, ferry authorization, etc."""
+    externalId: str
+    title: str
+    description: str
+    rule: str = ""
+    category: str = ""
+    references: str = ""
+    type: str = "OperationalPolicy"
+
+
+class FleetOwner(BaseModel):
+    """Fleet management entity — owns and governs all aircraft in the fleet."""
+    externalId: str
+    name: str
+    description: str = ""
+    location: str = ""
+    contact: str = ""
+    type: str = "FleetOwner"
+
+
+# ---------------------------------------------------------------------------
 # Store singleton
 # ---------------------------------------------------------------------------
 
@@ -117,27 +148,22 @@ class CdfStore:
     """
     Thread-safe JSON persistence layer for all CDF resource types.
 
-    State routing: Events and Datapoints are stored in three state-specific
-    JSON files. Assets, TimeSeries, Relationships, and Files are shared
-    across all states (single files). Calling set_state() switches which
-    event/datapoint store is active — used by the demo mode selector.
+    Single active store — no multi-state routing. One events.json and one
+    datapoints.json covering the entire Desert Sky Aviation fleet.
     """
-
-    STATES = ("clean", "caution", "grounded")
 
     def __init__(self) -> None:
         self._lock = threading.Lock()
         self._assets: dict[str, Asset] = {}
         self._timeseries: dict[str, TimeSeries] = {}
-        # Active state's data (switches on set_state)
         self._datapoints: dict[str, list[Datapoint]] = {}
         self._events: dict[str, CdfEvent] = {}
         self._relationships: dict[str, Relationship] = {}
         self._files: dict[str, CdfFile] = {}
-        # Multi-state stores — loaded at startup
-        self._events_stores: dict[str, dict[str, CdfEvent]] = {}
-        self._datapoints_stores: dict[str, dict[str, list[Datapoint]]] = {}
-        self._active_state: str = "clean"
+        # Extended fleet resources
+        self._symptoms: dict[str, SymptomNode] = {}
+        self._policies: dict[str, OperationalPolicy] = {}
+        self._fleet_owners: dict[str, FleetOwner] = {}
         self.init()
 
     # ------------------------------------------------------------------
@@ -159,14 +185,7 @@ class CdfStore:
         path.write_text(json.dumps(data, indent=2, default=str))
 
     def init(self) -> None:
-        """
-        Load all resource stores from disk into memory.
-
-        Shared stores (assets, timeseries, relationships, files) are loaded
-        from single files. State-specific stores (events, datapoints) are
-        loaded from {resource}_{state}.json files, falling back to the legacy
-        {resource}.json if state files don't exist yet.
-        """
+        """Load all resource stores from disk into memory."""
         with self._lock:
             self._assets = {
                 a["externalId"]: Asset(**a)
@@ -185,42 +204,36 @@ class CdfStore:
                 for f in self._read_json("files.json")
             }
 
-            # Load state-specific event/datapoint stores
-            for state in self.STATES:
-                events_file = f"events_{state}.json"
-                # Fall back to legacy events.json if state file not present
-                events_raw = self._read_json(events_file) or self._read_json("events.json")
-                self._events_stores[state] = {
-                    e["externalId"]: CdfEvent(**e) for e in events_raw
-                }
+            # Events — single unified store
+            self._events = {
+                e["externalId"]: CdfEvent(**e)
+                for e in self._read_json("events.json")
+            }
 
-                dp_file = f"datapoints_{state}.json"
-                dp_raw = self._read_json(dp_file) or self._read_json("datapoints.json")
-                dp_map: dict[str, list[Datapoint]] = {}
-                for entry in dp_raw:
-                    ext_id = entry.get("externalId", "")
-                    points = [Datapoint(**p) for p in entry.get("datapoints", [])]
-                    dp_map[ext_id] = points
-                self._datapoints_stores[state] = dp_map
+            # Datapoints — single unified store
+            dp_map: dict[str, list[Datapoint]] = {}
+            for entry in self._read_json("datapoints.json"):
+                ext_id = entry.get("externalId", "")
+                dp_map[ext_id] = [Datapoint(**p) for p in entry.get("datapoints", [])]
+            self._datapoints = dp_map
 
-            # Activate the current state
-            self._events = self._events_stores.get(self._active_state, {})
-            self._datapoints = self._datapoints_stores.get(self._active_state, {})
+            # Extended fleet resources
+            self._symptoms = {
+                s["externalId"]: SymptomNode(**s)
+                for s in self._read_json("symptoms.json")
+            }
+            self._policies = {
+                p["externalId"]: OperationalPolicy(**p)
+                for p in self._read_json("policies.json")
+            }
+            self._fleet_owners = {
+                fo["externalId"]: FleetOwner(**fo)
+                for fo in self._read_json("fleet_owners.json")
+            }
 
-    def set_state(self, state: str) -> None:
-        """
-        Switch the active demo state. All subsequent event/datapoint reads
-        will use the selected state's data. Thread-safe.
-        """
-        if state not in self.STATES:
-            raise ValueError(f"Invalid state '{state}'. Must be one of: {self.STATES}")
-        with self._lock:
-            self._active_state = state
-            self._events = self._events_stores.get(state, {})
-            self._datapoints = self._datapoints_stores.get(state, {})
-
-    def get_active_state(self) -> str:
-        return self._active_state
+    # ------------------------------------------------------------------
+    # Flush helpers
+    # ------------------------------------------------------------------
 
     def _flush_assets(self) -> None:
         self._write_json("assets.json", [a.model_dump() for a in self._assets.values()])
@@ -229,28 +242,29 @@ class CdfStore:
         self._write_json("timeseries.json", [ts.model_dump() for ts in self._timeseries.values()])
 
     def _flush_datapoints(self) -> None:
-        """Flush active state's datapoints to its state-specific file."""
         records = [
             {"externalId": ext_id, "datapoints": [dp.model_dump() for dp in dps]}
             for ext_id, dps in self._datapoints.items()
         ]
-        self._write_json(f"datapoints_{self._active_state}.json", records)
-        # Keep legacy file in sync for backward compatibility
-        if self._active_state == "clean":
-            self._write_json("datapoints.json", records)
+        self._write_json("datapoints.json", records)
 
     def _flush_events(self) -> None:
-        """Flush active state's events to its state-specific file."""
-        data = [e.model_dump() for e in self._events.values()]
-        self._write_json(f"events_{self._active_state}.json", data)
-        if self._active_state == "clean":
-            self._write_json("events.json", data)
+        self._write_json("events.json", [e.model_dump() for e in self._events.values()])
 
     def _flush_relationships(self) -> None:
         self._write_json("relationships.json", [r.model_dump() for r in self._relationships.values()])
 
     def _flush_files(self) -> None:
         self._write_json("files.json", [f.model_dump() for f in self._files.values()])
+
+    def _flush_symptoms(self) -> None:
+        self._write_json("symptoms.json", [s.model_dump() for s in self._symptoms.values()])
+
+    def _flush_policies(self) -> None:
+        self._write_json("policies.json", [p.model_dump() for p in self._policies.values()])
+
+    def _flush_fleet_owners(self) -> None:
+        self._write_json("fleet_owners.json", [fo.model_dump() for fo in self._fleet_owners.values()])
 
     # ------------------------------------------------------------------
     # Asset methods
@@ -353,13 +367,11 @@ class CdfStore:
             if external_id not in self._datapoints:
                 self._datapoints[external_id] = []
             self._datapoints[external_id].extend(points)
-            self._datapoints_stores[self._active_state] = self._datapoints
             self._flush_datapoints()
 
     def set_datapoints(self, external_id: str, points: list[Datapoint]) -> None:
         with self._lock:
             self._datapoints[external_id] = points
-            self._datapoints_stores[self._active_state] = self._datapoints
             self._flush_datapoints()
 
     # ------------------------------------------------------------------
@@ -377,7 +389,6 @@ class CdfStore:
     def upsert_event(self, event: CdfEvent) -> CdfEvent:
         with self._lock:
             self._events[event.externalId] = event
-            self._events_stores[self._active_state] = self._events
             self._flush_events()
             return event
 
@@ -385,7 +396,6 @@ class CdfStore:
         with self._lock:
             for event in events:
                 self._events[event.externalId] = event
-            self._events_stores[self._active_state] = self._events
             self._flush_events()
 
     # ------------------------------------------------------------------
@@ -395,6 +405,35 @@ class CdfStore:
     def get_relationships(self) -> list[Relationship]:
         with self._lock:
             return list(self._relationships.values())
+
+    def get_relationships_for_node(
+        self,
+        external_id: str,
+        relationship_type: Optional[str] = None,
+        direction: str = "both",
+    ) -> list[Relationship]:
+        """
+        Return relationships where external_id is source, target, or both.
+
+        direction='outbound' — edges where this node is the source
+        direction='inbound'  — edges where this node is the target
+        direction='both'     — union (default, required for fleet/policy traversal)
+        """
+        with self._lock:
+            results = []
+            for rel in self._relationships.values():
+                is_source = rel.sourceExternalId == external_id
+                is_target = rel.targetExternalId == external_id
+                if direction == "outbound" and not is_source:
+                    continue
+                if direction == "inbound" and not is_target:
+                    continue
+                if direction == "both" and not (is_source or is_target):
+                    continue
+                if relationship_type and rel.relationshipType != relationship_type:
+                    continue
+                results.append(rel)
+            return results
 
     def upsert_relationship(self, rel: Relationship) -> Relationship:
         with self._lock:
@@ -433,6 +472,44 @@ class CdfStore:
             self._flush_files()
 
     # ------------------------------------------------------------------
+    # Extended fleet resource methods
+    # ------------------------------------------------------------------
+
+    def get_symptoms(self, aircraft_id: Optional[str] = None) -> list[SymptomNode]:
+        with self._lock:
+            items = list(self._symptoms.values())
+            if aircraft_id:
+                items = [s for s in items if s.aircraft_id == aircraft_id]
+            return items
+
+    def upsert_symptoms(self, items: list[SymptomNode]) -> None:
+        with self._lock:
+            for s in items:
+                self._symptoms[s.externalId] = s
+            self._flush_symptoms()
+
+
+    def get_policies(self) -> list[OperationalPolicy]:
+        with self._lock:
+            return list(self._policies.values())
+
+    def upsert_policies(self, items: list[OperationalPolicy]) -> None:
+        with self._lock:
+            for p in items:
+                self._policies[p.externalId] = p
+            self._flush_policies()
+
+    def get_fleet_owners(self) -> list[FleetOwner]:
+        with self._lock:
+            return list(self._fleet_owners.values())
+
+    def upsert_fleet_owners(self, items: list[FleetOwner]) -> None:
+        with self._lock:
+            for fo in items:
+                self._fleet_owners[fo.externalId] = fo
+            self._flush_fleet_owners()
+
+    # ------------------------------------------------------------------
     # Utility
     # ------------------------------------------------------------------
 
@@ -445,18 +522,26 @@ class CdfStore:
             self._events = {}
             self._relationships = {}
             self._files = {}
-            self._events_stores = {s: {} for s in self.STATES}
-            self._datapoints_stores = {s: {} for s in self.STATES}
-            for filename in ["assets.json", "timeseries.json", "relationships.json", "files.json"]:
+            self._symptoms = {}
+            self._policies = {}
+            self._fleet_owners = {}
+            for filename in [
+                "assets.json", "timeseries.json", "relationships.json", "files.json",
+                "events.json", "datapoints.json",
+                "symptoms.json",
+                "policies.json", "fleet_owners.json",
+            ]:
                 self._write_json(filename, [])
-            for state in self.STATES:
-                self._write_json(f"events_{state}.json", [])
-                self._write_json(f"datapoints_{state}.json", [])
-            self._write_json("events.json", [])
-            self._write_json("datapoints.json", [])
+            for legacy in ("findings.json", "conditions.json"):
+                leg = STORE_DIR / legacy
+                if leg.exists():
+                    try:
+                        leg.unlink()
+                    except OSError:
+                        pass
 
     def get_counts(self) -> dict[str, int]:
-        """Return record counts for all resource types (active state)."""
+        """Return record counts for all resource types."""
         with self._lock:
             return {
                 "assets": len(self._assets),
@@ -465,6 +550,9 @@ class CdfStore:
                 "events": len(self._events),
                 "relationships": len(self._relationships),
                 "files": len(self._files),
+                "symptoms": len(self._symptoms),
+                "policies": len(self._policies),
+                "fleet_owners": len(self._fleet_owners),
             }
 
 

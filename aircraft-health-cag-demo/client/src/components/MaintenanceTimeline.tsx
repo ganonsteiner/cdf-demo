@@ -9,26 +9,20 @@ import {
 } from "lucide-react";
 import { cn, formatDate, formatTimestamp, urgencyColor } from "../lib/utils";
 import { api } from "../lib/api";
-import { useStore } from "../lib/store";
+import { useStore, TAILS } from "../lib/store";
 import type { MaintenanceItem, MaintenanceRecord } from "../lib/types";
 
 const COMPONENT_OPTIONS = [
   { value: "", label: "All components" },
-  { value: "AIRCRAFT", label: "Aircraft (annual)" },
-  { value: "ENGINE-1", label: "Engine" },
-  { value: "ENGINE-1-OIL-FILTER", label: "Oil filter" },
-  { value: "ENGINE-1-MAGS", label: "Magnetos" },
-  { value: "ENGINE-1-SPARK-PLUGS", label: "Spark plugs" },
-  { value: "ENGINE-1-CAM-LIFTERS", label: "Cam & Lifters" },
-  { value: "PROP-1", label: "Propeller" },
-  { value: "AIRFRAME-1", label: "Airframe" },
-  { value: "AVIONICS-1-XPDR", label: "Transponder" },
-  { value: "AVIONICS-1-ELT", label: "ELT" },
+  { value: "ENGINE", label: "Engine" },
+  { value: "PROPELLER", label: "Propeller" },
+  { value: "AIRFRAME", label: "Airframe" },
+  { value: "AVIONICS", label: "Avionics" },
 ];
 
 const YEARS = [
   { value: "", label: "All years" },
-  ...Array.from({ length: 12 }, (_, i) => {
+  ...Array.from({ length: 5 }, (_, i) => {
     const y = 2026 - i;
     return { value: String(y), label: String(y) };
   }),
@@ -39,7 +33,8 @@ interface Props {
 }
 
 export default function MaintenanceTimeline({ active }: Props) {
-  const { demoMode } = useStore();
+  const { selectedAircraft, setSelectedAircraft } = useStore();
+  const tail = selectedAircraft ?? "N4798E";
   const [upcoming, setUpcoming] = useState<MaintenanceItem[]>([]);
   const [history, setHistory] = useState<MaintenanceRecord[]>([]);
   const [total, setTotal] = useState(0);
@@ -51,23 +46,23 @@ export default function MaintenanceTimeline({ active }: Props) {
   const [upcomingLoading, setUpcomingLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Upcoming maintenance — refetch on demo mode change
+  // Upcoming maintenance — refetch on tail change
   useEffect(() => {
     setUpcomingLoading(true);
     api
-      .upcomingMaintenance()
+      .upcomingMaintenance(tail)
       .then(setUpcoming)
       .catch(() => setUpcoming([]))
       .finally(() => setUpcomingLoading(false));
-  }, [demoMode]);
+  }, [tail]);
 
-  // History — refetch on demo mode, page, or filter change
+  // History — refetch on tail, page, or filter change
   useEffect(() => {
     if (!active) return;
     setLoading(true);
     setError(null);
     api
-      .maintenanceHistory({
+      .maintenanceHistory(tail, {
         page,
         per_page: 25,
         component: componentFilter || undefined,
@@ -80,14 +75,27 @@ export default function MaintenanceTimeline({ active }: Props) {
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [active, demoMode, page, componentFilter, yearFilter]);
+  }, [active, tail, page, componentFilter, yearFilter]);
 
   const handleFilterChange = () => {
     setPage(1);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="h-full overflow-y-auto">
+    <div className="max-w-4xl mx-auto py-6 px-2 space-y-6">
+      {/* Aircraft selector */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-zinc-500">Aircraft:</span>
+        <div className="flex gap-1">
+          {TAILS.map((t) => (
+            <button key={t} onClick={() => setSelectedAircraft(t)}
+              className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors ${
+                t === tail ? "bg-sky-600 text-white border-sky-500" : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500"
+              }`}>{t}</button>
+          ))}
+        </div>
+      </div>
       {/* Upcoming maintenance */}
       <section>
         <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3 flex items-center gap-2">
@@ -367,6 +375,7 @@ export default function MaintenanceTimeline({ active }: Props) {
           </>
         )}
       </section>
+    </div>
     </div>
   );
 }

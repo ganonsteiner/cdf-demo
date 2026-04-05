@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Plane, ChevronRight, CheckCircle, AlertTriangle, XCircle, Wrench } from "lucide-react";
 import { cn, formatDate } from "../lib/utils";
 import { api } from "../lib/api";
-import { useStore } from "../lib/store";
+import { useStore, TAILS } from "../lib/store";
 import type { ComponentNode, MaintenanceRecord } from "../lib/types";
 
 interface Props {
@@ -34,7 +34,8 @@ function statusDot(status: ComponentNode["status"]) {
 }
 
 export default function AircraftComponents({ active }: Props) {
-  const { demoMode } = useStore();
+  const { selectedAircraft, setSelectedAircraft } = useStore();
+  const tail = selectedAircraft ?? "N4798E";
   const [components, setComponents] = useState<ComponentNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,12 +47,13 @@ export default function AircraftComponents({ active }: Props) {
     if (!active) return;
     setLoading(true);
     setError(null);
+    setSelectedId(null);
     api
-      .components()
+      .components(tail)
       .then(setComponents)
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [active, demoMode]);
+  }, [active, tail]);
 
   useEffect(() => {
     if (!selectedId) {
@@ -60,11 +62,11 @@ export default function AircraftComponents({ active }: Props) {
     }
     setHistoryLoading(true);
     api
-      .maintenanceHistory({ component: selectedId, per_page: 50 })
+      .maintenanceHistory(tail, { component: selectedId, per_page: 50 })
       .then((res) => setCompHistory(res.records))
       .catch(() => setCompHistory([]))
       .finally(() => setHistoryLoading(false));
-  }, [selectedId]);
+  }, [selectedId, tail]);
 
   const tree = buildTree(components);
 
@@ -132,12 +134,26 @@ export default function AircraftComponents({ active }: Props) {
   const selectedComp = components.find((c) => c.externalId === selectedId);
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-220px)] min-h-[500px]">
+    <div className="h-full flex flex-col overflow-hidden">
+      {/* Aircraft selector */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800 shrink-0">
+        <span className="text-xs text-zinc-500">Aircraft:</span>
+        <div className="flex gap-1">
+          {TAILS.map((t) => (
+            <button key={t} onClick={() => setSelectedAircraft(t)}
+              className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors ${
+                t === tail ? "bg-sky-600 text-white border-sky-500" : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500"
+              }`}>{t}</button>
+          ))}
+        </div>
+      </div>
+
+    <div className="flex-1 flex gap-4 overflow-hidden p-4">
       {/* Component tree */}
       <div className="flex-1 min-w-0 bg-zinc-900 rounded-xl border border-zinc-800 overflow-y-auto">
         <div className="px-4 py-3 border-b border-zinc-800 flex items-center gap-2">
           <Plane className="w-4 h-4 text-sky-400" />
-          <span className="text-sm font-semibold text-zinc-300">Component Hierarchy</span>
+          <span className="text-sm font-semibold text-zinc-300">{tail} — Component Hierarchy</span>
           <span className="text-xs text-zinc-600 ml-auto">{components.length} nodes</span>
         </div>
 
@@ -250,6 +266,7 @@ export default function AircraftComponents({ active }: Props) {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { api } from "../lib/api";
 import { useStore } from "../lib/store";
-import type { GraphData, GraphNode } from "../lib/types";
+import type { GraphData, GraphLink, GraphNode } from "../lib/types";
 import TraversalGraph from "./TraversalGraph";
 import QueryInterface from "./QueryInterface";
 
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export default function KnowledgeGraph({ active }: Props) {
-  const { demoMode, traversalEvents } = useStore();
+  const { traversalEvents } = useStore();
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export default function KnowledgeGraph({ active }: Props) {
       .then(setGraphData)
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [active, demoMode]);
+  }, [active]);
 
   // Measure available height for the graph canvas
   useEffect(() => {
@@ -58,13 +58,53 @@ export default function KnowledgeGraph({ active }: Props) {
     const ids = new Set<string>();
     for (const evt of traversalEvents) {
       if (evt.type === "traversal" && evt.node) {
-        // node format: "Asset:ENGINE-1" — extract the id after the colon
         const colonIdx = evt.node.indexOf(":");
         if (colonIdx !== -1) ids.add(evt.node.slice(colonIdx + 1));
+        // e.g. IS_TYPE:N4798E-ENGINE→ENGINE_MODEL_LYC_O320_H2AD
+        const arrow = evt.node.indexOf("→");
+        if (arrow !== -1) {
+          const right = evt.node.slice(arrow + 1).trim();
+          if (right) ids.add(right);
+        }
       }
     }
     return ids;
   }, [traversalEvents]);
+
+  const allEdgeTypes = useMemo(() => {
+    if (!graphData?.links.length) return [] as string[];
+    const s = new Set<string>();
+    for (const l of graphData.links) {
+      if (l.type) s.add(l.type);
+    }
+    return Array.from(s).sort();
+  }, [graphData?.links]);
+
+  const [visibleEdgeTypes, setVisibleEdgeTypes] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (graphData && allEdgeTypes.length) {
+      setVisibleEdgeTypes(new Set(allEdgeTypes));
+    }
+  }, [graphData, allEdgeTypes]);
+
+  const filteredGraphData = useMemo((): GraphData | null => {
+    if (!graphData) return null;
+    if (visibleEdgeTypes.size === 0) {
+      return { ...graphData, links: [] };
+    }
+    const links = graphData.links.filter((l: GraphLink) => visibleEdgeTypes.has(l.type));
+    return { ...graphData, links };
+  }, [graphData, visibleEdgeTypes]);
+
+  const toggleEdgeType = (t: string) => {
+    setVisibleEdgeTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(t)) next.delete(t);
+      else next.add(t);
+      return next;
+    });
+  };
 
   const stats = graphData?.stats;
 
@@ -116,9 +156,9 @@ export default function KnowledgeGraph({ active }: Props) {
           </div>
         )}
 
-        {!loading && !error && graphData && (
+        {!loading && !error && filteredGraphData && (
           <TraversalGraph
-            data={graphData}
+            data={filteredGraphData}
             traversedIds={traversedIds}
             onNodeClick={setSelectedNode}
             height={height}
@@ -127,25 +167,62 @@ export default function KnowledgeGraph({ active }: Props) {
 
         {/* Legend overlay */}
         {graphData && !loading && (
-          <div className="absolute top-3 left-3 bg-zinc-900/90 border border-zinc-700 rounded-lg px-3 py-2 backdrop-blur-sm">
+          <div className="absolute top-3 left-3 bg-zinc-900/90 border border-zinc-700 rounded-lg px-3 py-2 backdrop-blur-sm max-w-[220px] max-h-[min(70vh,520px)] overflow-y-auto">
             <p className="text-xs font-medium text-zinc-500 mb-1.5 uppercase tracking-wide">
               Node types
             </p>
             <div className="space-y-1">
               {[
                 { type: "Asset", color: "#38bdf8" },
+                { type: "Engine model", color: "#f1f5f9" },
                 { type: "TimeSeries", color: "#4ade80" },
                 { type: "File", color: "#c084fc" },
               ].map((l) => (
                 <div key={l.type} className="flex items-center gap-2 text-xs text-zinc-400">
                   <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    className="w-2.5 h-2.5 rounded-full shrink-0 border border-zinc-600"
                     style={{ backgroundColor: l.color }}
                   />
                   {l.type}
                 </div>
               ))}
             </div>
+            {allEdgeTypes.length > 0 && (
+              <>
+                <p className="text-xs font-medium text-zinc-500 mb-1 mt-2 pt-2 border-t border-zinc-700 uppercase tracking-wide">
+                  Edge types
+                </p>
+                <div className="space-y-1">
+                  {allEdgeTypes.map((t) => {
+                    const on = visibleEdgeTypes.has(t);
+                    const sample = graphData.links.find((l) => l.type === t);
+                    const swatch = sample?.color || "#666";
+                    const isTypeStyle = t === "IS_TYPE";
+                    return (
+                      <label
+                        key={t}
+                        className="flex items-center gap-2 text-xs text-zinc-400 cursor-pointer select-none"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={on}
+                          onChange={() => toggleEdgeType(t)}
+                          className="rounded border-zinc-600"
+                        />
+                        <span
+                          className="w-6 h-0.5 shrink-0"
+                          style={{
+                            backgroundColor: isTypeStyle ? "transparent" : swatch,
+                            borderTop: isTypeStyle ? `2px dashed ${swatch}` : undefined,
+                          }}
+                        />
+                        <span className="truncate font-mono">{t}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </>
+            )}
             {traversedIds.size > 0 && (
               <div className="flex items-center gap-2 text-xs text-yellow-400 mt-1.5 border-t border-zinc-700 pt-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0" />
@@ -191,7 +268,7 @@ export default function KnowledgeGraph({ active }: Props) {
             </button>
           </div>
           <div className="flex-1 overflow-hidden">
-            <QueryInterface apiKeyMissing={false} compact />
+            <QueryInterface apiKeyMissing={false} />
           </div>
         </div>
       )}

@@ -1,59 +1,57 @@
 """
-Transform Flight Data to CAG-Ready CSVs.
+Transform flight data → per-tail CSVs in data/.
 
-Reads from dataset.py (single source of truth) and writes three state-specific
-CSV files for the ingestion pipeline:
-  data/flight_data_clean.csv
-  data/flight_data_caution.csv
-  data/flight_data_grounded.csv
-
-Each CSV uses FLIGHTS_SHARED as the common base, with state-specific recent
-flights appended for the post-divergence period (after Nov 1, 2025).
-
-Usage:
-  cd aircraft-health-cag-demo
-  python backend/scripts/transform_flights_to_cag.py
+Imports from dataset.py and writes flight_data_{TAIL}.csv for each of the
+four aircraft. The CSV columns mirror the CDF TimeSeries / Events ingestion
+schema used by ingest_flights.py.
 """
+
 from __future__ import annotations
 
+import csv
 import sys
 from pathlib import Path
 
-import pandas as pd
+# Resolve paths relative to this script's location
+SCRIPT_DIR = Path(__file__).parent
+DATA_DIR = SCRIPT_DIR.parent.parent / "data"
 
-# Allow importing from the scripts directory
-sys.path.insert(0, str(Path(__file__).parent))
-from dataset import (  # noqa: E402
-    FLIGHTS_SHARED,
-    FLIGHTS_CLEAN_RECENT,
-    FLIGHTS_CAUTION_RECENT,
-    FLIGHTS_GROUNDED_RECENT,
-)
-
-DATA_DIR = Path(__file__).parent.parent.parent / "data"
+sys.path.insert(0, str(SCRIPT_DIR))
+from dataset import TAILS, generate_flights  # noqa: E402
 
 
-def write_flights(rows: list[dict], state: str) -> None:
-    """Write assembled flight records to data/flight_data_{state}.csv."""
-    df = pd.DataFrame(rows)
-    out = DATA_DIR / f"flight_data_{state}.csv"
-    df.to_csv(out, index=False)
-    print(f"  [{state}] ✓ {len(df)} flight records → {out.name}")
-    h_start = df["hobbs_start"].min()
-    h_end = df["hobbs_end"].max()
-    print(f"           Hobbs range: {h_start:.1f} → {h_end:.1f}")
+def write_flight_csv(tail: str) -> Path:
+    """Generate and write flight CSV for one aircraft."""
+    flights = generate_flights(tail)
+    output_path = DATA_DIR / f"flight_data_{tail}.csv"
+
+    if not flights:
+        print(f"  [{tail}] No flights generated — skipping")
+        return output_path
+
+    fieldnames = [
+        "timestamp", "hobbs_start", "hobbs_end", "tach_start", "tach_end",
+        "route", "duration", "oil_pressure_min", "oil_pressure_max",
+        "oil_temp_max", "cht_max", "egt_max", "fuel_used_gal", "cycles",
+        "pilot_notes", "tail", "flight_index",
+    ]
+
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(flights)
+
+    print(f"  [{tail}] {len(flights)} flights → {output_path.name}")
+    return output_path
+
+
+def main() -> None:
+    print("Generating per-tail flight CSVs...")
+    for tail in TAILS:
+        write_flight_csv(tail)
+    print("Done.")
 
 
 if __name__ == "__main__":
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    print("\n✈  Transforming flight data for N4798E (three demo states)...\n")
-
-    FLIGHTS_CLEAN    = FLIGHTS_SHARED + FLIGHTS_CLEAN_RECENT
-    FLIGHTS_CAUTION  = FLIGHTS_SHARED + FLIGHTS_CAUTION_RECENT
-    FLIGHTS_GROUNDED = FLIGHTS_SHARED + FLIGHTS_GROUNDED_RECENT
-
-    write_flights(FLIGHTS_CLEAN,    "clean")
-    write_flights(FLIGHTS_CAUTION,  "caution")
-    write_flights(FLIGHTS_GROUNDED, "grounded")
-
-    print(f"\n✓ Three flight CSV files written to {DATA_DIR}\n")
+    main()

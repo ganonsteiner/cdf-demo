@@ -1,0 +1,38 @@
+[
+  {
+    "externalId": "Policy_OilChangeInterval",
+    "title": "Oil Change Interval",
+    "description": "All Desert Sky Aviation aircraft require oil and filter change every 50 Hobbs hours or 4 calendar months, whichever comes first. References Lycoming SB 388C.",
+    "rule": "oil_change_hobbs_interval=50; oil_change_calendar_months=4",
+    "category": "engine_maintenance",
+    "references": "Lycoming SB 388C; FAA AC 43.13-1B",
+    "type": "OperationalPolicy"
+  },
+  {
+    "externalId": "Policy_OilGracePeriod",
+    "title": "Oil Change Grace Period \u2014 Ferry Flight Authorization",
+    "description": "Aircraft with oil change overdue by 1-5 Hobbs hours may conduct a single direct ferry flight to the maintenance facility. The PIC must document the ferry flight in the aircraft journey log. Aircraft with oil overdue by more than 5 hours are NOT AIRWORTHY.",
+    "rule": "ferry_authorized_if_oil_overdue_hours_between=1,5; ferry_not_authorized_if_oil_overdue_hours_gt=5",
+    "category": "airworthiness",
+    "references": "Desert Sky Aviation Operations Manual Rev 4.2",
+    "type": "OperationalPolicy"
+  },
+  {
+    "externalId": "Policy_AnnualInspection",
+    "title": "Annual Inspection Currency",
+    "description": "All aircraft must maintain current annual inspection per 14 CFR 91.409. Annual inspection must be completed by a certificated A&P/IA. Aircraft with expired annual are NOT AIRWORTHY.",
+    "rule": "annual_inspection_required_calendar_months=12",
+    "category": "airworthiness",
+    "references": "14 CFR 91.409; Desert Sky Aviation Policy Manual",
+    "type": "OperationalPolicy"
+  },
+  {
+    "externalId": "Policy_FerryFlightOilOverdue",
+    "title": "Ferry Flight Procedure for Maintenance",
+    "description": "Ferry flights to maintenance facility are permitted only when: (1) aircraft has a valid annual inspection, (2) oil is overdue by no more than 5 hours, (3) no grounding squawks exist, (4) PIC holds at least private certificate with appropriate ratings, (5) flight is direct to maintenance facility with no intermediate stops.",
+    "rule": "ferry_requires_valid_annual=true; ferry_max_oil_overdue_hours=5; ferry_requires_no_grounding_squawks=true",
+    "category": "operations",
+    "references": "Desert Sky Aviation Operations Manual Rev 4.2",
+    "type": "OperationalPolicy"
+  }
+]
