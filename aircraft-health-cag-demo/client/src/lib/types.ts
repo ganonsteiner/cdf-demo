@@ -17,6 +17,8 @@ export interface FleetAircraft {
   tbo: number;
   smohPercent: number;
   hobbs: number;
+  /** Engine tach (maintenance clock). */
+  tach: number;
   airworthiness: Airworthiness;
   isAirworthy: boolean;
   openSquawkCount: number;
@@ -28,8 +30,8 @@ export interface FleetAircraft {
   oilDaysUntilDue: number | null;
   annualDaysRemaining: number | null;
   annualDueDate: string;
+  /** Count of active Observation/Symptom events (pilot/ops observations). */
   activeSymptoms: number;
-  activeConditions: number;
   metadata: Record<string, string>;
 }
 
@@ -74,7 +76,7 @@ export interface Squawk {
   externalId: string;
   description: string;
   component: string;
-  severity: "grounding" | "non-grounding" | "cosmetic" | string;
+  severity: "grounding" | "non-grounding" | "cosmetic" | string; // GANON
   status: "open" | "resolved" | "deferred" | string;
   dateIdentified: string;
   tail: string;
@@ -109,6 +111,8 @@ export interface MaintenanceHistoryPage {
   page: number;
   per_page: number;
   total_pages: number;
+  /** Calendar years present in history for this aircraft (after component/type filters, before year filter). */
+  available_years?: number[];
 }
 
 export interface FlightRecord {

@@ -1,25 +1,45 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { GitBranch, Box, Activity, FileText, AlertTriangle } from "lucide-react";
+import {
+  Box,
+  Crosshair,
+  FileText,
+  LineChart,
+  RotateCcw,
+  Share2,
+  AlertTriangle,
+  Waypoints,
+} from "lucide-react";
+import {
+  cn,
+  CARD_SURFACE_A,
+  CARD_SURFACE_B,
+  MAIN_TAB_CONTENT_FRAME,
+  TAB_PAGE_TOP_INSET,
+} from "../lib/utils";
 import { api } from "../lib/api";
+import { highlightedGraphIdsFromTraversal } from "../lib/traversalGraphIds";
 import { useStore } from "../lib/store";
 import type { GraphData, GraphLink, GraphNode } from "../lib/types";
-import TraversalGraph from "./TraversalGraph";
+import TraversalGraph, { type TraversalGraphHandle } from "./TraversalGraph";
 
 interface Props {
   active: boolean;
 }
 
 export default function KnowledgeGraph({ active }: Props) {
-  const { traversalEvents } = useStore();
+  const { traversalEvents, setGraphDataSnapshot } = useStore();
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [_selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(600);
+  const graphRef = useRef<TraversalGraphHandle>(null);
+  const [viewport, setViewport] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
+  /** Load once per page session; revisiting the tab keeps data and TraversalGraph state (no re-fetch, no re-animation). */
   useEffect(() => {
     if (!active) return;
+    if (graphData !== null) return;
     setLoading(true);
     setError(null);
     api
@@ -27,39 +47,41 @@ export default function KnowledgeGraph({ active }: Props) {
       .then(setGraphData)
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [active]);
+  }, [active, graphData]);
 
-  // Measure available height for the graph canvas
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (graphData) setGraphDataSnapshot(graphData);
+  }, [graphData, setGraphDataSnapshot]);
+
+  // Measure while mounted — graph tab stays in layout (absolute when inactive) so size stays valid.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
     const update = () => {
-      if (containerRef.current) {
-        setHeight(containerRef.current.clientHeight);
+      const box = containerRef.current;
+      if (box) {
+        const w = box.clientWidth;
+        const h = box.clientHeight;
+        if (w > 0 && h > 0) {
+          setViewport({ width: w, height: h });
+        }
       }
     };
     update();
     const ro = new ResizeObserver(update);
-    ro.observe(containerRef.current);
-    return () => ro.disconnect();
+    ro.observe(el);
+    const id = requestAnimationFrame(() => update());
+    return () => {
+      cancelAnimationFrame(id);
+      ro.disconnect();
+    };
   }, []);
 
-  // Build set of traversed node IDs from the live Zustand traversal feed
-  const traversedIds = useMemo<Set<string>>(() => {
-    const ids = new Set<string>();
-    for (const evt of traversalEvents) {
-      if (evt.type === "traversal" && evt.node) {
-        const colonIdx = evt.node.indexOf(":");
-        if (colonIdx !== -1) ids.add(evt.node.slice(colonIdx + 1));
-        // e.g. IS_TYPE:N4798E-ENGINE→ENGINE_MODEL_LYC_O320_H2AD
-        const arrow = evt.node.indexOf("→");
-        if (arrow !== -1) {
-          const right = evt.node.slice(arrow + 1).trim();
-          if (right) ids.add(right);
-        }
-      }
-    }
-    return ids;
-  }, [traversalEvents]);
+  /** Distinct graph node ids from the traversal log (yellow ring; legend “N nodes traversed”). */
+  const traversedIds = useMemo(
+    () => highlightedGraphIdsFromTraversal(traversalEvents, graphData),
+    [traversalEvents, graphData]
+  );
 
   const allEdgeTypes = useMemo(() => {
     if (!graphData?.links.length) return [] as string[];
@@ -99,21 +121,22 @@ export default function KnowledgeGraph({ active }: Props) {
   const stats = graphData?.stats;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-220px)] min-h-[500px] relative">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide flex items-center gap-2">
-          <GitBranch className="w-4 h-4" />
-          Knowledge Graph
-        </h2>
-
+    <div
+      className={cn(
+        "flex flex-1 min-h-0 flex-col overflow-hidden pb-6 relative",
+        MAIN_TAB_CONTENT_FRAME,
+        TAB_PAGE_TOP_INSET
+      )}
+    >
+      {/* Tab→graph card ≈ AI chat: TAB_PAGE_TOP_INSET + chrome row + mb-1. Min-height offsets smaller mb-1 vs AI mb-3; items-end keeps stats flush above the card. */}
+      <div className="shrink-0 mb-1 flex min-h-[34px] flex-wrap items-end justify-end gap-3 sm:min-h-[30px]">
         {stats && (
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-3">
             {[
               { label: "Assets", count: stats.assets, icon: <Box className="w-3 h-3" />, color: "text-sky-400" },
-              { label: "TimeSeries", count: stats.timeseries, icon: <Activity className="w-3 h-3" />, color: "text-emerald-400" },
+              { label: "TimeSeries", count: stats.timeseries, icon: <LineChart className="w-3 h-3" aria-hidden />, color: "text-emerald-400" },
               { label: "Files", count: stats.files, icon: <FileText className="w-3 h-3" />, color: "text-purple-400" },
-              { label: "Relations", count: stats.relationships, icon: <GitBranch className="w-3 h-3" />, color: "text-violet-400" },
+              { label: "Relations", count: stats.relationships, icon: <Share2 className="w-3 h-3" aria-hidden />, color: "text-violet-400" },
             ].map((s) => (
               <div key={s.label} className={`flex items-center gap-1.5 text-xs ${s.color}`}>
                 {s.icon}
@@ -126,11 +149,14 @@ export default function KnowledgeGraph({ active }: Props) {
       </div>
 
       {/* Graph canvas */}
-      <div ref={containerRef} className="flex-1 bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden relative">
+      <div
+        ref={containerRef}
+        className={cn("flex-1 min-h-[16rem] sm:min-h-[24rem] rounded-xl overflow-hidden relative", CARD_SURFACE_A)}
+      >
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
             <div className="text-center">
-              <GitBranch className="w-10 h-10 mb-3 animate-pulse mx-auto" />
+              <Waypoints className="w-10 h-10 mb-3 animate-pulse mx-auto" />
               <p className="text-sm">Loading knowledge graph…</p>
             </div>
           </div>
@@ -146,19 +172,56 @@ export default function KnowledgeGraph({ active }: Props) {
           </div>
         )}
 
-        {!loading && !error && filteredGraphData && (
-          <TraversalGraph
-            data={filteredGraphData}
-            traversedIds={traversedIds}
-            onNodeClick={setSelectedNode}
-            height={height}
-          />
-        )}
+        {!loading &&
+          !error &&
+          filteredGraphData &&
+          viewport.width > 0 &&
+          viewport.height > 0 && (
+            <TraversalGraph
+              ref={graphRef}
+              active={active}
+              data={filteredGraphData}
+              traversedIds={traversedIds}
+              onNodeClick={setSelectedNode}
+              width={viewport.width}
+              height={viewport.height}
+            />
+          )}
+
+        {graphData &&
+          !loading &&
+          !error &&
+          filteredGraphData &&
+          viewport.width > 0 &&
+          viewport.height > 0 && (
+            <div className="absolute bottom-3 right-3 z-10 flex gap-2">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-900/90 px-2.5 py-1.5 text-xs text-zinc-300 backdrop-blur-sm hover:border-zinc-600 hover:bg-zinc-800/90 focus:outline-none focus:border-sky-600"
+                title="Fit graph in view"
+                aria-label="Recenter graph"
+                onClick={() => graphRef.current?.recenter()}
+              >
+                <Crosshair className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span className="hidden sm:inline">Recenter</span>
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-900/90 px-2.5 py-1.5 text-xs text-zinc-300 backdrop-blur-sm hover:border-zinc-600 hover:bg-zinc-800/90 focus:outline-none focus:border-sky-600"
+                title="Animate back to the default settled layout"
+                aria-label="Reset graph layout"
+                onClick={() => graphRef.current?.resetLayout()}
+              >
+                <RotateCcw className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span className="hidden sm:inline">Reset</span>
+              </button>
+            </div>
+          )}
 
         {/* Legend overlay */}
         {graphData && !loading && (
-          <div className="absolute top-3 left-3 bg-zinc-900/90 border border-zinc-700 rounded-lg px-3 py-2 backdrop-blur-sm max-w-[220px] max-h-[min(70vh,520px)] overflow-y-auto">
-            <p className="text-xs font-medium text-zinc-500 mb-1.5 uppercase tracking-wide">
+          <div className={cn("absolute top-3 left-3 rounded-lg px-3 py-2 backdrop-blur-sm max-w-[220px] max-h-[min(70vh,520px)] overflow-y-auto bg-zinc-900/90 border-zinc-800", CARD_SURFACE_B)}>
+            <p className="text-xs font-semibold text-zinc-500 mb-1.5 uppercase tracking-widest">
               Node types
             </p>
             <div className="space-y-1">
@@ -179,7 +242,7 @@ export default function KnowledgeGraph({ active }: Props) {
             </div>
             {allEdgeTypes.length > 0 && (
               <>
-                <p className="text-xs font-medium text-zinc-500 mb-1 mt-2 pt-2 border-t border-zinc-700 uppercase tracking-wide">
+                <p className="text-xs font-semibold text-zinc-500 mb-1 mt-2 pt-2 border-t border-zinc-800/60 uppercase tracking-widest">
                   Edge types
                 </p>
                 <div className="space-y-1">
@@ -214,9 +277,9 @@ export default function KnowledgeGraph({ active }: Props) {
               </>
             )}
             {traversedIds.size > 0 && (
-              <div className="flex items-center gap-2 text-xs text-yellow-400 mt-1.5 border-t border-zinc-700 pt-1.5">
+              <div className="flex items-center gap-2 text-xs text-yellow-400 mt-1.5 border-t border-zinc-800/60 pt-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 shrink-0" />
-                Traversed ({traversedIds.size})
+                {traversedIds.size} node{traversedIds.size === 1 ? "" : "s"} traversed
               </div>
             )}
           </div>

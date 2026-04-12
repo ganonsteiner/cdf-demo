@@ -15,19 +15,19 @@
       "engine_type": "Lycoming O-320-H2AD",
       "engine_tbo_hours": "2000",
       "engine_smoh": "380",
-      "overhaul_tach": "4101.0",
+      "overhaul_tach": "4060.3",
       "max_gross_weight_lbs": "2300",
       "airworthiness_status": "AIRWORTHY",
       "operator": "Desert Sky Aviation"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 2,
     "externalId": "N4798E-ENGINE",
     "name": "N4798E \u2014 Engine (Lycoming O-320-H2AD)",
-    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBO, 380 SMOH",
+    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBOH, 380 SMOH",
     "parentId": null,
     "parentExternalId": "N4798E",
     "metadata": {
@@ -37,8 +37,8 @@
       "smoh": "380",
       "fuel_type": "100LL"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 3,
@@ -51,8 +51,8 @@
       "count": "4",
       "plug_model": "Champion REM40E"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 4,
@@ -65,14 +65,14 @@
       "capacity_qts": "8",
       "change_interval_hrs": "50"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 5,
     "externalId": "N4798E-PROPELLER",
     "name": "N4798E \u2014 Propeller (McCauley 1C235/DTM7557)",
-    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBO",
+    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBOH",
     "parentId": null,
     "parentExternalId": "N4798E",
     "metadata": {
@@ -80,8 +80,8 @@
       "tbo_hours": "2000",
       "tbo_years": "6"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 6,
@@ -94,8 +94,8 @@
       "max_gross_weight_lbs": "2300",
       "vne_kias": "163"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 7,
@@ -108,8 +108,8 @@
       "transponder_inspection_months": "24",
       "elt_battery_months": "12"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 8,
@@ -122,14 +122,14 @@
       "capacity_gal_usable": "43",
       "fuel_type": "100LL"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 11,
     "externalId": "N2251K",
     "name": "N2251K \u2014 1978 Cessna 172N",
-    "description": "1978 Cessna 172N, S/N 17271243. FERRY ONLY \u2014 oil overdue 1.2 hrs. Based KPHX.",
+    "description": "1978 Cessna 172N, S/N 17271243. FERRY ONLY \u2014 oil overdue 1.2 hr. Based KPHX.",
     "parentId": null,
     "parentExternalId": null,
     "metadata": {
@@ -141,19 +141,19 @@
       "engine_type": "Lycoming O-320-H2AD",
       "engine_tbo_hours": "2000",
       "engine_smoh": "290",
-      "overhaul_tach": "4503.0",
+      "overhaul_tach": "4464.9",
       "max_gross_weight_lbs": "2300",
       "airworthiness_status": "FERRY_ONLY",
       "operator": "Desert Sky Aviation"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 12,
     "externalId": "N2251K-ENGINE",
     "name": "N2251K \u2014 Engine (Lycoming O-320-H2AD)",
-    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBO, 290 SMOH",
+    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBOH, 290 SMOH",
     "parentId": null,
     "parentExternalId": "N2251K",
     "metadata": {
@@ -163,8 +163,8 @@
       "smoh": "290",
       "fuel_type": "100LL"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 13,
@@ -177,8 +177,8 @@
       "count": "4",
       "plug_model": "Champion REM40E"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 14,
@@ -191,14 +191,14 @@
       "capacity_qts": "8",
       "change_interval_hrs": "50"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 15,
     "externalId": "N2251K-PROPELLER",
     "name": "N2251K \u2014 Propeller (McCauley 1C235/DTM7557)",
-    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBO",
+    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBOH",
     "parentId": null,
     "parentExternalId": "N2251K",
     "metadata": {
@@ -206,8 +206,8 @@
       "tbo_hours": "2000",
       "tbo_years": "6"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 16,
@@ -220,8 +220,8 @@
       "max_gross_weight_lbs": "2300",
       "vne_kias": "163"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 17,
@@ -234,8 +234,8 @@
       "transponder_inspection_months": "24",
       "elt_battery_months": "12"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 18,
@@ -248,8 +248,8 @@
       "capacity_gal_usable": "43",
       "fuel_type": "100LL"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 21,
@@ -267,19 +267,19 @@
       "engine_type": "Lycoming O-320-H2AD",
       "engine_tbo_hours": "2000",
       "engine_smoh": "198",
-      "overhaul_tach": "4310.0",
+      "overhaul_tach": "4267.2",
       "max_gross_weight_lbs": "2300",
       "airworthiness_status": "CAUTION",
       "operator": "Desert Sky Aviation"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 22,
     "externalId": "N8834Q-ENGINE",
     "name": "N8834Q \u2014 Engine (Lycoming O-320-H2AD)",
-    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBO, 198 SMOH",
+    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBOH, 198 SMOH",
     "parentId": null,
     "parentExternalId": "N8834Q",
     "metadata": {
@@ -289,8 +289,8 @@
       "smoh": "198",
       "fuel_type": "100LL"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 23,
@@ -303,8 +303,8 @@
       "count": "4",
       "plug_model": "Champion REM40E"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 24,
@@ -317,14 +317,14 @@
       "capacity_qts": "8",
       "change_interval_hrs": "50"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 25,
     "externalId": "N8834Q-PROPELLER",
     "name": "N8834Q \u2014 Propeller (McCauley 1C235/DTM7557)",
-    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBO",
+    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBOH",
     "parentId": null,
     "parentExternalId": "N8834Q",
     "metadata": {
@@ -332,8 +332,8 @@
       "tbo_hours": "2000",
       "tbo_years": "6"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 26,
@@ -346,8 +346,8 @@
       "max_gross_weight_lbs": "2300",
       "vne_kias": "163"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 27,
@@ -360,8 +360,8 @@
       "transponder_inspection_months": "24",
       "elt_battery_months": "12"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 28,
@@ -374,14 +374,14 @@
       "capacity_gal_usable": "43",
       "fuel_type": "100LL"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 31,
     "externalId": "N1156P",
     "name": "N1156P \u2014 1978 Cessna 172N",
-    "description": "1978 Cessna 172N, S/N 17271891. NOT AIRWORTHY \u2014 catastrophic engine failure Oct 2025. Grounded.",
+    "description": "1978 Cessna 172N, S/N 17271891. NOT AIRWORTHY \u2014 catastrophic engine failure (March 2026). Grounded.",
     "parentId": null,
     "parentExternalId": null,
     "metadata": {
@@ -398,14 +398,14 @@
       "airworthiness_status": "NOT_AIRWORTHY",
       "operator": "Desert Sky Aviation"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 32,
     "externalId": "N1156P-ENGINE",
     "name": "N1156P \u2014 Engine (Lycoming O-320-H2AD)",
-    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBO, 520 SMOH",
+    "description": "Lycoming O-320-H2AD, 160 hp, 2000 hr TBOH, 520 SMOH",
     "parentId": null,
     "parentExternalId": "N1156P",
     "metadata": {
@@ -415,8 +415,8 @@
       "smoh": "520",
       "fuel_type": "100LL"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 33,
@@ -429,8 +429,8 @@
       "count": "4",
       "plug_model": "Champion REM40E"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 34,
@@ -443,14 +443,14 @@
       "capacity_qts": "8",
       "change_interval_hrs": "50"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 35,
     "externalId": "N1156P-PROPELLER",
     "name": "N1156P \u2014 Propeller (McCauley 1C235/DTM7557)",
-    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBO",
+    "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBOH",
     "parentId": null,
     "parentExternalId": "N1156P",
     "metadata": {
@@ -458,8 +458,8 @@
       "tbo_hours": "2000",
       "tbo_years": "6"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 36,
@@ -472,8 +472,8 @@
       "max_gross_weight_lbs": "2300",
       "vne_kias": "163"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 37,
@@ -486,8 +486,8 @@
       "transponder_inspection_months": "24",
       "elt_battery_months": "12"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 38,
@@ -500,14 +500,14 @@
       "capacity_gal_usable": "43",
       "fuel_type": "100LL"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 101,
     "externalId": "ENGINE_MODEL_LYC_O320_H2AD",
     "name": "Lycoming O-320-H2AD",
-    "description": "4-cylinder horizontally opposed aircraft engine, 160hp, 2000hr TBO",
+    "description": "4-cylinder horizontally opposed aircraft engine, 160hp, 2000hr TBOH",
     "parentId": null,
     "parentExternalId": null,
     "metadata": {
@@ -515,8 +515,8 @@
       "horsepower": "160",
       "tbo_hours": "2000"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   },
   {
     "id": 100,
@@ -530,7 +530,7 @@
       "contact": "ops@desertsky.aero",
       "type": "FleetOperator"
     },
-    "createdTime": 1775447062329,
-    "lastUpdatedTime": 1775447062329
+    "createdTime": 1775975548314,
+    "lastUpdatedTime": 1775975548314
   }
 ]

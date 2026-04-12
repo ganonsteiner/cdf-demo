@@ -8,10 +8,11 @@
  *   - traversalEvents: graph nodes visited by the most recent query
  *   - replayNodes: traversal nodes for replay animation
  *   - floatingChatOpen: FAB chat popup (all tabs except AI Assistant)
+ *   - graphDataSnapshot: last /api/graph payload — aligns traversal counts with highlights
  */
 
 import { create } from "zustand";
-import type { AgentEvent, ChatMessage } from "./types";
+import type { AgentEvent, ChatMessage, GraphData } from "./types";
 
 export const TAILS = ["N4798E", "N2251K", "N8834Q", "N1156P"] as const;
 export type TailNumber = typeof TAILS[number];
@@ -38,6 +39,9 @@ interface AppState {
   floatingChatOpen: boolean;
   setFloatingChatOpen: (v: boolean) => void;
   toggleFloatingChat: () => void;
+
+  graphDataSnapshot: GraphData | null;
+  setGraphDataSnapshot: (d: GraphData | null) => void;
 }
 
 export const useStore = create<AppState>((set) => ({
@@ -78,4 +82,7 @@ export const useStore = create<AppState>((set) => ({
   setFloatingChatOpen: (v) => set({ floatingChatOpen: v }),
   toggleFloatingChat: () =>
     set((s) => ({ floatingChatOpen: !s.floatingChatOpen })),
+
+  graphDataSnapshot: null,
+  setGraphDataSnapshot: (d) => set({ graphDataSnapshot: d }),
 }));

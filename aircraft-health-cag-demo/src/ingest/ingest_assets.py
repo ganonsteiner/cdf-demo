@@ -27,7 +27,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
-from dataset import ENGINE_TACH_AT_OVERHAUL  # noqa: E402
+from dataset import ENGINE_TACH_AT_OVERHAUL, format_n1156p_accident_month_year  # noqa: E402
 
 from mock_cdf.store.store import store, Asset  # noqa: E402
 
@@ -46,7 +46,7 @@ FLEET: list[dict[str, Any]] = [
     {
         "tail": "N2251K",
         "name": "N2251K — 1978 Cessna 172N",
-        "description": "1978 Cessna 172N, S/N 17271243. FERRY ONLY — oil overdue 1.2 hrs. Based KPHX.",
+        "description": "1978 Cessna 172N, S/N 17271243. FERRY ONLY — oil overdue 1.2 hr. Based KPHX.",
         "serial": "17271243",
         "smoh": "290",
         "status": "FERRY_ONLY",
@@ -62,7 +62,10 @@ FLEET: list[dict[str, Any]] = [
     {
         "tail": "N1156P",
         "name": "N1156P — 1978 Cessna 172N",
-        "description": "1978 Cessna 172N, S/N 17271891. NOT AIRWORTHY — catastrophic engine failure Oct 2025. Grounded.",
+        "description": (
+            "1978 Cessna 172N, S/N 17271891. NOT AIRWORTHY — catastrophic engine failure "
+            f"({format_n1156p_accident_month_year()}). Grounded."
+        ),
         "serial": "17271891",
         "smoh": "520",
         "status": "NOT_AIRWORTHY",
@@ -107,7 +110,7 @@ def _build_fleet_assets() -> list[dict[str, Any]]:
             "id": base_id + 1,
             "externalId": f"{tail}-ENGINE",
             "name": f"{tail} — Engine (Lycoming O-320-H2AD)",
-            "description": f"Lycoming O-320-H2AD, 160 hp, 2000 hr TBO, {aircraft['smoh']} SMOH",
+            "description": f"Lycoming O-320-H2AD, 160 hp, 2000 hr TBOH, {aircraft['smoh']} SMOH",
             "parentExternalId": tail,
             "metadata": {
                 "model": "O-320-H2AD",
@@ -143,7 +146,7 @@ def _build_fleet_assets() -> list[dict[str, Any]]:
             "id": base_id + 4,
             "externalId": f"{tail}-PROPELLER",
             "name": f"{tail} — Propeller (McCauley 1C235/DTM7557)",
-            "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBO",
+            "description": "McCauley 1C235/DTM7557 fixed-pitch 2-blade, 2000 hr / 6 yr TBOH",
             "parentExternalId": tail,
             "metadata": {"model": "1C235/DTM7557", "tbo_hours": "2000", "tbo_years": "6"},
         })
@@ -185,7 +188,7 @@ def _build_fleet_assets() -> list[dict[str, Any]]:
         "id": 101,
         "externalId": "ENGINE_MODEL_LYC_O320_H2AD",
         "name": "Lycoming O-320-H2AD",
-        "description": "4-cylinder horizontally opposed aircraft engine, 160hp, 2000hr TBO",
+        "description": "4-cylinder horizontally opposed aircraft engine, 160hp, 2000hr TBOH",
         "parentExternalId": None,
         "metadata": {
             "type": "EngineModel",

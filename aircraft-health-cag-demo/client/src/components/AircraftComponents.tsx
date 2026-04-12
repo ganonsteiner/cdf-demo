@@ -1,12 +1,27 @@
-import { useEffect, useLayoutEffect, useState } from "react";
-import { Plane, ChevronRight, CheckCircle, AlertTriangle, XCircle, Wrench } from "lucide-react";
-import { cn, formatDate } from "../lib/utils";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { Puzzle, ChevronRight, AlertTriangle, Wrench } from "lucide-react";
+import {
+  cn,
+  CARD_SURFACE_A,
+  CARD_SURFACE_B,
+  MAIN_TAB_CONTENT_FRAME,
+  TAB_PAGE_TOP_INSET,
+  calendarDaysUntil,
+  formatDate,
+  toneClasses,
+} from "../lib/utils";
 import { api } from "../lib/api";
 import { useStore, TAILS } from "../lib/store";
 import type { ComponentNode, MaintenanceRecord } from "../lib/types";
-
 interface Props {
   active: boolean;
+}
+
+/** Strip leading `N4798E — ` style prefix from CDF asset names; tail is already shown in the page strip. */
+function componentDisplayName(name: string, tail: string): string {
+  const escaped = tail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const stripped = name.replace(new RegExp(`^${escaped}\\s*[\\u2014\\-–]\\s*`), "").trim();
+  return stripped.length > 0 ? stripped : name;
 }
 
 function buildTree(nodes: ComponentNode[]): Map<string | null, ComponentNode[]> {
@@ -19,18 +34,30 @@ function buildTree(nodes: ComponentNode[]): Map<string | null, ComponentNode[]> 
   return tree;
 }
 
-function statusIcon(status: ComponentNode["status"]) {
-  if (status === "overdue")
-    return <XCircle className="w-3.5 h-3.5 text-red-400 shrink-0" />;
-  if (status === "due_soon")
-    return <AlertTriangle className="w-3.5 h-3.5 text-yellow-400 shrink-0" />;
-  return <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />;
-}
-
 function statusDot(status: ComponentNode["status"]) {
   if (status === "overdue") return "bg-red-500";
   if (status === "due_soon") return "bg-yellow-400";
   return "bg-emerald-500";
+}
+
+/** Same relative component on another aircraft (N4798E-ENGINE → N2251K-ENGINE). Unknown ids → root. */
+function mapComponentExternalIdForTailChange(
+  id: string,
+  fromTail: string,
+  toTail: string
+): string {
+  if (fromTail === toTail) return id;
+  if (id === fromTail) return toTail;
+  const prefix = `${fromTail}-`;
+  if (id.startsWith(prefix)) {
+    return `${toTail}-${id.slice(prefix.length)}`;
+  }
+  return toTail;
+}
+
+/** True when this payload is for the given aircraft (avoids reconciling selection against a stale tail's graph). */
+function componentsBelongToTail(nodes: ComponentNode[], aircraftTail: string): boolean {
+  return nodes.some((c) => c.externalId === aircraftTail);
 }
 
 export default function AircraftComponents({ active }: Props) {
@@ -42,35 +69,102 @@ export default function AircraftComponents({ active }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [compHistory, setCompHistory] = useState<MaintenanceRecord[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const prevTailRef = useRef<string | null>(null);
+  /** False while another app tab is focused — used to detect return to Components. */
+  const prevAppTabActiveRef = useRef(false);
 
   useLayoutEffect(() => {
-    if (!active) return;
+    if (!active) {
+      prevAppTabActiveRef.current = false;
+      return;
+    }
+
+    const reenteredComponentsTab = !prevAppTabActiveRef.current;
+    prevAppTabActiveRef.current = true;
+
     setLoading(true);
     setError(null);
-    setSelectedId(null);
     setComponents([]);
+
+    const prev = prevTailRef.current;
+    if (reenteredComponentsTab) {
+      setSelectedId(tail);
+    } else if (prev !== null && prev !== tail) {
+      setSelectedId((sid) =>
+        sid === null ? null : mapComponentExternalIdForTailChange(sid, prev, tail)
+      );
+    }
+    prevTailRef.current = tail;
   }, [active, tail]);
 
   useEffect(() => {
     if (!active) return;
-    api
-      .components(tail)
-      .then(setComponents)
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoading(false));
+    const onVisibility = () => {
+      if (document.visibilityState !== "visible") return;
+      setSelectedId(tail);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [active, tail]);
+
+  useEffect(() => {
+    if (!active) return;
+    const ac = new AbortController();
+    api
+      .components(tail, { signal: ac.signal })
+      .then((data) => {
+        if (ac.signal.aborted) return;
+        setComponents(data);
+      })
+      .catch((e: unknown) => {
+        if (ac.signal.aborted) return;
+        setError(e instanceof Error ? e.message : String(e));
+      })
+      .finally(() => {
+        if (ac.signal.aborted) return;
+        setLoading(false);
+      });
+    return () => ac.abort();
+  }, [active, tail]);
+
+  /**
+   * Default to aircraft root when there is no valid selection; keep remapped id once the graph matches this tail.
+   * Must ignore stale component lists (out-of-order fetches) so we do not snap back to root.
+   */
+  useEffect(() => {
+    if (!active || loading) return;
+    if (components.length === 0) return;
+    if (!componentsBelongToTail(components, tail)) return;
+    setSelectedId((sid) => {
+      const ok = sid !== null && components.some((c) => c.externalId === sid);
+      if (ok) return sid;
+      return tail;
+    });
+  }, [active, loading, components, tail]);
 
   useEffect(() => {
     if (!selectedId) {
       setCompHistory([]);
+      setHistoryLoading(false);
       return;
     }
+    const ac = new AbortController();
     setHistoryLoading(true);
     api
-      .maintenanceHistory(tail, { component: selectedId, per_page: 50 })
-      .then((res) => setCompHistory(res.records))
-      .catch(() => setCompHistory([]))
-      .finally(() => setHistoryLoading(false));
+      .maintenanceHistory(tail, { component: selectedId, per_page: 50, signal: ac.signal })
+      .then((res) => {
+        if (ac.signal.aborted) return;
+        setCompHistory(res.records);
+      })
+      .catch(() => {
+        if (ac.signal.aborted) return;
+        setCompHistory([]);
+      })
+      .finally(() => {
+        if (ac.signal.aborted) return;
+        setHistoryLoading(false);
+      });
+    return () => ac.abort();
   }, [selectedId, tail]);
 
   const tree = buildTree(components);
@@ -89,24 +183,27 @@ export default function AircraftComponents({ active }: Props) {
             className={cn(
               "w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-left text-sm transition-colors group",
               selectedId === node.externalId
-                ? "bg-sky-950/50 border border-sky-800/50"
-                : "hover:bg-zinc-800/60 border border-transparent"
+                ? "bg-sky-950/50 border border-sky-800/50 text-sky-100"
+                : "hover:bg-zinc-900/80 border border-transparent"
             )}
           >
             <span className={cn("w-2 h-2 rounded-full shrink-0", statusDot(node.status))} />
             <span className="flex-1 min-w-0">
-              <span className="text-zinc-200 font-medium truncate block">{node.name}</span>
-              <span className="text-xs text-zinc-600 font-mono truncate block">{node.externalId}</span>
+              <span className="text-zinc-200 font-medium truncate block">
+                {componentDisplayName(node.name, tail)}
+              </span>
+              <span className="text-xs text-zinc-500 font-mono truncate block">{node.externalId}</span>
             </span>
-            <div className="flex items-center gap-2 shrink-0">
-              {node.maintenanceCount > 0 && (
-                <span className="text-xs text-zinc-600">{node.maintenanceCount}</span>
-              )}
-              {statusIcon(node.status)}
-              {hasChildren && (
-                <ChevronRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400" />
-              )}
-            </div>
+            {(node.maintenanceCount > 0 || hasChildren) && (
+              <div className="flex items-center gap-2 shrink-0">
+                {node.maintenanceCount > 0 && (
+                  <span className="text-xs text-zinc-600">{node.maintenanceCount}</span>
+                )}
+                {hasChildren && (
+                  <ChevronRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400" />
+                )}
+              </div>
+            )}
           </button>
           {/* Children indented with a left border connector line */}
           {hasChildren && (
@@ -124,49 +221,56 @@ export default function AircraftComponents({ active }: Props) {
   const treeSkeletonMargins = [0, 0, 20, 20, 40, 20, 20, 0];
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-zinc-800 shrink-0">
-        <span className="text-xs text-zinc-500">Aircraft:</span>
-        <div className="flex gap-1 flex-wrap">
-          {TAILS.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setSelectedAircraft(t)}
-              className={cn(
-                "px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors",
-                tail === t
-                  ? "bg-sky-600 text-white border-sky-500"
-                  : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500"
-              )}
-            >
-              {t}
-            </button>
-          ))}
+    <div
+      className={cn(
+        "flex flex-1 min-h-0 flex-col overflow-hidden pb-6",
+        MAIN_TAB_CONTENT_FRAME,
+        TAB_PAGE_TOP_INSET
+      )}
+    >
+      <div className="shrink-0 mb-3">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1 flex-wrap">
+            {TAILS.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setSelectedAircraft(t)}
+                className={cn(
+                  "px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors",
+                  tail === t
+                    ? "bg-sky-600 text-white border-sky-500"
+                    : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500"
+                )}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="flex-1 flex gap-4 overflow-hidden p-4 min-h-0">
-        <div className="flex-1 min-w-0 bg-zinc-900 rounded-xl border border-zinc-800 overflow-y-auto">
-          <div className="px-4 py-3 border-b border-zinc-800 flex items-center gap-2">
-            <Plane className="w-4 h-4 text-sky-400" />
-            <span className="text-sm font-semibold text-zinc-300">{tail} — Component Hierarchy</span>
-            <span className="text-xs text-zinc-600 ml-auto">
-              {loading ? "…" : `${components.length} nodes`}
-            </span>
-          </div>
-
-          <div className="px-4 py-2 border-b border-zinc-800/50 flex gap-4">
-            {[
-              { label: "OK", color: "bg-emerald-500" },
-              { label: "Due soon", color: "bg-yellow-400" },
-              { label: "Overdue", color: "bg-red-500" },
-            ].map((l) => (
-              <span key={l.label} className="flex items-center gap-1.5 text-xs text-zinc-500">
-                <span className={cn("w-2 h-2 rounded-full shrink-0", l.color)} />
-                {l.label}
+      <div className="flex-1 flex gap-4 overflow-hidden min-h-0">
+        <div className={cn("flex-1 min-w-0 rounded-xl overflow-y-auto", CARD_SURFACE_B)}>
+          <div className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2 min-w-0">
+              <Puzzle className="w-3.5 h-3.5 text-zinc-500 shrink-0" aria-hidden />
+              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">
+                Aircraft Components
               </span>
-            ))}
+            </div>
+            <div className="flex items-center gap-4 shrink-0">
+              {[
+                { label: "OK", color: "bg-emerald-500" },
+                { label: "Due soon", color: "bg-yellow-400" },
+                { label: "Overdue", color: "bg-red-500" },
+              ].map((l) => (
+                <span key={l.label} className="flex items-center gap-1.5 text-xs text-zinc-500">
+                  <span className={cn("w-2 h-2 rounded-full shrink-0", l.color)} />
+                  {l.label}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div className="p-2 space-y-0.5">
@@ -188,7 +292,12 @@ export default function AircraftComponents({ active }: Props) {
                 ))}
               </div>
             ) : error ? (
-              <div className="flex items-center gap-3 p-4 m-2 rounded-xl bg-red-950/20 border border-red-800/30">
+              <div
+                className={cn(
+                  "flex items-center gap-3 p-4 m-2 rounded-xl",
+                  toneClasses("bad").bannerPanel
+                )}
+              >
                 <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
                 <p className="text-sm text-red-300">{error}</p>
               </div>
@@ -202,12 +311,12 @@ export default function AircraftComponents({ active }: Props) {
         {selectedComp ? (
           <>
             {/* Component card */}
-            <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-4">
+            <div className={cn("rounded-xl p-4", CARD_SURFACE_B)}>
               <div className="flex items-start gap-2 mb-3">
                 <span className={cn("w-2.5 h-2.5 rounded-full mt-1 shrink-0", statusDot(selectedComp.status))} />
                 <div className="min-w-0">
                   <p className="font-semibold text-zinc-100 text-sm leading-tight">
-                    {selectedComp.name}
+                    {componentDisplayName(selectedComp.name, tail)}
                   </p>
                   <p className="text-xs font-mono text-zinc-500 mt-0.5">{selectedComp.externalId}</p>
                 </div>
@@ -226,39 +335,62 @@ export default function AircraftComponents({ active }: Props) {
                 />
                 <DetailRow
                   label="Last maintenance"
-                  value={formatDate(selectedComp.lastMaintenanceDate) ?? "No records"}
+                  value={
+                    <span className="whitespace-nowrap">
+                      {formatDate(selectedComp.lastMaintenanceDate) ?? "No records"}
+                    </span>
+                  }
                 />
                 {selectedComp.nextDueTach != null && (
                   <DetailRow
                     label="Next due (tach)"
-                    value={`${selectedComp.nextDueTach.toFixed(1)} hr${
-                      selectedComp.hoursUntilDue !== null
-                        ? ` (${selectedComp.hoursUntilDue > 0 ? "+" : ""}${selectedComp.hoursUntilDue?.toFixed(1)} tach hr)`
-                        : ""
-                    }`}
-                    highlight={selectedComp.status !== "ok"}
+                    value={
+                      <>
+                        {`${selectedComp.nextDueTach.toFixed(1)} hr`}
+                        {selectedComp.hoursUntilDue !== null && (
+                          <span className="whitespace-nowrap">
+                            {` (${selectedComp.hoursUntilDue.toFixed(1)} hr)`}
+                          </span>
+                        )}
+                      </>
+                    }
+                    valueTone={
+                      selectedComp.hoursUntilDue !== null && selectedComp.hoursUntilDue < 0
+                        ? "bad"
+                        : selectedComp.status === "due_soon"
+                          ? "warn"
+                          : "default"
+                    }
                   />
                 )}
                 {selectedComp.nextDueDate && (
                   <DetailRow
                     label="Due date"
-                    value={formatDate(selectedComp.nextDueDate) ?? ""}
+                    value={(() => {
+                      const fd = formatDate(selectedComp.nextDueDate) ?? "";
+                      const days = calendarDaysUntil(selectedComp.nextDueDate);
+                      const text =
+                        days === null ? fd : `${fd} (${days} d)`;
+                      return <span className="whitespace-nowrap">{text}</span>;
+                    })()}
                   />
                 )}
               </div>
             </div>
 
-            {/* Maintenance history for this component */}
-            <div className="flex-1 bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden flex flex-col">
+            {/* Maintenance history for this component — Tier A shell, Tier B rows */}
+            <div className={cn("flex-1 rounded-xl overflow-hidden flex flex-col", CARD_SURFACE_A)}>
               <div className="px-4 py-3 border-b border-zinc-800 flex items-center gap-2">
-                <Wrench className="w-3.5 h-3.5 text-zinc-500" />
-                <span className="text-sm font-medium text-zinc-400">Maintenance History</span>
+                <Wrench className="w-3.5 h-3.5 text-zinc-500 shrink-0" aria-hidden />
+                <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">
+                  Maintenance History
+                </span>
               </div>
               <div className="flex-1 overflow-y-auto" style={{ minHeight: 0 }}>
                 {historyLoading ? (
                   <div className="p-4 space-y-2 animate-pulse">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className="h-12 bg-zinc-800 rounded-lg" />
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className={cn("h-12 rounded-lg", CARD_SURFACE_B)} />
                     ))}
                   </div>
                 ) : compHistory.length === 0 ? (
@@ -271,13 +403,25 @@ export default function AircraftComponents({ active }: Props) {
                     {compHistory.map((rec, i) => (
                       <div
                         key={rec.externalId || i}
-                        className="p-3 rounded-lg bg-zinc-800/40 border border-zinc-800/60"
+                        className={cn("p-3 rounded-lg", CARD_SURFACE_B)}
                       >
                         <p className="text-xs text-zinc-200 leading-snug">
                           {rec.description || rec.subtype || rec.type}
                         </p>
-                        <div className="flex gap-2 mt-1 text-xs text-zinc-600">
-                          <span>{rec.metadata?.date || "—"}</span>
+                        <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1 text-xs text-zinc-600">
+                          <span className="whitespace-nowrap">
+                            {(() => {
+                              const d =
+                                formatDate(rec.metadata?.date) ??
+                                rec.metadata?.date ??
+                                "—";
+                              const nd = rec.metadata?.next_due_date?.trim();
+                              if (!nd) return d;
+                              const days = calendarDaysUntil(nd);
+                              if (days === null) return d;
+                              return `${d} (${days} d)`;
+                            })()}
+                          </span>
                           {rec.metadata?.hobbs_at_service && (
                             <span className="font-mono">{rec.metadata.hobbs_at_service} hr</span>
                           )}
@@ -290,8 +434,8 @@ export default function AircraftComponents({ active }: Props) {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-zinc-900 rounded-xl border border-zinc-800 text-zinc-600 text-center p-8">
-            <Plane className="w-10 h-10 mb-3" />
+          <div className={cn("flex-1 flex flex-col items-center justify-center rounded-xl text-zinc-600 text-center p-8", CARD_SURFACE_A)}>
+            <Puzzle className="w-10 h-10 mb-3" />
             <p className="text-sm">Select a component</p>
             <p className="text-xs mt-1">to view maintenance history</p>
           </div>
@@ -305,18 +449,22 @@ export default function AircraftComponents({ active }: Props) {
 function DetailRow({
   label,
   value,
-  highlight = false,
+  valueTone = "default",
 }: {
   label: string;
-  value: string;
-  highlight?: boolean;
+  value: ReactNode;
+  valueTone?: "default" | "warn" | "bad";
 }) {
+  const valueClass =
+    valueTone === "bad"
+      ? "text-red-400"
+      : valueTone === "warn"
+        ? "text-yellow-400"
+        : "text-zinc-300";
   return (
     <div className="flex items-start gap-2">
       <span className="text-zinc-600 w-28 shrink-0">{label}</span>
-      <span className={cn("font-mono", highlight ? "text-yellow-400" : "text-zinc-300")}>
-        {value}
-      </span>
+      <span className={cn("font-mono min-w-0 flex-1", valueClass)}>{value}</span>
     </div>
   );
 }

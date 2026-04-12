@@ -11,8 +11,8 @@
   {
     "externalId": "Policy_OilGracePeriod",
     "title": "Oil Change Grace Period \u2014 Ferry Flight Authorization",
-    "description": "Aircraft with oil change overdue by 1-5 tach hours may conduct a single direct ferry flight to the maintenance facility. The PIC must document the ferry flight in the aircraft journey log. Aircraft with oil overdue by more than 5 tach hours are NOT AIRWORTHY.",
-    "rule": "ferry_authorized_if_oil_overdue_tach_hours_between=1,5; ferry_not_authorized_if_oil_overdue_tach_hours_gt=5",
+    "description": "Aircraft may conduct a single direct ferry to the maintenance facility when oil is overdue on tach by >0.0\u20135.0 hours, or on the calendar leg by 1\u201313 days (per 50 tach hr / 4 month policy). PIC must document the ferry in the journey log. Oil overdue by more than 5 tach hours, or 14+ calendar days past the due date, is NOT AIRWORTHY.",
+    "rule": "ferry_authorized_if_oil_overdue_tach_hours_between=0.1,5; ferry_authorized_if_oil_overdue_calendar_days_between=1,13; ferry_not_authorized_if_oil_overdue_tach_hours_gt=5; ferry_not_authorized_if_oil_overdue_calendar_days_gte=14",
     "category": "airworthiness",
     "references": "Desert Sky Aviation Operations Manual Rev 4.2",
     "type": "OperationalPolicy"
@@ -29,8 +29,8 @@
   {
     "externalId": "Policy_FerryFlightOilOverdue",
     "title": "Ferry Flight Procedure for Maintenance",
-    "description": "Ferry flights to maintenance facility are permitted only when: (1) aircraft has a valid annual inspection, (2) oil is overdue by no more than 5 tach hours, (3) no grounding squawks exist, (4) PIC holds at least private certificate with appropriate ratings, (5) flight is direct to maintenance facility with no intermediate stops.",
-    "rule": "ferry_requires_valid_annual=true; ferry_max_oil_overdue_tach_hours=5; ferry_requires_no_grounding_squawks=true",
+    "description": "Ferry flights to maintenance facility are permitted only when: (1) aircraft has a valid annual inspection, (2) oil is overdue by no more than 5 tach hours and no more than 13 calendar days (4-month leg), (3) no grounding squawks exist, (4) PIC holds at least private certificate with appropriate ratings, (5) flight is direct to maintenance facility with no intermediate stops.",
+    "rule": "ferry_requires_valid_annual=true; ferry_max_oil_overdue_tach_hours=5; ferry_max_oil_overdue_calendar_days=13; ferry_requires_no_grounding_squawks=true",
     "category": "operations",
     "references": "Desert Sky Aviation Operations Manual Rev 4.2",
     "type": "OperationalPolicy"

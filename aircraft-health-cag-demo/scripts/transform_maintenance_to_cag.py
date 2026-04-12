@@ -9,6 +9,7 @@ by ingest_maintenance.py.
 from __future__ import annotations
 
 import csv
+import os
 import sys
 from pathlib import Path
 
@@ -16,7 +17,7 @@ SCRIPT_DIR = Path(__file__).parent
 DATA_DIR = SCRIPT_DIR.parent / "data"
 
 sys.path.insert(0, str(SCRIPT_DIR))
-from dataset import TAILS, get_all_maintenance  # noqa: E402
+from dataset import TAILS, get_all_maintenance, get_demo_anchor  # noqa: E402
 
 
 FIELDNAMES = [
@@ -47,6 +48,10 @@ def write_maintenance_csv(tail: str) -> Path:
 
 
 def main() -> None:
+    anchor = get_demo_anchor()
+    env_used = os.environ.get("DESERT_SKY_DEMO_DATE", "").strip()
+    src = "DESERT_SKY_DEMO_DATE" if env_used else "UTC today"
+    print(f"Demo anchor (UTC date): {anchor.date().isoformat()} (source: {src})")
     print("Generating per-tail maintenance CSVs...")
     for tail in TAILS:
         write_maintenance_csv(tail)

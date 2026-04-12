@@ -1,11 +1,27 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, CheckCircle, Info, XCircle, Plane } from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, XCircle, Plane, ArrowRight } from "lucide-react";
 import { api } from "../lib/api";
 import { useStore, TAILS, type TailNumber } from "../lib/store";
 import type { FleetAircraft } from "../lib/types";
-import { cn } from "../lib/utils";
+import {
+  cn,
+  CARD_SURFACE_A,
+  CARD_SURFACE_B,
+  CARD_SURFACE_C,
+  formatSignedOilHoursCompact,
+  TAB_PAGE_TOP_INSET,
+  toneClasses,
+  toneForAirworthiness,
+  toneForDue,
+  toneForOilLife,
+  toneForSquawks,
+} from "../lib/utils";
 
 type Tab = "fleet" | "dashboard" | "query" | "maintenance" | "flights" | "aircraft" | "graph";
+
+/** Mirrors StatusDashboard assistant footer inset: `left-2 bottom-2` there → `right-2 bottom-2` here (do not change Status). */
+const FLEET_CARD_STATUS_FOOTER_ROW =
+  "pointer-events-none absolute right-2 bottom-2 z-10 inline-flex shrink-0 items-center gap-0.5 text-sm leading-none text-zinc-500 transition-colors group-hover/card:text-sky-400";
 
 interface FleetPageProps {
   onNavigate: (tab: Tab, tail: TailNumber) => void;
@@ -16,35 +32,35 @@ const AIRWORTHINESS_CONFIG = {
     label: "AIRWORTHY",
     icon: CheckCircle,
     dot: "bg-emerald-400",
-    badge: "text-emerald-400 bg-emerald-950/40 border-emerald-800/50",
+    badge: toneClasses("ok").badge,
     card: "border-emerald-800/30",
   },
   FERRY_ONLY: {
     label: "FERRY ONLY",
     icon: Info,
     dot: "bg-yellow-400",
-    badge: "text-yellow-400 bg-yellow-950/40 border-yellow-800/50",
+    badge: toneClasses("warn").badge,
     card: "border-yellow-800/30",
   },
   CAUTION: {
     label: "CAUTION",
     icon: AlertTriangle,
-    dot: "bg-orange-400",
-    badge: "text-orange-400 bg-orange-950/40 border-orange-800/50",
-    card: "border-orange-800/30",
+    dot: "bg-yellow-400",
+    badge: toneClasses("warn").badge,
+    card: "border-yellow-800/30",
   },
   NOT_AIRWORTHY: {
     label: "NOT AIRWORTHY",
     icon: XCircle,
     dot: "bg-red-500",
-    badge: "text-red-400 bg-red-950/40 border-red-800/50",
+    badge: toneClasses("bad").badge,
     card: "border-red-800/30",
   },
   UNKNOWN: {
     label: "UNKNOWN",
     icon: Info,
     dot: "bg-zinc-400",
-    badge: "text-zinc-400 bg-zinc-800/40 border-zinc-700",
+    badge: toneClasses("unknown").badge,
     card: "border-zinc-700",
   },
 };
@@ -57,59 +73,90 @@ function AircraftCard({
   onSelect: () => void;
 }) {
   const cfg = AIRWORTHINESS_CONFIG[aircraft.airworthiness] ?? AIRWORTHINESS_CONFIG.UNKNOWN;
+  const awTone = toneForAirworthiness(aircraft.airworthiness);
   const smoh = Number(aircraft.smoh) || 0;
   const smohPct = Math.min(100, Number(aircraft.smohPercent) || 0);
   const hobbs = Number(aircraft.hobbs) || 0;
+  const tach = Number(aircraft.tach) || 0;
   const oilOver =
     Number(aircraft.oilTachHoursOverdue ?? aircraft.oilHoursOverdue) || 0;
-  const oilUntil = Number(aircraft.oilTachHoursUntilDue) || 0;
+  const rawUntil = Number(aircraft.oilTachHoursUntilDue);
+  const oilUntil = Number.isFinite(rawUntil) ? rawUntil : 0;
   const oilDays = aircraft.oilDaysUntilDue;
   const loadErr = aircraft.metadata?.load_error;
 
-  const oilLine = () => {
-    if (oilOver > 0) {
-      const d = oilDays;
-      if (d !== null && d < 0) return `${oilOver.toFixed(1)} hr overdue · ${Math.abs(d)} d`;
-      return `${oilOver.toFixed(1)} hr overdue`;
-    }
-    if (oilUntil > 0) {
-      const hr = `${oilUntil.toFixed(1)} hr`;
-      if (oilDays !== null && oilDays >= 0) return `${hr} · ${oilDays} d`;
-      return hr;
-    }
-    return "Current";
+  /** Signed tach hours until oil due (negative = overdue). Prefer overdue magnitude when both are present. */
+  const signedOilHours = oilOver > 0 ? -oilOver : oilUntil;
+  const hasOilHorizon = oilOver > 0 || oilUntil !== 0 || oilDays !== null;
+
+  const formatSignedDays = (d: number | null) => {
+    if (d === null) return "— d";
+    const sign = d < 0 ? "-" : "";
+    return `${sign}${Math.abs(d)} d`;
   };
+
+  const oilLine = hasOilHorizon
+    ? `${formatSignedOilHoursCompact(signedOilHours, " ")} / ${formatSignedDays(oilDays)}`
+    : "— hr / — d";
+
+  const oilTone = !hasOilHorizon
+    ? toneForAirworthiness("UNKNOWN")
+    : toneForOilLife({
+        oilHoursOverdue: oilOver,
+        oilTachHoursUntilDue: signedOilHours,
+        oilDaysUntilDue: oilDays,
+      });
+
+  const annualTone = toneForDue(aircraft.annualDaysRemaining, "days");
+  const squawkTone = toneForSquawks(aircraft.openSquawkCount, aircraft.groundingSquawkCount);
+  const symptomTone = toneClasses(aircraft.activeSymptoms > 0 ? "warn" : "ok");
+  const nbsp = "\u00a0";
 
   return (
     <button
       onClick={onSelect}
       className={cn(
-        "text-left rounded-xl border bg-zinc-900/60 p-5 transition-all hover:bg-zinc-800/60 hover:border-zinc-600 group",
-        cfg.card
+        "relative text-left rounded-xl p-5 sm:p-6 pb-9 transition-all hover:bg-zinc-900/30 hover:border-zinc-700 group/card",
+        CARD_SURFACE_A,
+        "flex flex-col w-full min-w-0 overflow-hidden"
       )}
     >
+      <div className="flex flex-col min-w-0">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-sky-500/10 rounded-lg border border-sky-500/20">
+      <div className="flex items-start justify-between gap-3 mb-3 shrink-0 min-w-0">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="p-2 bg-sky-500/10 rounded-lg border border-sky-500/20 shrink-0">
             <Plane className="w-4 h-4 text-sky-400" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="font-bold text-base text-zinc-100 tracking-wide">{aircraft.tail}</div>
-            <div className="text-xs text-zinc-500 mt-0.5">1978 Cessna 172N · KPHX</div>
+            <div className="text-xs text-zinc-400 mt-0.5">1978 Cessna 172N · KPHX</div>
           </div>
         </div>
-        <span className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border", cfg.badge)}>
-          <span className={cn("w-1.5 h-1.5 rounded-full", cfg.dot)} />
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap px-2.5 py-1 rounded-full text-xs font-semibold border",
+            awTone.badge
+          )}
+        >
+          <span className={cn("w-1.5 h-1.5 shrink-0 rounded-full", awTone.dot)} />
           {cfg.label}
         </span>
       </div>
 
       {/* SMOH bar */}
-      <div className="mb-4">
-        <div className="flex justify-between text-xs mb-1.5">
-          <span className="text-zinc-400">Engine SMOH</span>
-          <span className="text-zinc-300 font-medium">{smoh.toFixed(0)} / {aircraft.tbo} hrs ({smohPct.toFixed(0)}%)</span>
+      <div className="mb-3 shrink-0">
+        <div className="flex justify-between items-baseline gap-2 text-sm mb-1.5">
+          <span className="text-zinc-400 font-medium">Engine SMOH</span>
+          <span className="tabular-nums shrink-0 text-sm">
+            <span className="text-zinc-300 font-medium">
+              {smoh.toFixed(0)} / {aircraft.tbo} hr
+            </span>
+            <span className="text-zinc-500 font-normal">
+              {"\u00a0"}·{"\u00a0"}
+              {smohPct.toFixed(0)}%
+            </span>
+          </span>
         </div>
         <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
           <div
@@ -122,61 +169,89 @@ function AircraftCard({
         </div>
       </div>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        <div className="bg-zinc-800/50 rounded-lg px-3 py-2">
-          <div className="text-zinc-500 mb-0.5">Hobbs</div>
-          <div className="text-zinc-200 font-medium">{hobbs.toFixed(1)} hrs</div>
-        </div>
-        <div className="bg-zinc-800/50 rounded-lg px-3 py-2">
-          <div className="text-zinc-500 mb-0.5">Open Squawks</div>
-          <div className={cn("font-medium", aircraft.groundingSquawkCount > 0 ? "text-red-400" : aircraft.openSquawkCount > 0 ? "text-yellow-400" : "text-emerald-400")}>
-            {aircraft.openSquawkCount} {aircraft.groundingSquawkCount > 0 && `(${aircraft.groundingSquawkCount} grounding)`}
+      {/* Stats grid — mb-3 separates tiles from absolute “View aircraft status” (pt on footer does not). */}
+      <div className="grid grid-cols-2 gap-3 shrink-0 mb-3">
+        <div className={cn("rounded-lg px-3 py-3", CARD_SURFACE_C)}>
+          <div className="text-xs font-medium text-zinc-400 mb-0.5">Aircraft Time (Hobbs)</div>
+          <div className="text-sm font-medium tabular-nums text-zinc-200 whitespace-nowrap">
+            {hobbs.toFixed(1)}
+            {"\u00a0"}
+            hr
           </div>
         </div>
-        <div className="bg-zinc-800/50 rounded-lg px-3 py-2">
-          <div className="text-zinc-500 mb-0.5">Annual Due</div>
-          <div className={cn("font-medium", aircraft.annualDaysRemaining !== null && aircraft.annualDaysRemaining < 0 ? "text-red-400" : aircraft.annualDaysRemaining !== null && aircraft.annualDaysRemaining < 30 ? "text-yellow-400" : "text-zinc-200")}>
+        <div className={cn("rounded-lg px-3 py-3", CARD_SURFACE_C)}>
+          <div className="text-xs font-medium text-zinc-400 mb-0.5">Engine Time (Tach)</div>
+          <div className="text-sm font-medium tabular-nums text-zinc-200 whitespace-nowrap">
+            {tach.toFixed(1)}
+            {"\u00a0"}
+            hr
+          </div>
+        </div>
+
+        {/* Annual (top-left under time cards) */}
+        <div className={cn("rounded-lg px-3 py-3", annualTone.panel)}>
+          <div className="text-xs font-medium text-zinc-400 mb-0.5">Annual Due</div>
+          <div
+            className={cn(
+              "text-sm font-medium",
+              annualTone.tone === "unknown" ? "text-zinc-200" : annualTone.text
+            )}
+          >
             {aircraft.annualDueDate || "—"}
           </div>
         </div>
-        <div className="bg-zinc-800/50 rounded-lg px-3 py-2">
-          <div className="text-zinc-500 mb-0.5">Oil Life</div>
+
+        {/* Oil (top-right under time cards) */}
+        <div className={cn("rounded-lg px-3 py-3", oilTone.panel)}>
+          <div className="text-xs font-medium text-zinc-400 mb-0.5">Oil Life</div>
           <div
             className={cn(
-              "font-medium",
-              oilOver > 0 ? "text-red-400" : oilUntil > 0 && oilUntil <= 10 ? "text-yellow-400" : "text-emerald-400"
+              "text-sm font-medium leading-snug",
+              !hasOilHorizon ? "text-zinc-200" : oilTone.text
             )}
           >
-            {oilLine()}
+            {oilLine}
+          </div>
+        </div>
+
+        {/* Squawks (bottom-left) */}
+        <div className={cn("rounded-lg px-3 py-3", squawkTone.panel)}>
+          <div className="text-xs font-medium text-zinc-400 mb-0.5">Squawks</div>
+          <div className={cn("text-sm font-medium tabular-nums", squawkTone.text)}>
+            {`${aircraft.openSquawkCount}${nbsp}open`}
+            {aircraft.groundingSquawkCount > 0 && (
+              <>
+                {" "}
+                ({aircraft.groundingSquawkCount} grounding)
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Symptoms (bottom-right) */}
+        <div className={cn("rounded-lg px-3 py-3", symptomTone.panel)}>
+          <div className="text-xs font-medium text-zinc-400 mb-0.5">Symptoms</div>
+          <div className={cn("text-sm font-medium tabular-nums", symptomTone.text)}>
+            {`${aircraft.activeSymptoms}${nbsp}reported`}
           </div>
         </div>
       </div>
 
-      {/* Symptoms/conditions if any */}
-      {(aircraft.activeSymptoms > 0 || aircraft.activeConditions > 0) && (
-        <div className="mt-3 flex gap-2 text-xs">
-          {aircraft.activeSymptoms > 0 && (
-            <span className="px-2 py-0.5 bg-orange-950/40 text-orange-400 border border-orange-800/40 rounded-full">
-              {aircraft.activeSymptoms} symptom{aircraft.activeSymptoms !== 1 ? "s" : ""}
-            </span>
-          )}
-          {aircraft.activeConditions > 0 && (
-            <span className="px-2 py-0.5 bg-red-950/40 text-red-400 border border-red-800/40 rounded-full">
-              {aircraft.activeConditions} condition{aircraft.activeConditions !== 1 ? "s" : ""}
-            </span>
-          )}
-        </div>
-      )}
-
       {loadErr && (
-        <div className="mt-3 text-xs text-red-400/90 border border-red-900/50 rounded-lg px-2 py-1.5 bg-red-950/20">
+        <div
+          className={cn(
+            "mt-3 text-xs text-red-400/90 rounded-lg px-2 py-1.5 border-l-[3px] border-l-red-500/60",
+            CARD_SURFACE_C
+          )}
+        >
           Could not load status: {loadErr}
         </div>
       )}
+      </div>
 
-      <div className="mt-3 text-xs text-zinc-600 group-hover:text-zinc-500 transition-colors">
-        View aircraft status →
+      <div className={FLEET_CARD_STATUS_FOOTER_ROW}>
+        <span className="whitespace-nowrap">View aircraft status</span>
+        <ArrowRight className="w-3.5 h-3.5 shrink-0" aria-hidden />
       </div>
     </button>
   );
@@ -204,23 +279,26 @@ export default function FleetPage({ onNavigate }: FleetPageProps) {
   const airworthyCounts = {
     AIRWORTHY: fleet.filter((a) => a.airworthiness === "AIRWORTHY").length,
     FERRY_ONLY: fleet.filter((a) => a.airworthiness === "FERRY_ONLY").length,
-    CAUTION: fleet.filter((a) => a.airworthiness === "CAUTION").length,
     NOT_AIRWORTHY: fleet.filter((a) => a.airworthiness === "NOT_AIRWORTHY").length,
   };
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="max-w-4xl mx-auto py-6 px-2">
+    <div className="flex flex-1 flex-col min-h-0 min-w-0 w-full overflow-hidden">
+      <div
+        className={cn(
+          "flex flex-1 flex-col min-h-0 max-w-4xl mx-auto w-full min-w-0 px-4 sm:px-6 pb-2 overflow-hidden",
+          TAB_PAGE_TOP_INSET
+        )}
+      >
         {/* Fleet header stats */}
         {!loading && fleet.length > 0 && (
-          <div className="grid grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3 shrink-0">
             {[
               { label: "Airworthy", count: airworthyCounts.AIRWORTHY, color: "text-emerald-400" },
               { label: "Ferry Only", count: airworthyCounts.FERRY_ONLY, color: "text-yellow-400" },
-              { label: "Caution", count: airworthyCounts.CAUTION, color: "text-orange-400" },
               { label: "Grounded", count: airworthyCounts.NOT_AIRWORTHY, color: "text-red-400" },
             ].map((s) => (
-              <div key={s.label} className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-4 text-center">
+              <div key={s.label} className={cn("rounded-xl p-3 sm:p-4 text-center", CARD_SURFACE_B)}>
                 <div className={cn("text-2xl font-bold", s.color)}>{s.count}</div>
                 <div className="text-xs text-zinc-500 mt-1">{s.label}</div>
               </div>
@@ -229,23 +307,26 @@ export default function FleetPage({ onNavigate }: FleetPageProps) {
         )}
 
         {loading && (
-          <>
-            <div className="grid grid-cols-4 gap-3 mb-6 animate-pulse" aria-busy="true">
-              {Array.from({ length: 4 }).map((_, i) => (
+          <div className="flex flex-col min-w-0">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3 shrink-0 animate-pulse" aria-busy="true">
+              {Array.from({ length: 3 }).map((_, i) => (
                 <div
                   key={i}
-                  className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-4 h-[5.25rem]"
+                  className={cn("rounded-xl p-4 h-[5.25rem]", CARD_SURFACE_B)}
                 >
                   <div className="h-8 bg-zinc-800 rounded mx-auto w-10 mb-2" />
                   <div className="h-3 bg-zinc-800/80 rounded mx-auto w-20" />
                 </div>
               ))}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
               {TAILS.map((t) => (
                 <div
                   key={t}
-                  className="min-h-[300px] rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 flex flex-col animate-pulse"
+                  className={cn(
+                    "min-h-[14rem] rounded-xl p-5 sm:p-6 flex flex-col animate-pulse",
+                    CARD_SURFACE_A
+                  )}
                 >
                   <div className="flex justify-between gap-3 mb-4">
                     <div className="flex gap-3 min-w-0">
@@ -258,34 +339,39 @@ export default function FleetPage({ onNavigate }: FleetPageProps) {
                     <div className="h-7 w-28 rounded-full bg-zinc-800 shrink-0" />
                   </div>
                   <div className="h-2 bg-zinc-800 rounded-full mb-4" />
-                  <div className="grid grid-cols-2 gap-2 flex-1 content-start">
-                    {Array.from({ length: 4 }).map((_, j) => (
-                      <div key={j} className="h-14 rounded-lg bg-zinc-800/60" />
+                  <div className="grid grid-cols-2 gap-3 flex-1 content-start">
+                    {Array.from({ length: 6 }).map((_, j) => (
+                      <div key={j} className={cn("min-h-[4.25rem] rounded-lg", CARD_SURFACE_C)} />
                     ))}
                   </div>
                 </div>
               ))}
             </div>
-          </>
+          </div>
         )}
 
         {/* Error */}
         {error && (
-          <div className="bg-red-950/30 border border-red-800/50 rounded-xl p-4 text-red-400 text-sm">
+          <div
+            className={cn(
+              "shrink-0 rounded-xl p-4 text-red-400 text-sm mb-2",
+              toneClasses("bad").bannerPanel
+            )}
+          >
             Failed to load fleet data: {error}
           </div>
         )}
 
-        {/* Aircraft cards — 2×2 grid */}
+        {/* Aircraft cards — 2×2; content-sized rows (no stretch); fleet column overflow-hidden = no scroll */}
         {!loading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
             {fleet.map((aircraft) => (
-              <AircraftCard
-                key={aircraft.tail}
-                aircraft={aircraft}
-                onSelect={() => handleSelect(aircraft.tail as TailNumber)}
-              />
-            ))}
+                <AircraftCard
+                  key={aircraft.tail}
+                  aircraft={aircraft}
+                  onSelect={() => handleSelect(aircraft.tail as TailNumber)}
+                />
+              ))}
           </div>
         )}
       </div>

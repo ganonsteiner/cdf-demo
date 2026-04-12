@@ -52,7 +52,7 @@ Oil Grade:          SAE 50 or SAE 40 (above 16°C)
 Oil Capacity:       8 quarts maximum
                     6 quarts minimum for flight
 
-Engine TBO:         2000 hours (Lycoming recommended, not FAA mandatory for non-commercial ops)
+Engine TBOH:        2000 hours (Lycoming recommended, not FAA mandatory for non-commercial ops)
 
 ================================================================================
 WEIGHT LIMITS

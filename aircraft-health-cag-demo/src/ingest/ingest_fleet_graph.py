@@ -4,7 +4,7 @@ Fleet Graph Ingestion — extended knowledge graph nodes and relationships.
 Creates the fleet-level knowledge graph structure from dataset constants:
   - FleetOwner node (Desert_Sky_Aviation)
   - OperationalPolicy nodes (oil change, grace period, annual, ferry)
-  - Observation/Symptom CDF Events for N8834Q and N1156P (from SYMPTOM_NODES)
+  - Observation/Symptom CDF Events for N8834Q and N1156P (from get_symptom_nodes())
   - GOVERNED_BY: each aircraft → FleetOwner
   - HAS_POLICY: FleetOwner → each policy
   - EXHIBITED: relevant flight events → Observation events
@@ -35,7 +35,7 @@ from mock_cdf.store.store import (  # type: ignore[import]
 )
 from dataset import (  # type: ignore[import]
     TAILS,
-    SYMPTOM_NODES,
+    get_symptom_nodes,
     OPERATIONAL_POLICIES,
     FLEET_OWNER,
     SYM_N8834Q_CHT,
@@ -70,11 +70,11 @@ def _flights_affected_for_symptom(external_id: str) -> str:
 
 
 def _symptom_nodes_to_observation_events() -> list[CdfEvent]:
-    """Build CDF Observation/Symptom events from dataset SYMPTOM_NODES."""
+    """Build CDF Observation/Symptom events from dataset get_symptom_nodes()."""
     existing = store.get_events()
     max_id = max((e.id for e in existing), default=0)
     events: list[CdfEvent] = []
-    for i, s in enumerate(SYMPTOM_NODES):
+    for i, s in enumerate(get_symptom_nodes()):
         ext = s["externalId"]
         tail = s["aircraft_id"]
         asset = store.get_asset(tail)
@@ -195,7 +195,7 @@ def ingest_fleet_graph() -> None:
             ))
 
     # Aircraft → symptom (Observation event) for knowledge graph and SDK traversal
-    for s in SYMPTOM_NODES:
+    for s in get_symptom_nodes():
         tail = str(s.get("aircraft_id") or "")
         sym_ext = str(s.get("externalId") or "")
         if not tail or not sym_ext:

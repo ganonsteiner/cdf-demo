@@ -202,6 +202,12 @@ def ingest_maintenance_for_tail(tail: str, event_id_offset: int) -> int:
 def ingest_maintenance() -> None:
     """Ingest maintenance for all four aircraft."""
     from dataset import TAILS  # type: ignore[import]
-    event_id = 10_000
+    from mock_cdf.store.store import store  # type: ignore[import]
+
+    for tail in TAILS:
+        store.delete_maintenance_ingest_for_tail(tail)
+
+    existing = store.get_events()
+    event_id = max((e.id for e in existing), default=0) + 1
     for tail in TAILS:
         event_id = ingest_maintenance_for_tail(tail, event_id)

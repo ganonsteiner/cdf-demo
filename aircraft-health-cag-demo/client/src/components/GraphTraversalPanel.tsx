@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { Network, Box, Zap, FileText, GitBranch, Activity, RotateCcw } from "lucide-react";
-import { cn } from "../lib/utils";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Network, Box, Zap, FileText, GitBranch, Activity, RotateCcw, Waypoints } from "lucide-react";
+import { cn, CARD_SURFACE_A, KG_DOCUMENT_NODE_COLOR } from "../lib/utils";
+import { traversalActivityCounts } from "../lib/traversalGraphIds";
+import { useStore } from "../lib/store";
 import type { AgentEvent } from "../lib/types";
 
 interface Props {
@@ -43,7 +45,7 @@ function nodeIcon(node: string) {
     return { icon: <GitBranch className="w-3 h-3" />, color: "text-violet-400", bg: "bg-violet-950/60 border-violet-800/50" };
 
   if (node.startsWith("File:") || node.startsWith("Documents:"))
-    return { icon: <FileText className="w-3 h-3" />, color: "text-purple-400", bg: "bg-purple-950/60 border-purple-800/50" };
+    return { icon: <FileText className="w-3 h-3" />, color: KG_DOCUMENT_NODE_COLOR, bg: "bg-purple-950/60 border-purple-800/50" };
 
   if (node.startsWith("Context:") || node.startsWith("FleetContext:"))
     return { icon: <Network className="w-3 h-3" />, color: "text-yellow-400", bg: "bg-yellow-950/60 border-yellow-800/50" };
@@ -68,7 +70,7 @@ function toolColor(name: string): string {
     get_datapoints: "text-emerald-300",
     get_events: "text-orange-400",
     get_relationships: "text-violet-400",
-    get_linked_documents: "text-purple-400",
+    get_linked_documents: KG_DOCUMENT_NODE_COLOR,
   };
   return map[name] || "text-zinc-400";
 }
@@ -82,7 +84,13 @@ export default function GraphTraversalPanel({
   onReplay,
   isReplaying = false,
 }: Props) {
+  const graphDataSnapshot = useStore((s) => s.graphDataSnapshot);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const { toolCount, stepCount, graphNodeCount } = useMemo(
+    () => traversalActivityCounts(events, graphDataSnapshot),
+    [events, graphDataSnapshot]
+  );
 
   // 150ms stagger: buffer incoming events, drain one every 150ms into visible list
   const [visibleEvents, setVisibleEvents] = useState<AgentEvent[]>([]);
@@ -150,38 +158,44 @@ export default function GraphTraversalPanel({
     }
   }, [visibleEvents]);
 
-  const traversalCount = visibleEvents.filter((e) => e.type === "traversal").length;
-  const toolCallCount = visibleEvents.filter((e) => e.type === "tool_call").length;
-
   return (
-    <div className="flex flex-col h-full bg-zinc-900 border-l border-zinc-800 overflow-hidden">
+    <div className={cn("flex flex-col h-full min-h-0 overflow-hidden rounded-xl", CARD_SURFACE_A)}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-900/80 shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 shrink-0">
         <div className="flex items-center gap-2 min-w-0">
-          <Network className="w-4 h-4 text-sky-400 shrink-0" />
+          <Waypoints className="w-4 h-4 text-sky-400 shrink-0" />
           <span className="text-sm font-semibold text-zinc-300">Graph Traversal</span>
           {isStreaming && (
             <span className="flex items-center gap-1 text-xs text-sky-400 animate-pulse shrink-0">
               <span className="w-1.5 h-1.5 bg-sky-400 rounded-full" />
-              scanning
+              traversing...
             </span>
           )}
           {isReplaying && (
-            <span className="flex items-center gap-1 text-xs text-violet-400 shrink-0">
-              <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-pulse" />
-              replaying
+            <span className="flex items-center gap-1 text-xs text-sky-400 animate-pulse shrink-0">
+              <span className="w-1.5 h-1.5 bg-sky-400 rounded-full" />
+              replaying...
             </span>
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-zinc-600">
-            {traversalCount} nodes · {toolCallCount} calls
+          <span className="text-xs text-zinc-600 tabular-nums">
+            {toolCount} tool{toolCount === 1 ? "" : "s"} ·{" "}
+            {graphNodeCount !== null ? (
+              <>
+                {graphNodeCount} node{graphNodeCount === 1 ? "" : "s"}
+              </>
+            ) : (
+              <>
+                {stepCount} step{stepCount === 1 ? "" : "s"}
+              </>
+            )}
           </span>
           {canReplay && onReplay && (
             <button
               onClick={onReplay}
-              title="Replay traversal at 150ms"
-              className="p-1 rounded text-zinc-500 hover:text-violet-400 hover:bg-violet-950/30 transition-colors"
+              title="Replay graph traversal"
+              className="p-1 rounded text-zinc-500 hover:text-sky-400 hover:bg-sky-950/30 transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -190,13 +204,13 @@ export default function GraphTraversalPanel({
       </div>
 
       {/* Legend */}
-      <div className="px-3 py-2 border-b border-zinc-800/50 flex flex-wrap gap-x-3 gap-y-1 shrink-0">
+      <div className="px-3 py-2 border-b border-zinc-800 flex flex-wrap gap-x-3 gap-y-1 shrink-0">
         {[
           { label: "Asset", color: "text-sky-400" },
           { label: "Sensor/TS", color: "text-emerald-400" },
           { label: "Event", color: "text-orange-400" },
           { label: "Relation", color: "text-violet-400" },
-          { label: "Document", color: "text-purple-400" },
+          { label: "Document", color: KG_DOCUMENT_NODE_COLOR },
           { label: "Context", color: "text-yellow-400" },
         ].map((l) => (
           <span key={l.label} className={cn("text-xs", l.color)}>
@@ -205,13 +219,13 @@ export default function GraphTraversalPanel({
         ))}
       </div>
 
-      {/* Events feed */}
+      {/* Events feed — vertical scroll list */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-1.5 font-mono" style={{ minHeight: 0 }}>
         {visibleEvents.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-zinc-700 py-8 text-center">
-            <Network className="w-8 h-8 mb-3" />
-            <p className="text-sm">Graph traversal events</p>
-            <p className="text-xs mt-1">appear here at 150ms intervals</p>
+            <Waypoints className="w-8 h-8 mb-3" />
+            <p className="text-sm">Displays nodes and edges</p>
+            <p className="text-xs mt-1">as they are traversed by the agent</p>
           </div>
         )}
 
@@ -260,13 +274,6 @@ export default function GraphTraversalPanel({
 
           return null;
         })}
-
-        {isStreaming && (
-          <div className="animate-pulse text-xs text-sky-600 flex items-center gap-1 pl-5 py-0.5">
-            <span className="w-1 h-1 bg-sky-600 rounded-full" />
-            traversing...
-          </div>
-        )}
       </div>
     </div>
   );

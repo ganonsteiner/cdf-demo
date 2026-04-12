@@ -9,6 +9,7 @@ schema used by ingest_flights.py.
 from __future__ import annotations
 
 import csv
+import os
 import sys
 from pathlib import Path
 
@@ -17,7 +18,7 @@ SCRIPT_DIR = Path(__file__).parent
 DATA_DIR = SCRIPT_DIR.parent / "data"
 
 sys.path.insert(0, str(SCRIPT_DIR))
-from dataset import TAILS, generate_flights  # noqa: E402
+from dataset import TAILS, generate_flights, get_demo_anchor  # noqa: E402
 
 
 def write_flight_csv(tail: str) -> Path:
@@ -47,6 +48,10 @@ def write_flight_csv(tail: str) -> Path:
 
 
 def main() -> None:
+    anchor = get_demo_anchor()
+    env_used = os.environ.get("DESERT_SKY_DEMO_DATE", "").strip()
+    src = "DESERT_SKY_DEMO_DATE" if env_used else "UTC today"
+    print(f"Demo anchor (UTC date): {anchor.date().isoformat()} (source: {src})")
     print("Generating per-tail flight CSVs...")
     for tail in TAILS:
         write_flight_csv(tail)

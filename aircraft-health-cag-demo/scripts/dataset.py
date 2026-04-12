@@ -2,10 +2,13 @@
 Fleet Dataset — Desert Sky Aviation, KPHX.
 
 Single source of truth for all four aircraft in the fleet:
-  N4798E  — AIRWORTHY   (380 SMOH tach, 1 open non-grounding squawk, oil due in ~18 tach hr)
-  N2251K  — FERRY ONLY  (290 SMOH tach, oil ~1.2 tach hr overdue, one direct ferry flight permitted, 0 squawks)
-  N8834Q  — CAUTION     (198 SMOH, elevated CHT #3 + rough mag check)
-  N1156P  — NOT AIRWORTHY (catastrophic engine failure at ~520 SMOH, 6 months ago)
+  N4798E  — AIRWORTHY   (380 SMOH tach, 1 open non-grounding squawk, oil due in ~18 tach hr; calendar leg current)
+  N2251K  — FERRY ONLY  (290 SMOH tach, oil ~1.2 tach hr overdue on tach leg, calendar leg current; ferry authorized per policy)
+  N8834Q  — CAUTION     (198 SMOH, elevated CHT #3 + rough mag check, oil due in ~11 tach hr)
+  N1156P  — NOT AIRWORTHY (catastrophic engine failure at ~520 SMOH, ~30 days before demo anchor)
+
+Calendar fields and ISO timestamps are offsets from get_demo_anchor() (UTC). Tach/Hobbs story
+numbers stay fixed. Optional env DESERT_SKY_DEMO_DATE=YYYY-MM-DD makes transforms reproducible.
 
 Uses numpy.random.default_rng(seed=42) for fully deterministic output.
 Story-beat overrides are applied on top of the random baseline.
@@ -13,6 +16,7 @@ Story-beat overrides are applied on top of the random baseline.
 
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -30,6 +34,10 @@ FLIGHT_COUNTS = {"N4798E": 70, "N2251K": 53, "N8834Q": 36, "N1156P": 78}
 # Months of history per tail
 HISTORY_MONTHS = {"N4798E": 14, "N2251K": 10, "N8834Q": 7, "N1156P": 20}
 
+# Non-N1156P: last N flights fall in the final R days before the demo anchor (active-rental look).
+RECENT_FLIGHT_COUNT = 6
+RECENT_FLIGHT_DAYS_BEFORE_ANCHOR = 7
+
 # Starting Hobbs per tail (first chronological flight hobbs_start for non–N1156P tails)
 HOBBS_START = {"N4798E": 4730.0, "N2251K": 5090.0, "N8834Q": 4802.0, "N1156P": 5268.0}
 
@@ -38,11 +46,11 @@ N1156P_LAST_HOBBS = 5435.5
 # First hobbs in CSV (oldest flight); chosen so annual at ~5282 falls inside the log
 N1156P_FIRST_HOBBS = 5268.0
 
-# Engine overhaul Hobbs baseline per tail (Hobbs at last major overhaul)
+# Engine overhaul Hobbs baseline per tail (Hobbs at last major overhaul = ENGINE_TACH_AT_OVERHAUL / 0.92)
 OVERHAUL_HOBBS = {
-    "N4798E": 4730.0 - 380.0,
-    "N2251K": 5090.0 - 290.0,
-    "N8834Q": 4802.0 - 198.0,
+    "N4798E": 4413.4,   # 4060.3 / 0.92
+    "N2251K": 4842.3,   # 4464.9 / 0.92
+    "N8834Q": 4638.3,   # 4267.2 / 0.92
     "N1156P": N1156P_LAST_HOBBS - 520.0,
 }
 
@@ -50,29 +58,31 @@ OVERHAUL_HOBBS = {
 ROUTE_CHOICES = ["KPHX-local", "KPHX-KSDL", "KPHX-KFLG", "KPHX-KPRC"]
 ROUTE_WEIGHTS = [0.60, 0.25, 0.10, 0.05]
 
-# Route typical durations (hours)
+# Route typical durations (hours) — local includes pattern work, maneuvers, and instrument training
 ROUTE_DURATIONS = {
-    "KPHX-local": (0.5, 1.2),
-    "KPHX-KSDL": (0.4, 0.9),
-    "KPHX-KFLG": (1.0, 2.0),
-    "KPHX-KPRC": (0.8, 1.5),
+    "KPHX-local": (1.0, 3.0),
+    "KPHX-KSDL": (0.5, 1.2),
+    "KPHX-KFLG": (1.5, 3.0),
+    "KPHX-KPRC": (1.2, 2.5),
 }
 
 ENGINE_TBO = 2000
 
 # Tach reading at last engine overhaul — SMOH = current_tach − this (maintenance clock is tach).
 ENGINE_TACH_AT_OVERHAUL: dict[str, float] = {
-    "N4798E": 4101.0,
-    "N2251K": 4503.0,
-    "N8834Q": 4310.0,
-    "N1156P": 4475.5,
+    "N4798E": 4060.3,   # SMOH = 4440.3 - 4060.3 = 380
+    "N2251K": 4464.9,   # SMOH = 4754.9 - 4464.9 = 290
+    "N8834Q": 4267.2,   # SMOH = 4465.2 - 4267.2 = 198
+    "N1156P": 4475.5,   # SMOH = 4995.5 - 4475.5 = 520
 }
 
-# End-of-flight-log tach (demo as-of). generate_flights() snaps the last row to match.
+# End-of-flight-log tach (demo as-of). Matches natural generate_flights() chain so the last
+# flight is not artificially lengthened; _snap_last_flight_to_target_tach only applies tiny
+# rounding corrections (≤0.05 hr duration delta).
 CURRENT_TACH_SNAPSHOT: dict[str, float] = {
-    "N4798E": 4481.4,   # 18 tach hr before next oil (4499.4)
-    "N2251K": 4793.1,   # 1.2 tach hr past due (4791.9)
-    "N8834Q": 4508.0,   # ~10.5 tach hr before next oil (4518.5)
+    "N4798E": 4440.3,   # 18 tach hr before next oil (4458.3)
+    "N2251K": 4754.9,   # 1.2 tach hr past due (next_due 4753.7)
+    "N8834Q": 4465.2,   # ~11 tach hr before next oil (4476.2)
     "N1156P": 4995.5,   # last log tach before/through failure timeline
 }
 
@@ -107,65 +117,123 @@ N1156P_SEVERE_FLIGHT_RANGE = (74, 78)
 N8834Q_EXHIBITED_FLIGHT_RANGE = (33, 36)
 
 # ---------------------------------------------------------------------------
+# Demo anchor (UTC midnight). All calendar dates in this module derive from it.
+# ---------------------------------------------------------------------------
+
+N1156P_FAILURE_DAYS_BEFORE_ANCHOR = 30
+
+
+def get_demo_anchor() -> datetime:
+    """
+    Demo as-of instant: UTC midnight for the resolved calendar day.
+
+    Set DESERT_SKY_DEMO_DATE=YYYY-MM-DD for reproducible CSVs and CI; otherwise today (UTC).
+    """
+    raw = os.environ.get("DESERT_SKY_DEMO_DATE", "").strip()
+    if raw:
+        return datetime.strptime(raw, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    d = datetime.now(timezone.utc).date()
+    return datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
+
+
+def _d(anchor: datetime, day_offset: int) -> str:
+    """Calendar date YYYY-MM-DD for anchor + day_offset (anchor is UTC midnight)."""
+    return (anchor + timedelta(days=day_offset)).strftime("%Y-%m-%d")
+
+
+def n1156p_accident_datetime(anchor: datetime | None = None) -> datetime:
+    """Catastrophic engine failure instant (UTC date boundary) for story ordering."""
+    a = anchor or get_demo_anchor()
+    return a - timedelta(days=N1156P_FAILURE_DAYS_BEFORE_ANCHOR)
+
+
+def format_n1156p_accident_iso(anchor: datetime | None = None) -> str:
+    """ISO date of N1156P failure (for maintenance narrative text)."""
+    return n1156p_accident_datetime(anchor).strftime("%Y-%m-%d")
+
+
+def format_n1156p_accident_month_year(anchor: datetime | None = None) -> str:
+    """Human label e.g. 'March 2026' for asset descriptions and prompts."""
+    return n1156p_accident_datetime(anchor).strftime("%B %Y")
+
+
+# ---------------------------------------------------------------------------
 # Symptom / policy data
 # ---------------------------------------------------------------------------
 
-SYMPTOM_NODES: list[dict[str, Any]] = [
-    {
-        "externalId": SYM_N8834Q_CHT,
-        "aircraft_id": "N8834Q",
-        "title": "Elevated CHT #3",
-        "description": "Cylinder head temperature on #3 cylinder running 40-60°F above the other cylinders during cruise. First observed three flights ago and trending upward.",
-        "observation": "CHT #3 consistently reaching 430-450°F while CHT #1, #2, #4 remain 360-380°F at same power setting.",
-        "severity": "caution",
-        "first_observed": "2026-02-15",
-    },
-    {
-        "externalId": SYM_N8834Q_MAG,
-        "aircraft_id": "N8834Q",
-        "title": "Rough Running on Left Mag",
-        "description": "Engine runs noticeably rough during mag check on left magneto. Right mag check is smooth. RPM drop on left mag is 150 RPM versus 50 RPM on right.",
-        "observation": "Mag check at runup: right mag 50 RPM drop (normal), left mag 150 RPM drop with roughness. Cleared after extended runup.",
-        "severity": "caution",
-        "first_observed": "2026-02-20",
-    },
-    {
-        "externalId": SYM_N1156P_CHT,
-        "aircraft_id": "N1156P",
-        "title": "Persistently Elevated CHT",
-        "description": "CHT readings trending upward over the previous nine flights before failure. Reached 460-480°F on final flights.",
-        "observation": "Pilot notes documented persistent high CHT during cruise, particularly on longer flights. Engine leaned aggressively to manage temperatures.",
-        "severity": "warning",
-        "first_observed": "2025-08-01",
-    },
-    {
-        "externalId": SYM_N1156P_OIL,
-        "aircraft_id": "N1156P",
-        "title": "Increased Oil Consumption",
-        "description": "Oil consumption increasing over the 3 months preceding failure. Required adding 1 qt oil every 8-10 flight hours versus normal 15-20 hours.",
-        "observation": "Pre-flight checks documented oil level dropping faster than historical baseline. No visible external leaks found.",
-        "severity": "warning",
-        "first_observed": "2025-07-15",
-    },
-    {
-        "externalId": SYM_N1156P_ROUGH,
-        "aircraft_id": "N1156P",
-        "title": "Intermittent Rough Running",
-        "description": "Rough engine operation noted intermittently during cruise flight, particularly at lean mixture settings. Cleared when mixture enriched.",
-        "observation": "Pilot notes on multiple flights mention roughness that cleared with mixture enrichment. Attributed to improper leaning technique at the time.",
-        "severity": "warning",
-        "first_observed": "2025-09-01",
-    },
-    {
-        "externalId": SYM_N1156P_POWER,
-        "aircraft_id": "N1156P",
-        "title": "Reduced Power Output",
-        "description": "Climb performance noticeably reduced on final flights before failure. Unable to maintain normal cruise RPM at full throttle.",
-        "observation": "Pilot reported inability to reach normal cruise RPM. Takeoff roll longer than normal. Climb rate approximately 400 FPM versus normal 770 FPM.",
-        "severity": "critical",
-        "first_observed": "2025-09-20",
-    },
-]
+
+def get_symptom_nodes(anchor: datetime | None = None) -> list[dict[str, Any]]:
+    """
+    Observation/symptom metadata for fleet graph ingest.
+
+    N8834Q first_observed dates sit in a short window before the anchor.
+    N1156P symptoms are compressed into the weeks before the accident date.
+    """
+    a = anchor or get_demo_anchor()
+    accident = n1156p_accident_datetime(a)
+
+    def iso(dt: datetime) -> str:
+        return dt.strftime("%Y-%m-%d")
+
+    q_cht = iso(a - timedelta(days=17))
+    q_mag = iso(a - timedelta(days=10))
+
+    return [
+        {
+            "externalId": SYM_N8834Q_CHT,
+            "aircraft_id": "N8834Q",
+            "title": "Elevated CHT #3",
+            "description": "Cylinder head temperature on #3 cylinder running 40-60°F above the other cylinders during cruise. First observed three flights ago and trending upward.",
+            "observation": "CHT #3 consistently reaching 430-450°F while CHT #1, #2, #4 remain 360-380°F at same power setting.",
+            "severity": "caution",
+            "first_observed": q_cht,
+        },
+        {
+            "externalId": SYM_N8834Q_MAG,
+            "aircraft_id": "N8834Q",
+            "title": "Rough Running on Left Mag",
+            "description": "Engine runs noticeably rough during mag check on left magneto. Right mag check is smooth. RPM drop on left mag is 150 RPM versus 50 RPM on right.",
+            "observation": "Mag check at runup: right mag 50 RPM drop (normal), left mag 150 RPM drop with roughness. Cleared after extended runup.",
+            "severity": "caution",
+            "first_observed": q_mag,
+        },
+        {
+            "externalId": SYM_N1156P_CHT,
+            "aircraft_id": "N1156P",
+            "title": "Persistently Elevated CHT",
+            "description": "CHT readings trending upward over the previous nine flights before failure. Reached 460-480°F on final flights.",
+            "observation": "Pilot notes documented persistent high CHT during cruise, particularly on longer flights. Engine leaned aggressively to manage temperatures.",
+            "severity": "warning",
+            "first_observed": iso(accident - timedelta(days=21)),
+        },
+        {
+            "externalId": SYM_N1156P_OIL,
+            "aircraft_id": "N1156P",
+            "title": "Increased Oil Consumption",
+            "description": "Oil consumption increased in the weeks preceding failure. Required adding 1 qt oil every 8-10 flight hours versus normal 15-20 hours.",
+            "observation": "Pre-flight checks documented oil level dropping faster than historical baseline. No visible external leaks found.",
+            "severity": "warning",
+            "first_observed": iso(accident - timedelta(days=24)),
+        },
+        {
+            "externalId": SYM_N1156P_ROUGH,
+            "aircraft_id": "N1156P",
+            "title": "Intermittent Rough Running",
+            "description": "Rough engine operation noted intermittently during cruise flight, particularly at lean mixture settings. Cleared when mixture enriched.",
+            "observation": "Pilot notes on multiple flights mention roughness that cleared with mixture enrichment. Attributed to improper leaning technique at the time.",
+            "severity": "warning",
+            "first_observed": iso(accident - timedelta(days=14)),
+        },
+        {
+            "externalId": SYM_N1156P_POWER,
+            "aircraft_id": "N1156P",
+            "title": "Reduced Power Output",
+            "description": "Climb performance noticeably reduced on final flights before failure. Unable to maintain normal cruise RPM at full throttle.",
+            "observation": "Pilot reported inability to reach normal cruise RPM. Takeoff roll longer than normal. Climb rate approximately 400 FPM versus normal 770 FPM.",
+            "severity": "critical",
+            "first_observed": iso(accident - timedelta(days=7)),
+        },
+    ]
 OPERATIONAL_POLICIES: list[dict[str, Any]] = [
     {
         "externalId": POLICY_OIL_CHANGE,
@@ -178,8 +246,8 @@ OPERATIONAL_POLICIES: list[dict[str, Any]] = [
     {
         "externalId": POLICY_OIL_GRACE,
         "title": "Oil Change Grace Period — Ferry Flight Authorization",
-        "description": "Aircraft with oil change overdue by 1-5 tach hours may conduct a single direct ferry flight to the maintenance facility. The PIC must document the ferry flight in the aircraft journey log. Aircraft with oil overdue by more than 5 tach hours are NOT AIRWORTHY.",
-        "rule": "ferry_authorized_if_oil_overdue_tach_hours_between=1,5; ferry_not_authorized_if_oil_overdue_tach_hours_gt=5",
+        "description": "Aircraft may conduct a single direct ferry to the maintenance facility when oil is overdue on tach by >0.0–5.0 hours, or on the calendar leg by 1–13 days (per 50 tach hr / 4 month policy). PIC must document the ferry in the journey log. Oil overdue by more than 5 tach hours, or 14+ calendar days past the due date, is NOT AIRWORTHY.",
+        "rule": "ferry_authorized_if_oil_overdue_tach_hours_between=0.1,5; ferry_authorized_if_oil_overdue_calendar_days_between=1,13; ferry_not_authorized_if_oil_overdue_tach_hours_gt=5; ferry_not_authorized_if_oil_overdue_calendar_days_gte=14",
         "category": "airworthiness",
         "references": "Desert Sky Aviation Operations Manual Rev 4.2",
     },
@@ -194,8 +262,8 @@ OPERATIONAL_POLICIES: list[dict[str, Any]] = [
     {
         "externalId": POLICY_FERRY,
         "title": "Ferry Flight Procedure for Maintenance",
-        "description": "Ferry flights to maintenance facility are permitted only when: (1) aircraft has a valid annual inspection, (2) oil is overdue by no more than 5 tach hours, (3) no grounding squawks exist, (4) PIC holds at least private certificate with appropriate ratings, (5) flight is direct to maintenance facility with no intermediate stops.",
-        "rule": "ferry_requires_valid_annual=true; ferry_max_oil_overdue_tach_hours=5; ferry_requires_no_grounding_squawks=true",
+        "description": "Ferry flights to maintenance facility are permitted only when: (1) aircraft has a valid annual inspection, (2) oil is overdue by no more than 5 tach hours and no more than 13 calendar days (4-month leg), (3) no grounding squawks exist, (4) PIC holds at least private certificate with appropriate ratings, (5) flight is direct to maintenance facility with no intermediate stops.",
+        "rule": "ferry_requires_valid_annual=true; ferry_max_oil_overdue_tach_hours=5; ferry_max_oil_overdue_calendar_days=13; ferry_requires_no_grounding_squawks=true",
         "category": "operations",
         "references": "Desert Sky Aviation Operations Manual Rev 4.2",
     },
@@ -310,9 +378,9 @@ def _generate_flights_n1156p() -> list[dict[str, Any]]:
     tail = "N1156P"
     count = N1156P_STORED_FLIGHT_COUNT
     months = HISTORY_MONTHS[tail]
-    now = datetime(2026, 4, 1, tzinfo=timezone.utc)
+    now = get_demo_anchor()
     history_start = now - timedelta(days=months * 30)
-    accident_date = datetime(2025, 10, 3, tzinfo=timezone.utc)
+    accident_date = n1156p_accident_datetime(now)
     span_days = max(1.0, (accident_date - history_start).total_seconds() / 86400.0)
 
     ex_lo, ex_hi = N1156P_EXHIBITED_FLIGHT_RANGE
@@ -406,11 +474,12 @@ def generate_flights(tail: str) -> list[dict[str, Any]]:
 
     count = FLIGHT_COUNTS[tail]
     months = HISTORY_MONTHS[tail]
-    now = datetime(2026, 4, 1, tzinfo=timezone.utc)
+    now = get_demo_anchor()
     history_start = now - timedelta(days=months * 30)
 
     routes = rng.choice(ROUTE_CHOICES, size=count, p=ROUTE_WEIGHTS)
-    time_offsets = sorted(rng.uniform(0, 1, size=count))
+    total_span_days = float(months * 30)
+    day_offsets = _chronological_day_offsets_into_history(rng, count, total_span_days)
 
     hobbs = HOBBS_START[tail]
     flights: list[dict[str, Any]] = []
@@ -422,8 +491,8 @@ def generate_flights(tail: str) -> list[dict[str, Any]]:
         route = str(routes[i])
         params = _gen_flight_params(rng, route, is_caution=is_caution, is_critical=False)
 
-        elapsed = time_offsets[i] * (months * 30)
-        flight_dt = history_start + timedelta(days=elapsed)
+        elapsed_days = float(day_offsets[i])
+        flight_dt = history_start + timedelta(days=elapsed_days)
 
         tach_start = round(hobbs * 0.92, 1)
 
@@ -464,17 +533,22 @@ def generate_flights(tail: str) -> list[dict[str, Any]]:
 
 def _snap_last_flight_to_target_tach(flights: list[dict[str, Any]], target_tach: float) -> None:
     """
-    Adjust the last flight so tach_end matches the fleet story snapshot.
+    Optionally nudge the last flight so tach_end matches the fleet story snapshot.
 
-    Uses the same hobbs/tach coupling as generate_flights: tach_start ≈ hobbs_start * 0.92,
-    tach_end = tach_start + duration * 0.92, hobbs_end = hobbs_start + duration.
+    If the snapshot would require stretching the last flight (typical when target hobbs is
+    far above the natural chain), we keep the natural duration so the final leg is not an
+    outlier. Only sub-0.05 hr duration adjustments are applied (rounding shim).
     """
     if not flights:
         return
     last = flights[-1]
     hobbs_start = float(last["hobbs_start"])
+    natural_dur = float(last["duration"])
     target_hobbs_end = target_tach / 0.92
-    dur = max(0.5, round(target_hobbs_end - hobbs_start, 2))
+    snap_dur = max(0.5, round(target_hobbs_end - hobbs_start, 2))
+    if abs(snap_dur - natural_dur) > 0.05:
+        return
+    dur = snap_dur
     tach_start = round(hobbs_start * 0.92, 1)
     tach_end = round(tach_start + dur * 0.92, 1)
     hobbs_end = round(hobbs_start + dur, 1)
@@ -551,15 +625,61 @@ def _gen_pilot_notes(
     return notes
 
 
+def _chronological_day_offsets_into_history(
+    rng: np.random.Generator,
+    count: int,
+    total_span_days: float,
+) -> np.ndarray:
+    """
+    Strictly increasing offsets in [0, total_span_days] from history_start toward the anchor.
+
+    The last RECENT_FLIGHT_COUNT points are sampled in the final RECENT_FLIGHT_DAYS_BEFORE_ANCHOR
+    days so N4798E / N2251K / N8834Q always show recent activity on the Flights page.
+    """
+    if count <= 0:
+        return np.array([], dtype=float)
+    k = min(RECENT_FLIGHT_COUNT, count)
+    early_n = count - k
+    t = float(total_span_days)
+    r = float(RECENT_FLIGHT_DAYS_BEFORE_ANCHOR)
+    if t <= r + 1e-9:
+        return np.sort(rng.uniform(0.0, t, size=count))
+    early_hi = t - r
+    early = np.sort(rng.uniform(0.0, early_hi, size=early_n)) if early_n > 0 else np.array([], dtype=float)
+    recent_lo = t - r
+    recent = np.sort(rng.uniform(recent_lo, t, size=k))
+    if early_n > 0:
+        return np.concatenate([early, recent])
+    return recent
+
+
 def _apply_n4798e_overrides(flights: list[dict[str, Any]], rng: np.random.Generator) -> list[dict[str, Any]]:
-    """Apply N4798E story overrides: Flagstaff trips in summer months."""
+    """Apply N4798E story overrides: Flagstaff day-trips in summer months.
+
+    After changing individual flight durations, rebuild the full hobbs/tach chain
+    so every flight's hobbs_start, hobbs_end, tach_start, and tach_end are
+    consistent and contiguous.
+    """
     for f in flights:
         dt = datetime.strptime(f["timestamp"], "%Y-%m-%d %H:%M:%S")
         if dt.month in (6, 7, 8) and rng.random() < 0.3:
-            f["route"] = "KPHX-KFLG"
+            orig_dur = float(f["duration"])
             new_dur = float(np.clip(rng.uniform(1.2, 2.0), 0.5, 4.0))
+            if orig_dur > 0:
+                f["fuel_used_gal"] = round(float(f["fuel_used_gal"]) * (new_dur / orig_dur), 2)
+            f["route"] = "KPHX-KFLG"
             f["duration"] = round(new_dur, 2)
-            f["hobbs_end"] = round(f["hobbs_start"] + new_dur, 1)
+
+    # Rebuild hobbs/tach chain so all flights are contiguous after duration changes
+    hobbs = float(flights[0]["hobbs_start"])
+    for f in flights:
+        f["hobbs_start"] = round(hobbs, 1)
+        dur = float(f["duration"])
+        f["hobbs_end"] = round(hobbs + dur, 1)
+        f["tach_start"] = round(hobbs * 0.92, 1)
+        f["tach_end"] = round((hobbs + dur) * 0.92, 1)
+        hobbs = f["hobbs_end"]
+
     return flights
 
 
@@ -567,335 +687,330 @@ def _apply_n4798e_overrides(flights: list[dict[str, Any]], rng: np.random.Genera
 # Maintenance records
 # ---------------------------------------------------------------------------
 
-# Component IDs used in maintenance records (shared prefix per tail)
-def _comp(tail: str, component: str) -> str:
-    return f"{tail}-{component}"
+def build_all_maintenance_by_tail(anchor: datetime | None = None) -> dict[str, list[dict[str, Any]]]:
+    """
+    Per-tail maintenance CSV rows (scheduled work + squawks), ordered for export.
+
+    Calendar date fields are offsets from the demo anchor; tach/hobbs match the fixed story.
+    """
+    a = anchor or get_demo_anchor()
+    accident = n1156p_accident_datetime(a)
+    fail_iso = format_n1156p_accident_iso(a)
+
+    n1156p_annual = accident - timedelta(days=171)
+    n1156p_next_annual = (n1156p_annual + timedelta(days=365)).strftime("%Y-%m-%d")
+    n1156p_post = accident + timedelta(days=43)
+
+    maint: dict[str, list[dict[str, Any]]] = {
+        "N4798E": [
+            {
+                "date": _d(a, -295),
+                "component_id": "N4798E",
+                "maintenance_type": "annual",
+                "description": "Annual inspection completed. All systems checked per FAR 43 Appendix D. Minor discrepancies noted and corrected. Aircraft returned to service.",
+                "hobbs_at_service": 4739.0,
+                "tach_at_service": 4360.9,
+                "next_due_hobbs": "",
+                "next_due_date": _d(a, 70),
+                "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
+                "inspector": "Mike Torres, IA #3847291",
+                "ad_reference": "AD 80-04-03 R2; AD 2001-23-03; AD 2011-10-09; AD 90-06-03 R1",
+                "sb_reference": "SB 480F",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Spark plugs rotated and gapped; oil and filter changed",
+                "labor_hours": 8.5,
+                "signoff_type": "inspection_approval",
+            },
+            {
+                "date": _d(a, -95),
+                "component_id": "N4798E-ENGINE",
+                "maintenance_type": "oil_change",
+                "description": "Oil and filter change. 50-hour interval. Drained 7 qts 15W-50. Cut filter — trace ferrous particles, within normal limits for this engine variant. Oil analysis sent to Blackstone Labs.",
+                "hobbs_at_service": 4791.6,
+                "tach_at_service": 4408.3,
+                "next_due_hobbs": "",
+                "next_due_tach": 4458.3,
+                "next_due_date": "",
+                "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
+                "inspector": "",
+                "ad_reference": "",
+                "sb_reference": "SB 388C",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Lycoming LW-16702 oil filter; 7 qts Aeroshell 15W-50",
+                "labor_hours": 1.0,
+                "signoff_type": "return_to_service",
+            },
+        ],
+        "N2251K": [
+            {
+                "date": _d(a, -300),
+                "component_id": "N2251K",
+                "maintenance_type": "annual",
+                "description": "Annual inspection completed. Seat tracks inspected per AD 2011-10-09. Exhaust inspected per AD 90-06-03 R1. Aircraft returned to service.",
+                "hobbs_at_service": 5092.0,
+                "tach_at_service": 4684.6,
+                "next_due_hobbs": "",
+                "next_due_date": _d(a, 65),
+                "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
+                "inspector": "James Wheeler, IA #2918473",
+                "ad_reference": "AD 80-04-03 R2; AD 2011-10-09; AD 90-06-03 R1",
+                "sb_reference": "SB 480F",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Exhaust gaskets; spark plugs inspected and rotated",
+                "labor_hours": 7.5,
+                "signoff_type": "inspection_approval",
+            },
+            {
+                "date": _d(a, -326),
+                "component_id": "N2251K-ENGINE",
+                "maintenance_type": "oil_change",
+                "description": "50-hour oil and filter change. No anomalies. Cut filter clean.",
+                "hobbs_at_service": 5058.4,
+                "tach_at_service": 4653.7,
+                "next_due_hobbs": "",
+                "next_due_tach": 4703.7,
+                "next_due_date": "",
+                "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
+                "inspector": "",
+                "ad_reference": "",
+                "sb_reference": "SB 388C",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
+                "labor_hours": 1.0,
+                "signoff_type": "return_to_service",
+            },
+            {
+                "date": _d(a, -66),
+                "component_id": "N2251K-ENGINE",
+                "maintenance_type": "oil_change",
+                "description": "50-hour oil and filter change. Cut filter — no metal. Last oil analysis normal.",
+                "hobbs_at_service": 5112.7,
+                "tach_at_service": 4703.7,
+                "next_due_hobbs": "",
+                "next_due_tach": 4753.7,
+                # Calendar leg still before due (tach leg is the only overdue leg for this tail).
+                "next_due_date": _d(a, 42),
+                "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
+                "inspector": "",
+                "ad_reference": "",
+                "sb_reference": "SB 388C",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
+                "labor_hours": 1.0,
+                "signoff_type": "return_to_service",
+            },
+        ],
+        "N8834Q": [
+            {
+                "date": _d(a, -201),
+                "component_id": "N8834Q",
+                "maintenance_type": "annual",
+                "description": "Annual inspection completed. All systems airworthy. Magnetos timed and tested. No discrepancies. Aircraft returned to service.",
+                "hobbs_at_service": 4758.2,
+                "tach_at_service": 4377.5,
+                "next_due_hobbs": "",
+                "next_due_date": _d(a, 164),
+                "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
+                "inspector": "Mike Torres, IA #3847291",
+                "ad_reference": "AD 80-04-03 R2; AD 2011-10-09; AD 90-06-03 R1",
+                "sb_reference": "SB 480F",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Spark plugs replaced; magneto points inspected",
+                "labor_hours": 9.0,
+                "signoff_type": "inspection_approval",
+            },
+            {
+                "date": _d(a, -193),
+                "component_id": "N8834Q-ENGINE",
+                "maintenance_type": "oil_change",
+                "description": "50-hour oil change concurrent with annual. No anomalies.",
+                "hobbs_at_service": 4758.2,
+                "tach_at_service": 4377.5,
+                "next_due_hobbs": "",
+                "next_due_tach": 4426.2,
+                "next_due_date": "",
+                "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
+                "inspector": "",
+                "ad_reference": "",
+                "sb_reference": "SB 388C",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
+                "labor_hours": 1.0,
+                "signoff_type": "return_to_service",
+            },
+            {
+                "date": _d(a, -63),
+                "component_id": "N8834Q-ENGINE",
+                "maintenance_type": "oil_change",
+                "description": "50-hour oil and filter change. Cut filter — very fine metallic particles, borderline. Noted for follow-up. Sent to Blackstone.",
+                "hobbs_at_service": 4811.1,
+                "tach_at_service": 4426.2,
+                "next_due_hobbs": "",
+                "next_due_tach": 4476.2,
+                "next_due_date": "",
+                "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
+                "inspector": "",
+                "ad_reference": "",
+                "sb_reference": "SB 388C",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
+                "labor_hours": 1.0,
+                "signoff_type": "return_to_service",
+            },
+        ],
+        "N1156P": [
+            {
+                "date": n1156p_annual.strftime("%Y-%m-%d"),
+                "component_id": "N1156P",
+                "maintenance_type": "annual",
+                "description": "Annual inspection completed. Minor squawks noted. ELT battery replaced. Aircraft returned to service.",
+                "hobbs_at_service": 5282.3,
+                "tach_at_service": 4859.7,
+                "next_due_hobbs": "",
+                "next_due_date": n1156p_next_annual,
+                "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
+                "inspector": "James Wheeler, IA #2918473",
+                "ad_reference": "AD 80-04-03 R2; AD 2011-10-09; AD 90-06-03 R1",
+                "sb_reference": "SB 480F",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "ELT battery; spark plugs rotated; oil and filter changed",
+                "labor_hours": 10.0,
+                "signoff_type": "inspection_approval",
+            },
+            {
+                "date": (accident - timedelta(days=166)).strftime("%Y-%m-%d"),
+                "component_id": "N1156P-ENGINE",
+                "maintenance_type": "oil_change",
+                "description": "Oil change concurrent with annual. Cut filter clean. No anomalies.",
+                "hobbs_at_service": 5282.3,
+                "tach_at_service": 4859.7,
+                "next_due_hobbs": "",
+                "next_due_tach": 4909.7,
+                "next_due_date": "",
+                "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
+                "inspector": "",
+                "ad_reference": "",
+                "sb_reference": "SB 388C",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
+                "labor_hours": 1.0,
+                "signoff_type": "return_to_service",
+            },
+            {
+                "date": (accident - timedelta(days=28)).strftime("%Y-%m-%d"),
+                "component_id": "N1156P-ENGINE",
+                "maintenance_type": "oil_change",
+                "description": "50-hour oil change. OVERDUE — 53.2 hours since last change. Pilot reported oil consumption has increased. Cut filter shows elevated fine metallic particles. RECOMMEND BORESCOPE AND OIL ANALYSIS BEFORE NEXT FLIGHT. Blackstone sample sent.",
+                "hobbs_at_service": 5385.5,
+                "tach_at_service": 4954.7,
+                "next_due_hobbs": "",
+                "next_due_tach": 5004.7,
+                "next_due_date": "",
+                "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
+                "inspector": "",
+                "ad_reference": "",
+                "sb_reference": "SB 388C",
+                "squawk_id": "",
+                "resolved_by": "",
+                "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
+                "labor_hours": 1.5,
+                "signoff_type": "return_to_service",
+            },
+            {
+                "date": n1156p_post.strftime("%Y-%m-%d"),
+                "component_id": "N1156P-ENGINE",
+                "maintenance_type": "post_accident_inspection",
+                "description": (
+                    f"Post-accident teardown inspection following catastrophic engine failure on {fail_iso}. "
+                    "Cylinder #2 connecting rod failed and exited through case. Evidence of chronic lean detonation found: "
+                    "piston crown erosion, cylinder head erosion consistent with detonation, valve face pitting. "
+                    "Engine is NOT REPAIRABLE. Replacement required."
+                ),
+                "hobbs_at_service": 5435.5,
+                "tach_at_service": 4995.5,
+                "next_due_hobbs": "",
+                "next_due_date": "",
+                "mechanic": "AZ Aviation Overhaul — Linda Chen, A&P/IA #3561028",
+                "inspector": "Linda Chen, IA #3561028",
+                "ad_reference": "AD 2011-10-09",
+                "sb_reference": "",
+                "squawk_id": "SQ-N1156P-001",
+                "resolved_by": "",
+                "parts_replaced": "",
+                "labor_hours": 24.0,
+                "signoff_type": "conformity_statement",
+            },
+        ],
+    }
+
+    squawks: dict[str, list[dict[str, Any]]] = {
+        "N4798E": [
+            {
+                "date": _d(a, -58),
+                "component_id": "N4798E-ENGINE",
+                "maintenance_type": "squawk",
+                "description": "Minor oil seep at rocker cover gasket — right rear cylinder. Not affecting oil level measurably. Deferred to next scheduled maintenance.",
+                "hobbs_at_service": 4810.1,
+                "tach_at_service": 4425.3,
+                "next_due_hobbs": "",
+                "next_due_date": "",
+                "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
+                "inspector": "",
+                "ad_reference": "",
+                "sb_reference": "",
+                "squawk_id": "SQ-N4798E-001",
+                "resolved_by": "",
+                "parts_replaced": "",
+                "labor_hours": 0.25,
+                "signoff_type": "",
+                "severity": "non-grounding",
+                "status": "open",
+            },
+        ],
+        "N2251K": [],
+        "N8834Q": [],
+        "N1156P": [
+            {
+                "date": fail_iso,
+                "component_id": "N1156P-ENGINE",
+                "maintenance_type": "squawk",
+                "description": "CATASTROPHIC ENGINE FAILURE. Connecting rod failure, rod exited through case. Aircraft made emergency off-airport landing. Aircraft NOT AIRWORTHY. Engine requires replacement.",
+                "hobbs_at_service": 5435.5,
+                "tach_at_service": 4995.5,
+                "next_due_hobbs": "",
+                "next_due_date": "",
+                "mechanic": "AZ Aviation Overhaul — Linda Chen, A&P/IA #3561028",
+                "inspector": "Linda Chen, IA #3561028",
+                "ad_reference": "AD 2011-10-09",
+                "sb_reference": "",
+                "squawk_id": "SQ-N1156P-001",
+                "resolved_by": "",
+                "parts_replaced": "",
+                "labor_hours": 2.0,
+                "signoff_type": "",
+                "severity": "grounding",
+                "status": "open",
+            },
+        ],
+    }
+
+    return {t: maint[t] + squawks[t] for t in TAILS}
 
 
-MAINTENANCE_RECORDS: dict[str, list[dict[str, Any]]] = {
-    "N4798E": [
-        {
-            "date": "2025-06-10",
-            "component_id": "N4798E",
-            "maintenance_type": "annual",
-            "description": "Annual inspection completed. All systems checked per FAR 43 Appendix D. Minor discrepancies noted and corrected. Aircraft returned to service.",
-            "hobbs_at_service": 4742.0,
-            "tach_at_service": 4362.0,
-            "next_due_hobbs": "",
-            # Calendar due 12 months after sign-off — keep ~2 months ahead of “demo now” (spring 2026)
-            "next_due_date": "2026-06-10",
-            "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
-            "inspector": "Mike Torres, IA #3847291",
-            "ad_reference": "AD 80-04-03 R2; AD 2001-23-03; AD 2011-10-09; AD 90-06-03 R1",
-            "sb_reference": "SB 480F",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Spark plugs rotated and gapped; oil and filter changed",
-            "labor_hours": 8.5,
-            "signoff_type": "inspection_approval",
-        },
-        {
-            "date": "2025-07-15",
-            "component_id": "N4798E-ENGINE",
-            "maintenance_type": "oil_change",
-            "description": "Oil and filter change. 50-hour interval. Drained 7 qts 15W-50. Cut filter — no metal found. Oil analysis sent to Blackstone Labs.",
-            "hobbs_at_service": 4780.2,
-            "tach_at_service": 4398.6,
-            "next_due_hobbs": "",
-            "next_due_tach": 4448.6,
-            "next_due_date": "",
-            "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
-            "inspector": "",
-            "ad_reference": "",
-            "sb_reference": "SB 388C",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Lycoming LW-16702 oil filter; 7 qts Aeroshell 15W-50",
-            "labor_hours": 1.0,
-            "signoff_type": "return_to_service",
-        },
-        {
-            "date": "2025-11-20",
-            "component_id": "N4798E-ENGINE",
-            "maintenance_type": "oil_change",
-            "description": "Oil and filter change at 50-hour interval. Cut filter — trace ferrous particles, within normal limits for this engine variant. Blackstone results from last change were normal.",
-            "hobbs_at_service": 4836.5,
-            "tach_at_service": 4449.4,
-            "next_due_hobbs": "",
-            "next_due_tach": 4499.4,
-            "next_due_date": "",
-            "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
-            "inspector": "",
-            "ad_reference": "",
-            "sb_reference": "SB 388C",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Lycoming LW-16702 oil filter; 7 qts Aeroshell 15W-50",
-            "labor_hours": 1.0,
-            "signoff_type": "return_to_service",
-        },
-    ],
-    "N2251K": [
-        {
-            "date": "2025-06-05",
-            "component_id": "N2251K",
-            "maintenance_type": "annual",
-            "description": "Annual inspection completed. Seat tracks inspected per AD 2011-10-09. Exhaust inspected per AD 90-06-03 R1. Aircraft returned to service.",
-            "hobbs_at_service": 5092.1,
-            "tach_at_service": 4685.1,
-            "next_due_hobbs": "",
-            "next_due_date": "2026-06-05",
-            "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
-            "inspector": "James Wheeler, IA #2918473",
-            "ad_reference": "AD 80-04-03 R2; AD 2011-10-09; AD 90-06-03 R1",
-            "sb_reference": "SB 480F",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Exhaust gaskets; spark plugs inspected and rotated",
-            "labor_hours": 7.5,
-            "signoff_type": "inspection_approval",
-        },
-        {
-            "date": "2025-07-01",
-            "component_id": "N2251K-ENGINE",
-            "maintenance_type": "oil_change",
-            "description": "50-hour oil and filter change. No anomalies. Cut filter clean.",
-            "hobbs_at_service": 5098.4,
-            "tach_at_service": 4690.5,
-            "next_due_hobbs": "",
-            "next_due_tach": 4740.5,
-            "next_due_date": "",
-            "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
-            "inspector": "",
-            "ad_reference": "",
-            "sb_reference": "SB 388C",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
-            "labor_hours": 1.0,
-            "signoff_type": "return_to_service",
-        },
-        {
-            "date": "2025-11-10",
-            "component_id": "N2251K-ENGINE",
-            "maintenance_type": "oil_change",
-            "description": "50-hour oil and filter change. Cut filter — no metal. Last oil analysis normal.",
-            "hobbs_at_service": 5154.2,
-            "tach_at_service": 4741.9,
-            "next_due_hobbs": "",
-            "next_due_tach": 4791.9,
-            "next_due_date": "",
-            "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
-            "inspector": "",
-            "ad_reference": "",
-            "sb_reference": "SB 388C",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
-            "labor_hours": 1.0,
-            "signoff_type": "return_to_service",
-        },
-    ],
-    "N8834Q": [
-        {
-            "date": "2025-09-12",
-            "component_id": "N8834Q",
-            "maintenance_type": "annual",
-            "description": "Annual inspection completed. All systems airworthy. Magnetos timed and tested. No discrepancies. Aircraft returned to service.",
-            "hobbs_at_service": 4803.8,
-            "tach_at_service": 4419.5,
-            "next_due_hobbs": "",
-            "next_due_date": "2026-09-12",
-            "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
-            "inspector": "Mike Torres, IA #3847291",
-            "ad_reference": "AD 80-04-03 R2; AD 2011-10-09; AD 90-06-03 R1",
-            "sb_reference": "SB 480F",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Spark plugs replaced; magneto points inspected",
-            "labor_hours": 9.0,
-            "signoff_type": "inspection_approval",
-        },
-        {
-            "date": "2025-09-20",
-            "component_id": "N8834Q-ENGINE",
-            "maintenance_type": "oil_change",
-            "description": "50-hour oil change concurrent with annual. No anomalies.",
-            "hobbs_at_service": 4803.8,
-            "tach_at_service": 4419.5,
-            "next_due_hobbs": "",
-            "next_due_tach": 4469.5,
-            "next_due_date": "",
-            "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
-            "inspector": "",
-            "ad_reference": "",
-            "sb_reference": "SB 388C",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
-            "labor_hours": 1.0,
-            "signoff_type": "return_to_service",
-        },
-        {
-            "date": "2026-01-28",
-            "component_id": "N8834Q-ENGINE",
-            "maintenance_type": "oil_change",
-            "description": "50-hour oil and filter change. Cut filter — very fine metallic particles, borderline. Noted for follow-up. Sent to Blackstone.",
-            "hobbs_at_service": 4857.1,
-            "tach_at_service": 4468.5,
-            "next_due_hobbs": "",
-            "next_due_tach": 4518.5,
-            "next_due_date": "",
-            "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
-            "inspector": "",
-            "ad_reference": "",
-            "sb_reference": "SB 388C",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
-            "labor_hours": 1.0,
-            "signoff_type": "return_to_service",
-        },
-    ],
-    "N1156P": [
-        {
-            "date": "2025-04-15",
-            "component_id": "N1156P",
-            "maintenance_type": "annual",
-            "description": "Annual inspection completed. Minor squawks noted. ELT battery replaced. Aircraft returned to service.",
-            "hobbs_at_service": 5282.3,
-            "tach_at_service": 4859.7,
-            "next_due_hobbs": "",
-            "next_due_date": "2026-04-15",
-            "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
-            "inspector": "James Wheeler, IA #2918473",
-            "ad_reference": "AD 80-04-03 R2; AD 2011-10-09; AD 90-06-03 R1",
-            "sb_reference": "SB 480F",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "ELT battery; spark plugs rotated; oil and filter changed",
-            "labor_hours": 10.0,
-            "signoff_type": "inspection_approval",
-        },
-        {
-            "date": "2025-04-20",
-            "component_id": "N1156P-ENGINE",
-            "maintenance_type": "oil_change",
-            "description": "Oil change concurrent with annual. Cut filter clean. No anomalies.",
-            "hobbs_at_service": 5282.3,
-            "tach_at_service": 4859.7,
-            "next_due_hobbs": "",
-            "next_due_tach": 4909.7,
-            "next_due_date": "",
-            "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
-            "inspector": "",
-            "ad_reference": "",
-            "sb_reference": "SB 388C",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
-            "labor_hours": 1.0,
-            "signoff_type": "return_to_service",
-        },
-        {
-            "date": "2025-09-05",
-            "component_id": "N1156P-ENGINE",
-            "maintenance_type": "oil_change",
-            "description": "50-hour oil change. OVERDUE — 53.2 hours since last change. Pilot reported oil consumption has increased. Cut filter shows elevated fine metallic particles. RECOMMEND BORESCOPE AND OIL ANALYSIS BEFORE NEXT FLIGHT. Blackstone sample sent.",
-            "hobbs_at_service": 5385.5,
-            "tach_at_service": 4954.7,
-            "next_due_hobbs": "",
-            "next_due_tach": 5004.7,
-            "next_due_date": "",
-            "mechanic": "Desert Aero Maintenance — James Wheeler, A&P/IA #2918473",
-            "inspector": "",
-            "ad_reference": "",
-            "sb_reference": "SB 388C",
-            "squawk_id": "",
-            "resolved_by": "",
-            "parts_replaced": "Oil filter; 7 qts Aeroshell 15W-50",
-            "labor_hours": 1.5,
-            "signoff_type": "return_to_service",
-        },
-        {
-            "date": "2025-11-15",
-            "component_id": "N1156P-ENGINE",
-            "maintenance_type": "post_accident_inspection",
-            "description": "Post-accident teardown inspection following catastrophic engine failure on 2025-10-03. Cylinder #2 connecting rod failed and exited through case. Evidence of chronic lean detonation found: piston crown erosion, cylinder head erosion consistent with detonation, valve face pitting. Engine is NOT REPAIRABLE. Replacement required.",
-            "hobbs_at_service": 5435.5,
-            "tach_at_service": 4995.5,
-            "next_due_hobbs": "",
-            "next_due_date": "",
-            "mechanic": "AZ Aviation Overhaul — Linda Chen, A&P/IA #3561028",
-            "inspector": "Linda Chen, IA #3561028",
-            "ad_reference": "AD 2011-10-09",
-            "sb_reference": "",
-            "squawk_id": "SQ-N1156P-001",
-            "resolved_by": "",
-            "parts_replaced": "",
-            "labor_hours": 24.0,
-            "signoff_type": "conformity_statement",
-        },
-    ],
-}
-
-SQUAWK_RECORDS: dict[str, list[dict[str, Any]]] = {
-    "N4798E": [
-        {
-            "date": "2026-01-15",
-            "component_id": "N4798E-ENGINE",
-            "maintenance_type": "squawk",
-            "description": "Minor oil seep at rocker cover gasket — right rear cylinder. Not affecting oil level measurably. Deferred to next scheduled maintenance.",
-            "hobbs_at_service": 4858.2,
-            "tach_at_service": 4469.5,
-            "next_due_hobbs": "",
-            "next_due_date": "",
-            "mechanic": "Cactus Aviation Services — Mike Torres, A&P/IA #3847291",
-            "inspector": "",
-            "ad_reference": "",
-            "sb_reference": "",
-            "squawk_id": "SQ-N4798E-001",
-            "resolved_by": "",
-            "parts_replaced": "",
-            "labor_hours": 0.25,
-            "signoff_type": "",
-            "severity": "non-grounding",
-            "status": "open",
-        },
-    ],
-    "N2251K": [],
-    "N8834Q": [],
-    "N1156P": [
-        {
-            "date": "2025-10-03",
-            "component_id": "N1156P-ENGINE",
-            "maintenance_type": "squawk",
-            "description": "CATASTROPHIC ENGINE FAILURE. Connecting rod failure, rod exited through case. Aircraft made emergency off-airport landing. Aircraft NOT AIRWORTHY. Engine requires replacement.",
-            "hobbs_at_service": 5435.5,
-            "tach_at_service": 4995.5,
-            "next_due_hobbs": "",
-            "next_due_date": "",
-            "mechanic": "AZ Aviation Overhaul — Linda Chen, A&P/IA #3561028",
-            "inspector": "Linda Chen, IA #3561028",
-            "ad_reference": "AD 2011-10-09",
-            "sb_reference": "",
-            "squawk_id": "SQ-N1156P-001",
-            "resolved_by": "",
-            "parts_replaced": "",
-            "labor_hours": 2.0,
-            "signoff_type": "",
-            "severity": "grounding",
-            "status": "open",
-        },
-    ],
-}
-
-
-def get_all_maintenance(tail: str) -> list[dict[str, Any]]:
-    """Return maintenance records + squawks for a given tail."""
-    records = list(MAINTENANCE_RECORDS.get(tail, []))
-    squawks = list(SQUAWK_RECORDS.get(tail, []))
-    all_records = records + squawks
+def get_all_maintenance(tail: str, *, anchor: datetime | None = None) -> list[dict[str, Any]]:
+    """Return maintenance records + squawks for a given tail (calendar fields from anchor)."""
+    by_tail = build_all_maintenance_by_tail(anchor)
+    all_records = list(by_tail.get(tail, []))
     # Normalize component IDs to use the tail prefix consistently
     for r in all_records:
         comp = r.get("component_id", "")

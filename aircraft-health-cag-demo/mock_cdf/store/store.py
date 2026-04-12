@@ -378,6 +378,31 @@ class CdfStore:
                 self._events[event.externalId] = event
             self._flush_events()
 
+    def delete_maintenance_ingest_for_tail(self, tail: str) -> None:
+        """
+        Remove maintenance CSV–sourced events for one aircraft and any relationships
+        that reference those events.
+
+        Maintenance externalIds embed the CSV ``date``; re-ingesting after a date change
+        would otherwise leave stale events alongside new ones (duplicate history rows).
+        """
+        with self._lock:
+            removed: set[str] = set()
+            for ext_id, ev in list(self._events.items()):
+                if ev.source != "maintenance_log_it":
+                    continue
+                if (ev.metadata or {}).get("tail") != tail:
+                    continue
+                del self._events[ext_id]
+                removed.add(ext_id)
+            if not removed:
+                return
+            for rel_id, rel in list(self._relationships.items()):
+                if rel.sourceExternalId in removed or rel.targetExternalId in removed:
+                    del self._relationships[rel_id]
+            self._flush_events()
+            self._flush_relationships()
+
     # ------------------------------------------------------------------
     # Relationship methods
     # ------------------------------------------------------------------

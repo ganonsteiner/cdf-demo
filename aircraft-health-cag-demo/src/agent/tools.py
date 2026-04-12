@@ -839,7 +839,6 @@ def assemble_fleet_context() -> dict[str, Any]:
             "openGroundingSquawks": len(open_grounding),
             "openSquawks": squawks.get("count", 0),
             "activeSymptoms": symptoms_data.get("symptom_count", 0),
-            "activeConditions": 0,
         })
 
     log_traversal("FleetContext:assembled")

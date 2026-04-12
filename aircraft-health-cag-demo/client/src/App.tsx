@@ -4,10 +4,11 @@ import {
   Activity,
   Wrench,
   MessageSquare,
-  GitBranch,
-  History,
+  Waypoints,
+  PlaneTakeoff,
   Loader2,
-  Users,
+  Puzzle,
+  Warehouse,
 } from "lucide-react";
 import { cn } from "./lib/utils";
 import { api } from "./lib/api";
@@ -25,14 +26,26 @@ import FloatingChatDock from "./components/FloatingChatDock";
 
 type Tab = "fleet" | "dashboard" | "query" | "maintenance" | "aircraft" | "flights" | "graph";
 
-/** Tabs where UI is single-aircraft only — no Fleet scope in page strip or floating chat. */
+/**
+ * Tabs where the page implies a single tail — Fleet is disabled in the floating chat;
+ * if scope were fleet-wide, we default the store to a tail for those UIs.
+ */
 const TABS_WITHOUT_FLEET_SCOPE: Tab[] = ["dashboard", "maintenance", "aircraft", "flights"];
+
+/** Hangar / Knowledge Graph — no in-page tail strip; keep a tail only while floating chat is open. */
+const TABS_WITHOUT_PAGE_AIRCRAFT_SELECTION: Tab[] = ["fleet", "graph"];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>("fleet");
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [healthError, setHealthError] = useState(false);
-  const { isQuerying, selectedAircraft, setSelectedAircraft, setFloatingChatOpen } = useStore();
+  const {
+    isQuerying,
+    selectedAircraft,
+    setSelectedAircraft,
+    floatingChatOpen,
+    setFloatingChatOpen,
+  } = useStore();
 
   useEffect(() => {
     api.health()
@@ -52,6 +65,16 @@ export default function App() {
     }
   }, [activeTab, selectedAircraft, setSelectedAircraft]);
 
+  useEffect(() => {
+    if (
+      TABS_WITHOUT_PAGE_AIRCRAFT_SELECTION.includes(activeTab) &&
+      !floatingChatOpen &&
+      selectedAircraft !== null
+    ) {
+      setSelectedAircraft(null);
+    }
+  }, [activeTab, floatingChatOpen, selectedAircraft, setSelectedAircraft]);
+
   const handleNavigate = (tab: Tab, tail?: TailNumber) => {
     if (tail) setSelectedAircraft(tail);
     setActiveTab(tab);
@@ -63,12 +86,15 @@ export default function App() {
     health?.mock_cdf_reachable === true &&
     health.mock_cdf_fleet_ready === false;
 
-  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: "fleet", label: "Fleet", icon: <Users className="w-4 h-4 shrink-0" /> },
+  const primaryTabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+    { id: "fleet", label: "Hangar", icon: <Warehouse className="w-4 h-4 shrink-0" /> },
     { id: "dashboard", label: "Aircraft Status", icon: <Activity className="w-4 h-4 shrink-0" /> },
-    { id: "aircraft", label: "Components", icon: <Plane className="w-4 h-4 shrink-0" /> },
     { id: "maintenance", label: "Maintenance", icon: <Wrench className="w-4 h-4 shrink-0" /> },
-    { id: "flights", label: "Flights", icon: <History className="w-4 h-4 shrink-0" /> },
+    { id: "aircraft", label: "Components", icon: <Puzzle className="w-4 h-4 shrink-0" /> },
+    { id: "flights", label: "Flights", icon: <PlaneTakeoff className="w-4 h-4 shrink-0" /> },
+  ];
+
+  const secondaryTabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     {
       id: "query",
       label: "AI Assistant",
@@ -78,8 +104,16 @@ export default function App() {
         <MessageSquare className="w-4 h-4 shrink-0" />
       ),
     },
-    { id: "graph", label: "Knowledge Graph", icon: <GitBranch className="w-4 h-4 shrink-0" /> },
+    { id: "graph", label: "Knowledge Graph", icon: <Waypoints className="w-4 h-4 shrink-0" /> },
   ];
+
+  const tabButtonClass = (tabId: Tab) =>
+    cn(
+      "flex items-center gap-1.5 px-3 py-3 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors shrink-0",
+      activeTab === tabId
+        ? "border-sky-500 text-sky-400"
+        : "border-transparent text-zinc-500 hover:text-zinc-300 hover:border-zinc-600"
+    );
 
   return (
     <div className="h-screen bg-zinc-950 text-zinc-100 flex flex-col overflow-hidden">
@@ -89,11 +123,11 @@ export default function App() {
           {/* Left: fleet identity */}
           <div className="flex items-center gap-3 shrink-0">
             <div className="p-2 bg-sky-500/10 rounded-lg border border-sky-500/20">
-              <Plane className="w-4 h-4 text-sky-400" />
+              <Plane className="w-4 h-4 text-sky-400" aria-hidden />
             </div>
             <div>
               <h1 className="text-sm font-semibold text-zinc-100 tracking-wide">Desert Sky Aviation</h1>
-              <p className="text-xs text-zinc-500 hidden sm:block">KPHX · 4 × 1978 Cessna 172N · CAG Demo</p>
+              <p className="text-xs text-zinc-500 hidden sm:block">KPHX · 4 × 1978 Cessna 172N</p>
             </div>
           </div>
 
@@ -128,24 +162,35 @@ export default function App() {
         </div>
       </header>
 
-      {/* Tab bar — 48px */}
-      <div className="h-12 shrink-0 border-b border-zinc-800 bg-zinc-900/70 z-40">
-        <div className="h-full max-w-screen-2xl mx-auto px-4 sm:px-6 flex items-end gap-0 overflow-x-auto scrollbar-hide">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "flex items-center gap-2 px-4 h-full text-sm font-medium border-b-2 whitespace-nowrap transition-colors shrink-0",
-                activeTab === tab.id
-                  ? "border-sky-500 text-sky-400"
-                  : "border-transparent text-zinc-500 hover:text-zinc-300 hover:border-zinc-600"
-              )}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
+      {/* Tab bar — primary left, AI + graph flush right (ml-auto); comfortable vertical padding */}
+      <div className="shrink-0 border-b border-zinc-800 bg-zinc-900/70 z-40">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 flex items-stretch min-w-0 min-h-[3.25rem]">
+          <div className="flex items-stretch gap-0 overflow-x-auto scrollbar-hide min-w-0">
+            {primaryTabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={tabButtonClass(tab.id)}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-stretch gap-0 shrink-0 pl-2 sm:pl-3 ml-auto">
+            {secondaryTabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={tabButtonClass(tab.id)}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -159,39 +204,87 @@ export default function App() {
         />
       )}
 
-      {/* Main content — fixed height, no page scroll */}
-      <main className="flex-1 overflow-hidden max-w-screen-2xl mx-auto w-full">
-        <div className={cn("h-full", activeTab === "fleet" ? "block" : "hidden")}>
-          <FleetPage onNavigate={handleNavigate} />
-        </div>
-        <div className={cn("h-full", activeTab === "dashboard" ? "block" : "hidden")}>
-          <StatusDashboard
-            selectedAircraft={selectedAircraft}
-            onSelectAircraft={setSelectedAircraft}
-            onOpenAssistant={() => setActiveTab("query")}
-          />
-        </div>
-        <div className={cn("h-full", activeTab === "query" ? "block" : "hidden")}>
-          <QueryInterface apiKeyMissing={apiKeyMissing} />
-        </div>
-        <div className={cn("h-full", activeTab === "maintenance" ? "block" : "hidden")}>
-          <MaintenanceTimeline active={activeTab === "maintenance"} />
-        </div>
-        <div className={cn("h-full", activeTab === "aircraft" ? "block" : "hidden")}>
-          <AircraftComponents active={activeTab === "aircraft"} />
-        </div>
-        <div className={cn("h-full min-h-0 min-w-0", activeTab === "flights" ? "block" : "hidden")}>
-          <FlightHistory active={activeTab === "flights"} />
-        </div>
-        <div className={cn("h-full", activeTab === "graph" ? "block" : "hidden")}>
-          <KnowledgeGraph active={activeTab === "graph"} />
+      {/* Main content: no document scroll — each tab uses flex-1 min-h-0; scroll only inside panels/cards */}
+      <main className="flex-1 min-h-0 flex flex-col overflow-hidden w-full min-w-0">
+        <div className="flex-1 min-h-0 overflow-hidden w-full min-w-0 flex flex-col">
+          {/* Full viewport width so page-level overflow-y (e.g. Aircraft Status) scrollbars sit on the browser edge */}
+          <div className="relative flex-1 min-h-0 w-full min-w-0 flex flex-col overflow-hidden">
+            <div
+              className={cn(
+                activeTab === "fleet"
+                  ? "flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden"
+                  : "hidden"
+              )}
+            >
+              <FleetPage onNavigate={handleNavigate} />
+            </div>
+            <div
+              className={cn(
+                activeTab === "dashboard"
+                  ? "flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden"
+                  : "hidden"
+              )}
+            >
+              <StatusDashboard
+                selectedAircraft={selectedAircraft}
+                onSelectAircraft={setSelectedAircraft}
+                onOpenAssistant={() => setActiveTab("query")}
+              />
+            </div>
+            <div
+              className={cn(
+                activeTab === "query"
+                  ? "flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden"
+                  : "hidden"
+              )}
+            >
+              <QueryInterface apiKeyMissing={apiKeyMissing} />
+            </div>
+            <div
+              className={cn(
+                activeTab === "maintenance"
+                  ? "flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden"
+                  : "hidden"
+              )}
+            >
+              <MaintenanceTimeline active={activeTab === "maintenance"} />
+            </div>
+            <div
+              className={cn(
+                activeTab === "aircraft"
+                  ? "flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden"
+                  : "hidden"
+              )}
+            >
+              <AircraftComponents active={activeTab === "aircraft"} />
+            </div>
+            <div
+              className={cn(
+                activeTab === "flights"
+                  ? "flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden"
+                  : "hidden"
+              )}
+            >
+              <FlightHistory active={activeTab === "flights"} />
+            </div>
+            <div
+              className={cn(
+                "flex flex-col flex-1 min-h-0 min-w-0 overflow-hidden",
+                activeTab === "graph"
+                  ? "relative z-[1]"
+                  : "absolute inset-0 z-0 opacity-0 pointer-events-none min-h-0"
+              )}
+              aria-hidden={activeTab !== "graph"}
+            >
+              <KnowledgeGraph active={activeTab === "graph"} />
+            </div>
+          </div>
         </div>
       </main>
 
       <FloatingChatDock
         visible={activeTab !== "query"}
         apiKeyMissing={apiKeyMissing}
-        graphContext={activeTab === "graph"}
         fleetOptionDisabled={TABS_WITHOUT_FLEET_SCOPE.includes(activeTab)}
       />
     </div>

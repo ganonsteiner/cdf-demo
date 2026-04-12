@@ -33,7 +33,12 @@ from sse_starlette.sse import EventSourceResponse
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from .agent.agent import run_agent_streaming  # noqa: E402
-from .agent.context import assemble_aircraft_context  # noqa: E402
+from .agent.context import (  # noqa: E402
+    _date_after_calendar_months,
+    _oil_change_calendar_months_from_policy,
+    assemble_aircraft_context,
+)
+from .date_only import calendar_days_until_iso  # noqa: E402
 from .aircraft_times import (  # noqa: E402
     current_hobbs_from_cdf_store,
     current_tach_from_cdf_store,
@@ -201,6 +206,7 @@ async def get_fleet() -> list[dict[str, Any]]:
                     "tbo": 2000,
                     "smohPercent": 0.0,
                     "hobbs": 0.0,
+                    "tach": 0.0,
                     "airworthiness": "UNKNOWN",
                     "isAirworthy": False,
                     "openSquawkCount": 0,
@@ -212,7 +218,6 @@ async def get_fleet() -> list[dict[str, Any]]:
                     "annualDaysRemaining": None,
                     "annualDueDate": "",
                     "activeSymptoms": 0,
-                    "activeConditions": 0,
                     "metadata": {"load_error": str(ctx.get("error", "unknown"))},
                 })
                 continue
@@ -224,6 +229,7 @@ async def get_fleet() -> list[dict[str, Any]]:
                 "tbo": ctx.get("engineTBO", 2000),
                 "smohPercent": ctx.get("engineSMOHPercent", 0),
                 "hobbs": ctx.get("currentHobbs", 0),
+                "tach": ctx.get("currentTach", 0),
                 "airworthiness": ctx.get("airworthiness", "UNKNOWN"),
                 "isAirworthy": ctx.get("isAirworthy", False),
                 "openSquawkCount": len(ctx.get("openSquawks", [])),
@@ -235,7 +241,6 @@ async def get_fleet() -> list[dict[str, Any]]:
                 "annualDaysRemaining": ctx.get("annualDaysRemaining"),
                 "annualDueDate": ctx.get("annualDueDate", ""),
                 "activeSymptoms": len(ctx.get("symptoms", [])),
-                "activeConditions": len(ctx.get("conditions", [])),
                 "metadata": ctx.get("aircraft", {}).get("metadata", {}),
             })
         return results
@@ -370,7 +375,11 @@ async def get_maintenance_history(
     year: Optional[int] = None,
     maint_type: Optional[str] = None,
 ) -> dict[str, Any]:
-    """GET /api/maintenance/history?aircraft=N4798E — paginated maintenance records."""
+    """GET /api/maintenance/history?aircraft=N4798E — paginated maintenance records.
+
+    Response includes ``available_years``: calendar years present after component/type
+    filters (before ``year``), for populating the year filter UI.
+    """
     tail = _require_tail(aircraft)
     try:
         ctx = await asyncio.to_thread(assemble_aircraft_context, tail)
@@ -396,6 +405,16 @@ async def get_maintenance_history(
                 or mt_lower in (r.get("metadata", {}).get("maintenance_type", "") or "").lower()
             ]
 
+        years_seen: set[int] = set()
+        for r in records_sorted:
+            y = _record_year(r)
+            if y is not None:
+                years_seen.add(y)
+        available_years = sorted(years_seen, reverse=True)
+
+        if year:
+            records_sorted = [r for r in records_sorted if _record_year(r) == year]
+
         total = len(records_sorted)
         total_pages = max(1, (total + per_page - 1) // per_page)
         start = (page - 1) * per_page
@@ -406,6 +425,7 @@ async def get_maintenance_history(
             "page": page,
             "per_page": per_page,
             "total_pages": total_pages,
+            "available_years": available_years,
         }
     except HTTPException:
         raise
@@ -609,7 +629,6 @@ def _sync_get_components(tail: str) -> list[dict[str, Any]]:
     current_hobbs = current_hobbs_from_cdf_store(cdf_store, tail)
     current_tach = current_tach_from_cdf_store(cdf_store, tail)
 
-    today = datetime.now(timezone.utc)
     result: list[dict[str, Any]] = []
 
     for asset in sorted(tail_assets, key=lambda a: a.externalId or ""):
@@ -645,6 +664,17 @@ def _sync_get_components(tail: str) -> list[dict[str, Any]]:
                 oil_next_due_date = (om.get("next_due_date") or "").strip() or None
                 next_due_tach = oil_next_due_tach
                 next_due_date = oil_next_due_date
+                # IT rows often omit next_due_date; calendar leg still applies (policy months from sign-off).
+                if not oil_next_due_date:
+                    svc = str(om.get("date", "") or "").strip()
+                    if svc:
+                        try:
+                            oil_next_due_date = _date_after_calendar_months(
+                                svc, _oil_change_calendar_months_from_policy()
+                            )
+                            next_due_date = oil_next_due_date
+                        except ValueError:
+                            pass
 
         if is_root:
             annual_recs = [
@@ -666,32 +696,22 @@ def _sync_get_components(tail: str) -> list[dict[str, Any]]:
             elif hours_until_tach <= 10:
                 status = "due_soon"
             if oil_next_due_date:
-                try:
-                    due_dt = datetime.fromisoformat(oil_next_due_date.replace("Z", "+00:00"))
-                    if due_dt.tzinfo is None:
-                        due_dt = due_dt.replace(tzinfo=timezone.utc)
-                    days_remaining = (due_dt - today).days
+                days_remaining = calendar_days_until_iso(oil_next_due_date)
+                if days_remaining is not None:
                     if days_remaining < 0 and hours_until_tach is not None and hours_until_tach > 0:
                         pass
                     elif days_remaining < 0:
                         status = "overdue"
                     elif days_remaining <= 30 and status == "ok":
                         status = "due_soon"
-                except (ValueError, TypeError):
-                    pass
 
         if is_root and next_due_date:
-            try:
-                due_dt = datetime.fromisoformat(next_due_date.replace("Z", "+00:00"))
-                if due_dt.tzinfo is None:
-                    due_dt = due_dt.replace(tzinfo=timezone.utc)
-                days_remaining = (due_dt - today).days
+            days_remaining = calendar_days_until_iso(next_due_date)
+            if days_remaining is not None:
                 if days_remaining < 0:
                     status = "overdue"
                 elif days_remaining <= 30 and status == "ok":
                     status = "due_soon"
-            except (ValueError, TypeError):
-                pass
 
         result.append({
             "externalId": ext_id,

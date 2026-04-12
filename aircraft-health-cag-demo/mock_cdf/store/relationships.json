@@ -7,8 +7,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-LIMITATIONS-N2251K",
@@ -18,8 +18,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-LIMITATIONS-N8834Q",
@@ -29,8 +29,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-LIMITATIONS-N1156P",
@@ -40,8 +40,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-EMERGENCY-N4798E",
@@ -51,8 +51,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-EMERGENCY-N2251K",
@@ -62,8 +62,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-EMERGENCY-N8834Q",
@@ -73,8 +73,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-EMERGENCY-N1156P",
@@ -84,8 +84,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-SYSTEMS-N4798E",
@@ -95,8 +95,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-SYSTEMS-N2251K",
@@ -106,8 +106,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-SYSTEMS-N8834Q",
@@ -117,8 +117,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-SYSTEMS-N1156P",
@@ -128,8 +128,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-SYSTEMS-N4798E-ENGINE",
@@ -139,8 +139,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-SYSTEMS-N2251K-ENGINE",
@@ -150,8 +150,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-SYSTEMS-N8834Q-ENGINE",
@@ -161,8 +161,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-SYSTEMS-N1156P-ENGINE",
@@ -172,8 +172,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-PERFORMANCE-N4798E",
@@ -183,8 +183,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-PERFORMANCE-N2251K",
@@ -194,8 +194,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-PERFORMANCE-N8834Q",
@@ -205,8 +205,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-POH-PERFORMANCE-N1156P",
@@ -216,8 +216,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-80-04-03-R2-N4798E-ENGINE",
@@ -227,8 +227,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-80-04-03-R2-N2251K-ENGINE",
@@ -238,8 +238,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-80-04-03-R2-N8834Q-ENGINE",
@@ -249,8 +249,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-80-04-03-R2-N1156P-ENGINE",
@@ -260,8 +260,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-80-04-03-R2-N4798E-ENGINE-CYLINDERS",
@@ -271,8 +271,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-80-04-03-R2-N2251K-ENGINE-CYLINDERS",
@@ -282,8 +282,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-80-04-03-R2-N8834Q-ENGINE-CYLINDERS",
@@ -293,8 +293,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-80-04-03-R2-N1156P-ENGINE-CYLINDERS",
@@ -304,8 +304,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-2001-23-03-N4798E-AIRFRAME",
@@ -315,8 +315,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-2001-23-03-N2251K-AIRFRAME",
@@ -326,8 +326,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-2001-23-03-N8834Q-AIRFRAME",
@@ -337,8 +337,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-2001-23-03-N1156P-AIRFRAME",
@@ -348,8 +348,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-2011-10-09-N4798E-AIRFRAME",
@@ -359,8 +359,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-2011-10-09-N2251K-AIRFRAME",
@@ -370,8 +370,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-2011-10-09-N8834Q-AIRFRAME",
@@ -381,8 +381,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-2011-10-09-N1156P-AIRFRAME",
@@ -392,8 +392,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-90-06-03-R1-N4798E-ENGINE",
@@ -403,8 +403,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-90-06-03-R1-N2251K-ENGINE",
@@ -414,8 +414,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-90-06-03-R1-N8834Q-ENGINE",
@@ -425,8 +425,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-AD-90-06-03-R1-N1156P-ENGINE",
@@ -436,8 +436,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-SB-480F-N4798E-ENGINE",
@@ -447,8 +447,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-SB-480F-N2251K-ENGINE",
@@ -458,8 +458,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-SB-480F-N8834Q-ENGINE",
@@ -469,8 +469,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-SB-480F-N1156P-ENGINE",
@@ -480,8 +480,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-SB-480F-N4798E-ENGINE-OIL",
@@ -491,8 +491,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-SB-480F-N2251K-ENGINE-OIL",
@@ -502,8 +502,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-SB-480F-N8834Q-ENGINE-OIL",
@@ -513,8 +513,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-LINKED-DOC-SB-480F-N1156P-ENGINE-OIL",
@@ -524,360 +524,8 @@
     "targetType": "file",
     "relationshipType": "LINKED_TO",
     "confidence": 1.0,
-    "createdTime": 1775447062344,
-    "lastUpdatedTime": 1775447062344
-  },
-  {
-    "externalId": "REL-INSP-N4798E-2025-06-10-PERFORMED_ON",
-    "sourceExternalId": "INSP-N4798E-2025-06-10",
-    "sourceType": "event",
-    "targetExternalId": "N4798E",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N4798E-2025-06-10-REFERENCES_AD-DOC_AD_80_04_03_R2",
-    "sourceExternalId": "INSP-N4798E-2025-06-10",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-80-04-03-R2",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N4798E-2025-06-10-REFERENCES_AD-DOC_AD_2001_23_03",
-    "sourceExternalId": "INSP-N4798E-2025-06-10",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-2001-23-03",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N4798E-2025-06-10-REFERENCES_AD-DOC_AD_2011_10_09",
-    "sourceExternalId": "INSP-N4798E-2025-06-10",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-2011-10-09",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N4798E-2025-06-10-REFERENCES_AD-DOC_AD_90_06_03_R1",
-    "sourceExternalId": "INSP-N4798E-2025-06-10",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-90-06-03-R1",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N4798E-oil_change-2025-07-15-PERFORMED_ON",
-    "sourceExternalId": "MAINT-N4798E-oil_change-2025-07-15",
-    "sourceType": "event",
-    "targetExternalId": "N4798E-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N4798E-oil_change-2025-11-20-PERFORMED_ON",
-    "sourceExternalId": "MAINT-N4798E-oil_change-2025-11-20",
-    "sourceType": "event",
-    "targetExternalId": "N4798E-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-SQ-N4798E-001-PERFORMED_ON",
-    "sourceExternalId": "SQ-N4798E-001",
-    "sourceType": "event",
-    "targetExternalId": "N4798E-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-SQ-N4798E-001-IDENTIFIED_ON",
-    "sourceExternalId": "SQ-N4798E-001",
-    "sourceType": "event",
-    "targetExternalId": "N4798E-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "IDENTIFIED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N2251K-2025-06-05-PERFORMED_ON",
-    "sourceExternalId": "INSP-N2251K-2025-06-05",
-    "sourceType": "event",
-    "targetExternalId": "N2251K",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N2251K-2025-06-05-REFERENCES_AD-DOC_AD_80_04_03_R2",
-    "sourceExternalId": "INSP-N2251K-2025-06-05",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-80-04-03-R2",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N2251K-2025-06-05-REFERENCES_AD-DOC_AD_2011_10_09",
-    "sourceExternalId": "INSP-N2251K-2025-06-05",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-2011-10-09",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N2251K-2025-06-05-REFERENCES_AD-DOC_AD_90_06_03_R1",
-    "sourceExternalId": "INSP-N2251K-2025-06-05",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-90-06-03-R1",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N2251K-oil_change-2025-07-01-PERFORMED_ON",
-    "sourceExternalId": "MAINT-N2251K-oil_change-2025-07-01",
-    "sourceType": "event",
-    "targetExternalId": "N2251K-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N2251K-oil_change-2025-11-10-PERFORMED_ON",
-    "sourceExternalId": "MAINT-N2251K-oil_change-2025-11-10",
-    "sourceType": "event",
-    "targetExternalId": "N2251K-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N8834Q-2025-09-12-PERFORMED_ON",
-    "sourceExternalId": "INSP-N8834Q-2025-09-12",
-    "sourceType": "event",
-    "targetExternalId": "N8834Q",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N8834Q-2025-09-12-REFERENCES_AD-DOC_AD_80_04_03_R2",
-    "sourceExternalId": "INSP-N8834Q-2025-09-12",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-80-04-03-R2",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N8834Q-2025-09-12-REFERENCES_AD-DOC_AD_2011_10_09",
-    "sourceExternalId": "INSP-N8834Q-2025-09-12",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-2011-10-09",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N8834Q-2025-09-12-REFERENCES_AD-DOC_AD_90_06_03_R1",
-    "sourceExternalId": "INSP-N8834Q-2025-09-12",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-90-06-03-R1",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N8834Q-oil_change-2025-09-20-PERFORMED_ON",
-    "sourceExternalId": "MAINT-N8834Q-oil_change-2025-09-20",
-    "sourceType": "event",
-    "targetExternalId": "N8834Q-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N8834Q-oil_change-2026-01-28-PERFORMED_ON",
-    "sourceExternalId": "MAINT-N8834Q-oil_change-2026-01-28",
-    "sourceType": "event",
-    "targetExternalId": "N8834Q-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N1156P-2025-04-15-PERFORMED_ON",
-    "sourceExternalId": "INSP-N1156P-2025-04-15",
-    "sourceType": "event",
-    "targetExternalId": "N1156P",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N1156P-2025-04-15-REFERENCES_AD-DOC_AD_80_04_03_R2",
-    "sourceExternalId": "INSP-N1156P-2025-04-15",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-80-04-03-R2",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N1156P-2025-04-15-REFERENCES_AD-DOC_AD_2011_10_09",
-    "sourceExternalId": "INSP-N1156P-2025-04-15",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-2011-10-09",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-INSP-N1156P-2025-04-15-REFERENCES_AD-DOC_AD_90_06_03_R1",
-    "sourceExternalId": "INSP-N1156P-2025-04-15",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-90-06-03-R1",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N1156P-oil_change-2025-04-20-PERFORMED_ON",
-    "sourceExternalId": "MAINT-N1156P-oil_change-2025-04-20",
-    "sourceType": "event",
-    "targetExternalId": "N1156P-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N1156P-oil_change-2025-09-05-PERFORMED_ON",
-    "sourceExternalId": "MAINT-N1156P-oil_change-2025-09-05",
-    "sourceType": "event",
-    "targetExternalId": "N1156P-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N1156P-postaccident-2025-11-15-PERFORMED_ON",
-    "sourceExternalId": "MAINT-N1156P-postaccident-2025-11-15",
-    "sourceType": "event",
-    "targetExternalId": "N1156P-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-MAINT-N1156P-postaccident-2025-11-15-REFERENCES_AD-DOC_AD_2011_10_09",
-    "sourceExternalId": "MAINT-N1156P-postaccident-2025-11-15",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-2011-10-09",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-SQ-N1156P-001-PERFORMED_ON",
-    "sourceExternalId": "SQ-N1156P-001",
-    "sourceType": "event",
-    "targetExternalId": "N1156P-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "PERFORMED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-SQ-N1156P-001-REFERENCES_AD-DOC_AD_2011_10_09",
-    "sourceExternalId": "SQ-N1156P-001",
-    "sourceType": "event",
-    "targetExternalId": "DOC-AD-2011-10-09",
-    "targetType": "file",
-    "relationshipType": "REFERENCES_AD",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
-  },
-  {
-    "externalId": "REL-SQ-N1156P-001-IDENTIFIED_ON",
-    "sourceExternalId": "SQ-N1156P-001",
-    "sourceType": "event",
-    "targetExternalId": "N1156P-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "IDENTIFIED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063921,
-    "lastUpdatedTime": 1775447063921
+    "createdTime": 1775975548324,
+    "lastUpdatedTime": 1775975548324
   },
   {
     "externalId": "REL-N4798E-GOVERNED_BY-Desert_Sky_Aviation",
@@ -887,8 +535,8 @@
     "targetType": "asset",
     "relationshipType": "GOVERNED_BY",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-N2251K-GOVERNED_BY-Desert_Sky_Aviation",
@@ -898,8 +546,8 @@
     "targetType": "asset",
     "relationshipType": "GOVERNED_BY",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-N8834Q-GOVERNED_BY-Desert_Sky_Aviation",
@@ -909,8 +557,8 @@
     "targetType": "asset",
     "relationshipType": "GOVERNED_BY",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-N1156P-GOVERNED_BY-Desert_Sky_Aviation",
@@ -920,8 +568,8 @@
     "targetType": "asset",
     "relationshipType": "GOVERNED_BY",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-Desert_Sky_Aviation-HAS_POLICY-Policy_OilChangeInterval",
@@ -931,8 +579,8 @@
     "targetType": "asset",
     "relationshipType": "HAS_POLICY",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-Desert_Sky_Aviation-HAS_POLICY-Policy_OilGracePeriod",
@@ -942,8 +590,8 @@
     "targetType": "asset",
     "relationshipType": "HAS_POLICY",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-Desert_Sky_Aviation-HAS_POLICY-Policy_AnnualInspection",
@@ -953,8 +601,8 @@
     "targetType": "asset",
     "relationshipType": "HAS_POLICY",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-Desert_Sky_Aviation-HAS_POLICY-Policy_FerryFlightOilOverdue",
@@ -964,30 +612,8 @@
     "targetType": "asset",
     "relationshipType": "HAS_POLICY",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-FLIGHT-N8834Q-0032-EXHIBITED-Symptom_N8834Q_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N8834Q-0032",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N8834Q_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N8834Q-0032-EXHIBITED-Symptom_N8834Q_RoughMag",
-    "sourceExternalId": "FLIGHT-N8834Q-0032",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N8834Q_RoughMag",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N8834Q-0033-EXHIBITED-Symptom_N8834Q_ElevatedCHT",
@@ -997,8 +623,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N8834Q-0033-EXHIBITED-Symptom_N8834Q_RoughMag",
@@ -1008,8 +634,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N8834Q-0034-EXHIBITED-Symptom_N8834Q_ElevatedCHT",
@@ -1019,8 +645,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N8834Q-0034-EXHIBITED-Symptom_N8834Q_RoughMag",
@@ -1030,690 +656,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0090-EXHIBITED-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N1156P-0090",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0090-EXHIBITED-Symptom_N1156P_OilConsumption",
-    "sourceExternalId": "FLIGHT-N1156P-0090",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_OilConsumption",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0091-EXHIBITED-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N1156P-0091",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0091-EXHIBITED-Symptom_N1156P_OilConsumption",
-    "sourceExternalId": "FLIGHT-N1156P-0091",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_OilConsumption",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0092-EXHIBITED-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N1156P-0092",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0092-EXHIBITED-Symptom_N1156P_OilConsumption",
-    "sourceExternalId": "FLIGHT-N1156P-0092",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_OilConsumption",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0093-EXHIBITED-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N1156P-0093",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0093-EXHIBITED-Symptom_N1156P_RoughRunning",
-    "sourceExternalId": "FLIGHT-N1156P-0093",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_RoughRunning",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0093-EXHIBITED-Symptom_N1156P_OilConsumption",
-    "sourceExternalId": "FLIGHT-N1156P-0093",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_OilConsumption",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0094-EXHIBITED-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N1156P-0094",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0094-EXHIBITED-Symptom_N1156P_RoughRunning",
-    "sourceExternalId": "FLIGHT-N1156P-0094",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_RoughRunning",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0094-EXHIBITED-Symptom_N1156P_OilConsumption",
-    "sourceExternalId": "FLIGHT-N1156P-0094",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_OilConsumption",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0095-EXHIBITED-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N1156P-0095",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0095-EXHIBITED-Symptom_N1156P_RoughRunning",
-    "sourceExternalId": "FLIGHT-N1156P-0095",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_RoughRunning",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0095-EXHIBITED-Symptom_N1156P_OilConsumption",
-    "sourceExternalId": "FLIGHT-N1156P-0095",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_OilConsumption",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0096-EXHIBITED-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N1156P-0096",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0096-EXHIBITED-Symptom_N1156P_RoughRunning",
-    "sourceExternalId": "FLIGHT-N1156P-0096",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_RoughRunning",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0096-EXHIBITED-Symptom_N1156P_OilConsumption",
-    "sourceExternalId": "FLIGHT-N1156P-0096",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_OilConsumption",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0097-EXHIBITED-Symptom_N1156P_RoughRunning",
-    "sourceExternalId": "FLIGHT-N1156P-0097",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_RoughRunning",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0097-EXHIBITED-Symptom_N1156P_PowerLoss",
-    "sourceExternalId": "FLIGHT-N1156P-0097",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_PowerLoss",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0097-EXHIBITED-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N1156P-0097",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0098-EXHIBITED-Symptom_N1156P_RoughRunning",
-    "sourceExternalId": "FLIGHT-N1156P-0098",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_RoughRunning",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0098-EXHIBITED-Symptom_N1156P_PowerLoss",
-    "sourceExternalId": "FLIGHT-N1156P-0098",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_PowerLoss",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-FLIGHT-N1156P-0098-EXHIBITED-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "FLIGHT-N1156P-0098",
-    "sourceType": "event",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "EXHIBITED",
-    "confidence": 1.0,
-    "createdTime": 1775442066996,
-    "lastUpdatedTime": 1775442066996
-  },
-  {
-    "externalId": "REL-N8834Q-OBSERVED_ON-Symptom_N8834Q_ElevatedCHT",
-    "sourceExternalId": "N8834Q",
-    "sourceType": "asset",
-    "targetExternalId": "Symptom_N8834Q_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "OBSERVED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N8834Q-OBSERVED_ON-Symptom_N8834Q_RoughMag",
-    "sourceExternalId": "N8834Q",
-    "sourceType": "asset",
-    "targetExternalId": "Symptom_N8834Q_RoughMag",
-    "targetType": "event",
-    "relationshipType": "OBSERVED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-OBSERVED_ON-Symptom_N1156P_ElevatedCHT",
-    "sourceExternalId": "N1156P",
-    "sourceType": "asset",
-    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
-    "targetType": "event",
-    "relationshipType": "OBSERVED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-OBSERVED_ON-Symptom_N1156P_OilConsumption",
-    "sourceExternalId": "N1156P",
-    "sourceType": "asset",
-    "targetExternalId": "Symptom_N1156P_OilConsumption",
-    "targetType": "event",
-    "relationshipType": "OBSERVED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-OBSERVED_ON-Symptom_N1156P_RoughRunning",
-    "sourceExternalId": "N1156P",
-    "sourceType": "asset",
-    "targetExternalId": "Symptom_N1156P_RoughRunning",
-    "targetType": "event",
-    "relationshipType": "OBSERVED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-OBSERVED_ON-Symptom_N1156P_PowerLoss",
-    "sourceExternalId": "N1156P",
-    "sourceType": "asset",
-    "targetExternalId": "Symptom_N1156P_PowerLoss",
-    "targetType": "event",
-    "relationshipType": "OBSERVED_ON",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N4798E-ENGINE-IS_TYPE-ENGINE_MODEL_LYC_O320_H2AD",
-    "sourceExternalId": "N4798E-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "ENGINE_MODEL_LYC_O320_H2AD",
-    "targetType": "asset",
-    "relationshipType": "IS_TYPE",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N2251K-ENGINE-IS_TYPE-ENGINE_MODEL_LYC_O320_H2AD",
-    "sourceExternalId": "N2251K-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "ENGINE_MODEL_LYC_O320_H2AD",
-    "targetType": "asset",
-    "relationshipType": "IS_TYPE",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N8834Q-ENGINE-IS_TYPE-ENGINE_MODEL_LYC_O320_H2AD",
-    "sourceExternalId": "N8834Q-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "ENGINE_MODEL_LYC_O320_H2AD",
-    "targetType": "asset",
-    "relationshipType": "IS_TYPE",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-ENGINE-IS_TYPE-ENGINE_MODEL_LYC_O320_H2AD",
-    "sourceExternalId": "N1156P-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "ENGINE_MODEL_LYC_O320_H2AD",
-    "targetType": "asset",
-    "relationshipType": "IS_TYPE",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-ENGINE",
-    "sourceExternalId": "N4798E",
-    "sourceType": "asset",
-    "targetExternalId": "N4798E-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N4798E-ENGINE-HAS_COMPONENT-N4798E-ENGINE-CYLINDERS",
-    "sourceExternalId": "N4798E-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "N4798E-ENGINE-CYLINDERS",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N4798E-ENGINE-HAS_COMPONENT-N4798E-ENGINE-OIL",
-    "sourceExternalId": "N4798E-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "N4798E-ENGINE-OIL",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-PROPELLER",
-    "sourceExternalId": "N4798E",
-    "sourceType": "asset",
-    "targetExternalId": "N4798E-PROPELLER",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-AIRFRAME",
-    "sourceExternalId": "N4798E",
-    "sourceType": "asset",
-    "targetExternalId": "N4798E-AIRFRAME",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-AVIONICS",
-    "sourceExternalId": "N4798E",
-    "sourceType": "asset",
-    "targetExternalId": "N4798E-AVIONICS",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-FUEL-SYSTEM",
-    "sourceExternalId": "N4798E",
-    "sourceType": "asset",
-    "targetExternalId": "N4798E-FUEL-SYSTEM",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-ENGINE",
-    "sourceExternalId": "N2251K",
-    "sourceType": "asset",
-    "targetExternalId": "N2251K-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N2251K-ENGINE-HAS_COMPONENT-N2251K-ENGINE-CYLINDERS",
-    "sourceExternalId": "N2251K-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "N2251K-ENGINE-CYLINDERS",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N2251K-ENGINE-HAS_COMPONENT-N2251K-ENGINE-OIL",
-    "sourceExternalId": "N2251K-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "N2251K-ENGINE-OIL",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-PROPELLER",
-    "sourceExternalId": "N2251K",
-    "sourceType": "asset",
-    "targetExternalId": "N2251K-PROPELLER",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-AIRFRAME",
-    "sourceExternalId": "N2251K",
-    "sourceType": "asset",
-    "targetExternalId": "N2251K-AIRFRAME",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-AVIONICS",
-    "sourceExternalId": "N2251K",
-    "sourceType": "asset",
-    "targetExternalId": "N2251K-AVIONICS",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-FUEL-SYSTEM",
-    "sourceExternalId": "N2251K",
-    "sourceType": "asset",
-    "targetExternalId": "N2251K-FUEL-SYSTEM",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-ENGINE",
-    "sourceExternalId": "N8834Q",
-    "sourceType": "asset",
-    "targetExternalId": "N8834Q-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N8834Q-ENGINE-HAS_COMPONENT-N8834Q-ENGINE-CYLINDERS",
-    "sourceExternalId": "N8834Q-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "N8834Q-ENGINE-CYLINDERS",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N8834Q-ENGINE-HAS_COMPONENT-N8834Q-ENGINE-OIL",
-    "sourceExternalId": "N8834Q-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "N8834Q-ENGINE-OIL",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-PROPELLER",
-    "sourceExternalId": "N8834Q",
-    "sourceType": "asset",
-    "targetExternalId": "N8834Q-PROPELLER",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-AIRFRAME",
-    "sourceExternalId": "N8834Q",
-    "sourceType": "asset",
-    "targetExternalId": "N8834Q-AIRFRAME",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-AVIONICS",
-    "sourceExternalId": "N8834Q",
-    "sourceType": "asset",
-    "targetExternalId": "N8834Q-AVIONICS",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-FUEL-SYSTEM",
-    "sourceExternalId": "N8834Q",
-    "sourceType": "asset",
-    "targetExternalId": "N8834Q-FUEL-SYSTEM",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-ENGINE",
-    "sourceExternalId": "N1156P",
-    "sourceType": "asset",
-    "targetExternalId": "N1156P-ENGINE",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-ENGINE-HAS_COMPONENT-N1156P-ENGINE-CYLINDERS",
-    "sourceExternalId": "N1156P-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "N1156P-ENGINE-CYLINDERS",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-ENGINE-HAS_COMPONENT-N1156P-ENGINE-OIL",
-    "sourceExternalId": "N1156P-ENGINE",
-    "sourceType": "asset",
-    "targetExternalId": "N1156P-ENGINE-OIL",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-PROPELLER",
-    "sourceExternalId": "N1156P",
-    "sourceType": "asset",
-    "targetExternalId": "N1156P-PROPELLER",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-AIRFRAME",
-    "sourceExternalId": "N1156P",
-    "sourceType": "asset",
-    "targetExternalId": "N1156P-AIRFRAME",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-AVIONICS",
-    "sourceExternalId": "N1156P",
-    "sourceType": "asset",
-    "targetExternalId": "N1156P-AVIONICS",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
-  },
-  {
-    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-FUEL-SYSTEM",
-    "sourceExternalId": "N1156P",
-    "sourceType": "asset",
-    "targetExternalId": "N1156P-FUEL-SYSTEM",
-    "targetType": "asset",
-    "relationshipType": "HAS_COMPONENT",
-    "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N8834Q-0035-EXHIBITED-Symptom_N8834Q_ElevatedCHT",
@@ -1723,8 +667,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N8834Q-0035-EXHIBITED-Symptom_N8834Q_RoughMag",
@@ -1734,8 +678,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0069-EXHIBITED-Symptom_N1156P_ElevatedCHT",
@@ -1745,8 +689,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0069-EXHIBITED-Symptom_N1156P_OilConsumption",
@@ -1756,8 +700,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0070-EXHIBITED-Symptom_N1156P_ElevatedCHT",
@@ -1767,8 +711,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0070-EXHIBITED-Symptom_N1156P_OilConsumption",
@@ -1778,8 +722,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0071-EXHIBITED-Symptom_N1156P_ElevatedCHT",
@@ -1789,8 +733,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0071-EXHIBITED-Symptom_N1156P_OilConsumption",
@@ -1800,8 +744,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0072-EXHIBITED-Symptom_N1156P_ElevatedCHT",
@@ -1811,8 +755,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0072-EXHIBITED-Symptom_N1156P_RoughRunning",
@@ -1822,8 +766,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0072-EXHIBITED-Symptom_N1156P_OilConsumption",
@@ -1833,8 +777,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0073-EXHIBITED-Symptom_N1156P_ElevatedCHT",
@@ -1844,8 +788,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0073-EXHIBITED-Symptom_N1156P_RoughRunning",
@@ -1855,8 +799,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0073-EXHIBITED-Symptom_N1156P_OilConsumption",
@@ -1866,8 +810,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0074-EXHIBITED-Symptom_N1156P_ElevatedCHT",
@@ -1877,8 +821,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0074-EXHIBITED-Symptom_N1156P_RoughRunning",
@@ -1888,8 +832,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0074-EXHIBITED-Symptom_N1156P_OilConsumption",
@@ -1899,8 +843,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0075-EXHIBITED-Symptom_N1156P_RoughRunning",
@@ -1910,8 +854,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0075-EXHIBITED-Symptom_N1156P_PowerLoss",
@@ -1921,8 +865,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0075-EXHIBITED-Symptom_N1156P_ElevatedCHT",
@@ -1932,8 +876,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0076-EXHIBITED-Symptom_N1156P_RoughRunning",
@@ -1943,8 +887,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0076-EXHIBITED-Symptom_N1156P_PowerLoss",
@@ -1954,8 +898,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0076-EXHIBITED-Symptom_N1156P_ElevatedCHT",
@@ -1965,8 +909,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0077-EXHIBITED-Symptom_N1156P_RoughRunning",
@@ -1976,8 +920,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0077-EXHIBITED-Symptom_N1156P_PowerLoss",
@@ -1987,8 +931,8 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
   },
   {
     "externalId": "REL-FLIGHT-N1156P-0077-EXHIBITED-Symptom_N1156P_ElevatedCHT",
@@ -1998,7 +942,766 @@
     "targetType": "event",
     "relationshipType": "EXHIBITED",
     "confidence": 1.0,
-    "createdTime": 1775447063997,
-    "lastUpdatedTime": 1775447063997
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-OBSERVED_ON-Symptom_N8834Q_ElevatedCHT",
+    "sourceExternalId": "N8834Q",
+    "sourceType": "asset",
+    "targetExternalId": "Symptom_N8834Q_ElevatedCHT",
+    "targetType": "event",
+    "relationshipType": "OBSERVED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-OBSERVED_ON-Symptom_N8834Q_RoughMag",
+    "sourceExternalId": "N8834Q",
+    "sourceType": "asset",
+    "targetExternalId": "Symptom_N8834Q_RoughMag",
+    "targetType": "event",
+    "relationshipType": "OBSERVED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-OBSERVED_ON-Symptom_N1156P_ElevatedCHT",
+    "sourceExternalId": "N1156P",
+    "sourceType": "asset",
+    "targetExternalId": "Symptom_N1156P_ElevatedCHT",
+    "targetType": "event",
+    "relationshipType": "OBSERVED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-OBSERVED_ON-Symptom_N1156P_OilConsumption",
+    "sourceExternalId": "N1156P",
+    "sourceType": "asset",
+    "targetExternalId": "Symptom_N1156P_OilConsumption",
+    "targetType": "event",
+    "relationshipType": "OBSERVED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-OBSERVED_ON-Symptom_N1156P_RoughRunning",
+    "sourceExternalId": "N1156P",
+    "sourceType": "asset",
+    "targetExternalId": "Symptom_N1156P_RoughRunning",
+    "targetType": "event",
+    "relationshipType": "OBSERVED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-OBSERVED_ON-Symptom_N1156P_PowerLoss",
+    "sourceExternalId": "N1156P",
+    "sourceType": "asset",
+    "targetExternalId": "Symptom_N1156P_PowerLoss",
+    "targetType": "event",
+    "relationshipType": "OBSERVED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N4798E-ENGINE-IS_TYPE-ENGINE_MODEL_LYC_O320_H2AD",
+    "sourceExternalId": "N4798E-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "ENGINE_MODEL_LYC_O320_H2AD",
+    "targetType": "asset",
+    "relationshipType": "IS_TYPE",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N2251K-ENGINE-IS_TYPE-ENGINE_MODEL_LYC_O320_H2AD",
+    "sourceExternalId": "N2251K-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "ENGINE_MODEL_LYC_O320_H2AD",
+    "targetType": "asset",
+    "relationshipType": "IS_TYPE",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-ENGINE-IS_TYPE-ENGINE_MODEL_LYC_O320_H2AD",
+    "sourceExternalId": "N8834Q-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "ENGINE_MODEL_LYC_O320_H2AD",
+    "targetType": "asset",
+    "relationshipType": "IS_TYPE",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-ENGINE-IS_TYPE-ENGINE_MODEL_LYC_O320_H2AD",
+    "sourceExternalId": "N1156P-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "ENGINE_MODEL_LYC_O320_H2AD",
+    "targetType": "asset",
+    "relationshipType": "IS_TYPE",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-ENGINE",
+    "sourceExternalId": "N4798E",
+    "sourceType": "asset",
+    "targetExternalId": "N4798E-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N4798E-ENGINE-HAS_COMPONENT-N4798E-ENGINE-CYLINDERS",
+    "sourceExternalId": "N4798E-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "N4798E-ENGINE-CYLINDERS",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N4798E-ENGINE-HAS_COMPONENT-N4798E-ENGINE-OIL",
+    "sourceExternalId": "N4798E-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "N4798E-ENGINE-OIL",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-PROPELLER",
+    "sourceExternalId": "N4798E",
+    "sourceType": "asset",
+    "targetExternalId": "N4798E-PROPELLER",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-AIRFRAME",
+    "sourceExternalId": "N4798E",
+    "sourceType": "asset",
+    "targetExternalId": "N4798E-AIRFRAME",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-AVIONICS",
+    "sourceExternalId": "N4798E",
+    "sourceType": "asset",
+    "targetExternalId": "N4798E-AVIONICS",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N4798E-HAS_COMPONENT-N4798E-FUEL-SYSTEM",
+    "sourceExternalId": "N4798E",
+    "sourceType": "asset",
+    "targetExternalId": "N4798E-FUEL-SYSTEM",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-ENGINE",
+    "sourceExternalId": "N2251K",
+    "sourceType": "asset",
+    "targetExternalId": "N2251K-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N2251K-ENGINE-HAS_COMPONENT-N2251K-ENGINE-CYLINDERS",
+    "sourceExternalId": "N2251K-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "N2251K-ENGINE-CYLINDERS",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N2251K-ENGINE-HAS_COMPONENT-N2251K-ENGINE-OIL",
+    "sourceExternalId": "N2251K-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "N2251K-ENGINE-OIL",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-PROPELLER",
+    "sourceExternalId": "N2251K",
+    "sourceType": "asset",
+    "targetExternalId": "N2251K-PROPELLER",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-AIRFRAME",
+    "sourceExternalId": "N2251K",
+    "sourceType": "asset",
+    "targetExternalId": "N2251K-AIRFRAME",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-AVIONICS",
+    "sourceExternalId": "N2251K",
+    "sourceType": "asset",
+    "targetExternalId": "N2251K-AVIONICS",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N2251K-HAS_COMPONENT-N2251K-FUEL-SYSTEM",
+    "sourceExternalId": "N2251K",
+    "sourceType": "asset",
+    "targetExternalId": "N2251K-FUEL-SYSTEM",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-ENGINE",
+    "sourceExternalId": "N8834Q",
+    "sourceType": "asset",
+    "targetExternalId": "N8834Q-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-ENGINE-HAS_COMPONENT-N8834Q-ENGINE-CYLINDERS",
+    "sourceExternalId": "N8834Q-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "N8834Q-ENGINE-CYLINDERS",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-ENGINE-HAS_COMPONENT-N8834Q-ENGINE-OIL",
+    "sourceExternalId": "N8834Q-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "N8834Q-ENGINE-OIL",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-PROPELLER",
+    "sourceExternalId": "N8834Q",
+    "sourceType": "asset",
+    "targetExternalId": "N8834Q-PROPELLER",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-AIRFRAME",
+    "sourceExternalId": "N8834Q",
+    "sourceType": "asset",
+    "targetExternalId": "N8834Q-AIRFRAME",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-AVIONICS",
+    "sourceExternalId": "N8834Q",
+    "sourceType": "asset",
+    "targetExternalId": "N8834Q-AVIONICS",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N8834Q-HAS_COMPONENT-N8834Q-FUEL-SYSTEM",
+    "sourceExternalId": "N8834Q",
+    "sourceType": "asset",
+    "targetExternalId": "N8834Q-FUEL-SYSTEM",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-ENGINE",
+    "sourceExternalId": "N1156P",
+    "sourceType": "asset",
+    "targetExternalId": "N1156P-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-ENGINE-HAS_COMPONENT-N1156P-ENGINE-CYLINDERS",
+    "sourceExternalId": "N1156P-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "N1156P-ENGINE-CYLINDERS",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-ENGINE-HAS_COMPONENT-N1156P-ENGINE-OIL",
+    "sourceExternalId": "N1156P-ENGINE",
+    "sourceType": "asset",
+    "targetExternalId": "N1156P-ENGINE-OIL",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-PROPELLER",
+    "sourceExternalId": "N1156P",
+    "sourceType": "asset",
+    "targetExternalId": "N1156P-PROPELLER",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-AIRFRAME",
+    "sourceExternalId": "N1156P",
+    "sourceType": "asset",
+    "targetExternalId": "N1156P-AIRFRAME",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-AVIONICS",
+    "sourceExternalId": "N1156P",
+    "sourceType": "asset",
+    "targetExternalId": "N1156P-AVIONICS",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-N1156P-HAS_COMPONENT-N1156P-FUEL-SYSTEM",
+    "sourceExternalId": "N1156P",
+    "sourceType": "asset",
+    "targetExternalId": "N1156P-FUEL-SYSTEM",
+    "targetType": "asset",
+    "relationshipType": "HAS_COMPONENT",
+    "confidence": 1.0,
+    "createdTime": 1775975549629,
+    "lastUpdatedTime": 1775975549629
+  },
+  {
+    "externalId": "REL-INSP-N4798E-2025-06-21-PERFORMED_ON",
+    "sourceExternalId": "INSP-N4798E-2025-06-21",
+    "sourceType": "event",
+    "targetExternalId": "N4798E",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N4798E-2025-06-21-REFERENCES_AD-DOC_AD_80_04_03_R2",
+    "sourceExternalId": "INSP-N4798E-2025-06-21",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-80-04-03-R2",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N4798E-2025-06-21-REFERENCES_AD-DOC_AD_2001_23_03",
+    "sourceExternalId": "INSP-N4798E-2025-06-21",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-2001-23-03",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N4798E-2025-06-21-REFERENCES_AD-DOC_AD_2011_10_09",
+    "sourceExternalId": "INSP-N4798E-2025-06-21",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-2011-10-09",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N4798E-2025-06-21-REFERENCES_AD-DOC_AD_90_06_03_R1",
+    "sourceExternalId": "INSP-N4798E-2025-06-21",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-90-06-03-R1",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-MAINT-N4798E-oil_change-2026-01-07-PERFORMED_ON",
+    "sourceExternalId": "MAINT-N4798E-oil_change-2026-01-07",
+    "sourceType": "event",
+    "targetExternalId": "N4798E-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-SQ-N4798E-001-PERFORMED_ON",
+    "sourceExternalId": "SQ-N4798E-001",
+    "sourceType": "event",
+    "targetExternalId": "N4798E-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-SQ-N4798E-001-IDENTIFIED_ON",
+    "sourceExternalId": "SQ-N4798E-001",
+    "sourceType": "event",
+    "targetExternalId": "N4798E-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "IDENTIFIED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N2251K-2025-06-16-PERFORMED_ON",
+    "sourceExternalId": "INSP-N2251K-2025-06-16",
+    "sourceType": "event",
+    "targetExternalId": "N2251K",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N2251K-2025-06-16-REFERENCES_AD-DOC_AD_80_04_03_R2",
+    "sourceExternalId": "INSP-N2251K-2025-06-16",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-80-04-03-R2",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N2251K-2025-06-16-REFERENCES_AD-DOC_AD_2011_10_09",
+    "sourceExternalId": "INSP-N2251K-2025-06-16",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-2011-10-09",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N2251K-2025-06-16-REFERENCES_AD-DOC_AD_90_06_03_R1",
+    "sourceExternalId": "INSP-N2251K-2025-06-16",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-90-06-03-R1",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-MAINT-N2251K-oil_change-2025-05-21-PERFORMED_ON",
+    "sourceExternalId": "MAINT-N2251K-oil_change-2025-05-21",
+    "sourceType": "event",
+    "targetExternalId": "N2251K-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-MAINT-N2251K-oil_change-2026-02-05-PERFORMED_ON",
+    "sourceExternalId": "MAINT-N2251K-oil_change-2026-02-05",
+    "sourceType": "event",
+    "targetExternalId": "N2251K-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N8834Q-2025-09-23-PERFORMED_ON",
+    "sourceExternalId": "INSP-N8834Q-2025-09-23",
+    "sourceType": "event",
+    "targetExternalId": "N8834Q",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N8834Q-2025-09-23-REFERENCES_AD-DOC_AD_80_04_03_R2",
+    "sourceExternalId": "INSP-N8834Q-2025-09-23",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-80-04-03-R2",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N8834Q-2025-09-23-REFERENCES_AD-DOC_AD_2011_10_09",
+    "sourceExternalId": "INSP-N8834Q-2025-09-23",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-2011-10-09",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N8834Q-2025-09-23-REFERENCES_AD-DOC_AD_90_06_03_R1",
+    "sourceExternalId": "INSP-N8834Q-2025-09-23",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-90-06-03-R1",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-MAINT-N8834Q-oil_change-2025-10-01-PERFORMED_ON",
+    "sourceExternalId": "MAINT-N8834Q-oil_change-2025-10-01",
+    "sourceType": "event",
+    "targetExternalId": "N8834Q-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-MAINT-N8834Q-oil_change-2026-02-08-PERFORMED_ON",
+    "sourceExternalId": "MAINT-N8834Q-oil_change-2026-02-08",
+    "sourceType": "event",
+    "targetExternalId": "N8834Q-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N1156P-2025-09-23-PERFORMED_ON",
+    "sourceExternalId": "INSP-N1156P-2025-09-23",
+    "sourceType": "event",
+    "targetExternalId": "N1156P",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N1156P-2025-09-23-REFERENCES_AD-DOC_AD_80_04_03_R2",
+    "sourceExternalId": "INSP-N1156P-2025-09-23",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-80-04-03-R2",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N1156P-2025-09-23-REFERENCES_AD-DOC_AD_2011_10_09",
+    "sourceExternalId": "INSP-N1156P-2025-09-23",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-2011-10-09",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-INSP-N1156P-2025-09-23-REFERENCES_AD-DOC_AD_90_06_03_R1",
+    "sourceExternalId": "INSP-N1156P-2025-09-23",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-90-06-03-R1",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-MAINT-N1156P-oil_change-2025-09-28-PERFORMED_ON",
+    "sourceExternalId": "MAINT-N1156P-oil_change-2025-09-28",
+    "sourceType": "event",
+    "targetExternalId": "N1156P-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-MAINT-N1156P-oil_change-2026-02-13-PERFORMED_ON",
+    "sourceExternalId": "MAINT-N1156P-oil_change-2026-02-13",
+    "sourceType": "event",
+    "targetExternalId": "N1156P-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-MAINT-N1156P-postaccident-2026-04-25-PERFORMED_ON",
+    "sourceExternalId": "MAINT-N1156P-postaccident-2026-04-25",
+    "sourceType": "event",
+    "targetExternalId": "N1156P-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-MAINT-N1156P-postaccident-2026-04-25-REFERENCES_AD-DOC_AD_2011_10_09",
+    "sourceExternalId": "MAINT-N1156P-postaccident-2026-04-25",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-2011-10-09",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-SQ-N1156P-001-PERFORMED_ON",
+    "sourceExternalId": "SQ-N1156P-001",
+    "sourceType": "event",
+    "targetExternalId": "N1156P-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "PERFORMED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-SQ-N1156P-001-REFERENCES_AD-DOC_AD_2011_10_09",
+    "sourceExternalId": "SQ-N1156P-001",
+    "sourceType": "event",
+    "targetExternalId": "DOC-AD-2011-10-09",
+    "targetType": "file",
+    "relationshipType": "REFERENCES_AD",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
+  },
+  {
+    "externalId": "REL-SQ-N1156P-001-IDENTIFIED_ON",
+    "sourceExternalId": "SQ-N1156P-001",
+    "sourceType": "event",
+    "targetExternalId": "N1156P-ENGINE",
+    "targetType": "asset",
+    "relationshipType": "IDENTIFIED_ON",
+    "confidence": 1.0,
+    "createdTime": 1775975549506,
+    "lastUpdatedTime": 1775975549506
   }
 ]

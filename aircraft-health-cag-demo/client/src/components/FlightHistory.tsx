@@ -8,21 +8,27 @@ import {
   ArrowDownWideNarrow,
   ArrowUpNarrowWide,
 } from "lucide-react";
-import { cn } from "../lib/utils";
+import {
+  cn,
+  CARD_SURFACE_A,
+  CARD_SURFACE_B,
+  MAIN_TAB_CONTENT_FRAME,
+  TAB_PAGE_TOP_INSET,
+  toneClasses,
+} from "../lib/utils";
+import { MenuSelect } from "./MenuSelect";
 import { api } from "../lib/api";
 import { useStore, TAILS } from "../lib/store";
 import type { FlightRecord } from "../lib/types";
 import {
-  isChtHigh,
-  isEgtHigh,
-  isOilPsiMaxHigh,
-  isOilPsiMinLow,
-  isOilTempHigh,
+  telemetrySeverityForField,
+  type TelemetrySeverity,
   telemetrySortFieldIsWarn,
   type TelemetrySortField,
 } from "../lib/flightThresholds";
 
-const YEARS = Array.from({ length: 3 }, (_, i) => 2026 - i);
+const CURRENT_YEAR = new Date().getFullYear();
+const YEARS = Array.from({ length: 3 }, (_, i) => CURRENT_YEAR - i);
 
 type SortField =
   | "timestamp"
@@ -160,16 +166,20 @@ interface Props {
 function DetailMetric({
   label,
   children,
-  warn,
+  severity,
 }: {
   label: string;
   children: ReactNode;
-  warn?: boolean;
+  severity?: TelemetrySeverity;
 }) {
+  const sev: TelemetrySeverity = severity ?? "ok";
+  const sevTone = sev === "bad" ? toneClasses("bad") : sev === "warn" ? toneClasses("warn") : null;
+  const sevText = sevTone ? sevTone.text : "text-zinc-200";
+  const sevPanel = sevTone ? sevTone.panel : CARD_SURFACE_B;
   return (
-    <div className="rounded-md border border-zinc-800/90 bg-zinc-900/50 px-2 py-1.5 min-w-0 max-w-full">
+    <div className={cn("rounded-md px-2 py-1.5 min-w-0 max-w-full", sevPanel)}>
       <div className="text-[10px] font-medium uppercase tracking-wide text-zinc-500">{label}</div>
-      <div className={cn("font-mono text-xs tabular-nums text-zinc-200 mt-0.5", warn && "text-yellow-400")}>
+      <div className={cn("font-mono text-xs tabular-nums mt-0.5", sevText)}>
         {children}
       </div>
     </div>
@@ -186,10 +196,15 @@ function FlightDetailPanel({ rec }: { rec: FlightRecord }) {
   const hasTach = tachStart !== null && tachEnd !== null;
 
   return (
-    <div className="px-3 sm:px-4 py-3 pl-9 sm:pl-11 bg-zinc-950/50 text-sm border-t border-zinc-800/60 min-w-0 max-w-full overflow-hidden">
-      <div className="text-zinc-500 text-xs uppercase tracking-wide mb-2">Flight details</div>
+    <div className={cn("px-3 sm:px-4 py-3 pl-9 sm:pl-11 text-sm min-w-0 max-w-full overflow-hidden", CARD_SURFACE_A)}>
+      <div className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-2">Flight details</div>
       <div className="flex flex-wrap gap-2 mb-3 min-w-0">
-        <div className="rounded-md border border-zinc-800/90 bg-zinc-900/50 px-2.5 py-1.5 min-w-[6rem] max-w-full">
+        <div
+          className={cn(
+            "rounded-md px-2.5 py-1.5 min-w-[6rem] max-w-full",
+            CARD_SURFACE_B
+          )}
+        >
           <div className="text-[10px] font-medium uppercase tracking-wide text-zinc-500">Route</div>
           <div className="text-xs text-zinc-200 mt-0.5">
             {routeLabel}
@@ -201,18 +216,18 @@ function FlightDetailPanel({ rec }: { rec: FlightRecord }) {
         <DetailMetric label="Fuel burn">
           {rec.fuel_used_gal !== null ? `${rec.fuel_used_gal.toFixed(1)} gal` : "—"}
         </DetailMetric>
-        <div className="rounded-md border border-zinc-800/90 bg-zinc-900/50 px-2.5 py-1.5">
+        <div className={cn("rounded-md px-2.5 py-1.5", CARD_SURFACE_B)}>
           <div className="text-[10px] font-medium uppercase tracking-wide text-zinc-500">Duration</div>
           <div className="font-mono text-xs text-zinc-200 tabular-nums mt-0.5">{rec.duration.toFixed(1)} hr</div>
         </div>
-        <div className="rounded-md border border-zinc-800/90 bg-zinc-900/50 px-2.5 py-1.5">
+        <div className={cn("rounded-md px-2.5 py-1.5", CARD_SURFACE_B)}>
           <div className="text-[10px] font-medium uppercase tracking-wide text-zinc-500">Hobbs</div>
           <div className="font-mono text-xs text-zinc-200 tabular-nums mt-0.5">
             {rec.hobbs_start.toFixed(1)} → {rec.hobbs_end.toFixed(1)} hr
           </div>
         </div>
         {hasTach ? (
-          <div className="rounded-md border border-zinc-800/90 bg-zinc-900/50 px-2.5 py-1.5 shrink-0">
+          <div className={cn("rounded-md px-2.5 py-1.5 shrink-0", CARD_SURFACE_B)}>
             <div className="text-[10px] font-medium uppercase tracking-wide text-zinc-500">Tach</div>
             <div className="font-mono text-xs text-zinc-200 tabular-nums mt-0.5">
               {tachStart.toFixed(1)} → {tachEnd.toFixed(1)} hr
@@ -221,19 +236,19 @@ function FlightDetailPanel({ rec }: { rec: FlightRecord }) {
         ) : null}
       </div>
       <div className="flex flex-wrap gap-2 border-t border-zinc-800/40 pt-2 min-w-0">
-        <DetailMetric label="CHT max" warn={isChtHigh(rec.cht_max)}>
+        <DetailMetric label="CHT max" severity={telemetrySeverityForField("cht_max", rec)}>
           {rec.cht_max !== null ? `${rec.cht_max} F` : "—"}
         </DetailMetric>
-        <DetailMetric label="Oil temp" warn={isOilTempHigh(rec.oil_temp_max)}>
+        <DetailMetric label="Oil temp" severity={telemetrySeverityForField("oil_temp_max", rec)}>
           {rec.oil_temp_max !== null ? `${rec.oil_temp_max} F` : "—"}
         </DetailMetric>
-        <DetailMetric label="Oil psi min" warn={isOilPsiMinLow(rec.oil_pressure_min)}>
+        <DetailMetric label="Oil psi min" severity={telemetrySeverityForField("oil_pressure_min", rec)}>
           {rec.oil_pressure_min !== null ? `${rec.oil_pressure_min}` : "—"}
         </DetailMetric>
-        <DetailMetric label="Oil psi max" warn={isOilPsiMaxHigh(rec.oil_pressure_max)}>
+        <DetailMetric label="Oil psi max" severity={telemetrySeverityForField("oil_pressure_max", rec)}>
           {rec.oil_pressure_max !== null ? `${rec.oil_pressure_max}` : "—"}
         </DetailMetric>
-        <DetailMetric label="EGT max" warn={isEgtHigh(rec.egt_max)}>
+        <DetailMetric label="EGT max" severity={telemetrySeverityForField("egt_max", rec)}>
           {rec.egt_max !== null ? `${rec.egt_max} F` : "—"}
         </DetailMetric>
       </div>
@@ -270,79 +285,6 @@ function directionAriaLabel(field: SortField, dir: SortDir): string {
     return dir === "desc" ? "Sort: Z to A" : "Sort: A to Z";
   }
   return dir === "desc" ? "Sort: high to low" : "Sort: low to high";
-}
-
-const menuBtnClass =
-  "inline-flex items-center justify-between gap-2 min-w-[8.5rem] rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-left text-sm text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/90 focus:outline-none focus:border-sky-600";
-
-function FlightMenuSelect<T extends string>({
-  value,
-  options,
-  onChange,
-  ariaLabel,
-  className,
-}: {
-  value: T;
-  options: { value: T; label: string }[];
-  onChange: (v: T) => void;
-  ariaLabel?: string;
-  className?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [open]);
-
-  const current = options.find((o) => o.value === value)?.label ?? value;
-
-  return (
-    <div ref={rootRef} className={cn("relative", className)}>
-      <button
-        type="button"
-        className={menuBtnClass}
-        aria-label={ariaLabel}
-        aria-expanded={open}
-        aria-haspopup="listbox"
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span className="truncate">{current}</span>
-        <ChevronDown className={cn("h-4 w-4 shrink-0 text-zinc-500 transition-transform", open && "rotate-180")} />
-      </button>
-      {open ? (
-        <ul
-          className="absolute left-0 top-full z-50 mt-1 max-h-60 min-w-full overflow-y-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
-          role="listbox"
-        >
-          {options.map((o) => (
-            <li key={String(o.value)} role="none">
-              <button
-                type="button"
-                role="option"
-                aria-selected={o.value === value}
-                className={cn(
-                  "w-full px-3 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800",
-                  o.value === value && "bg-zinc-800/80 text-sky-400"
-                )}
-                onClick={() => {
-                  onChange(o.value);
-                  setOpen(false);
-                }}
-              >
-                {o.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </div>
-  );
 }
 
 export default function FlightHistory({ active }: Props) {
@@ -511,10 +453,15 @@ export default function FlightHistory({ active }: Props) {
   })();
 
   return (
-    <div className="h-full flex flex-col min-h-0 min-w-0 w-full max-w-screen-2xl mx-auto py-6 px-3 sm:px-4">
-      <div className="shrink-0 space-y-4 mb-3">
+    <div
+      className={cn(
+        "flex flex-1 min-h-0 flex-col min-w-0 pb-6 overflow-hidden",
+        MAIN_TAB_CONTENT_FRAME,
+        TAB_PAGE_TOP_INSET
+      )}
+    >
+      <div className="shrink-0 flex flex-col gap-2 mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-zinc-500">Aircraft:</span>
           <div className="flex gap-1 flex-wrap">
             {TAILS.map((t) => (
               <button
@@ -535,19 +482,18 @@ export default function FlightHistory({ active }: Props) {
         </div>
 
         <div className="flex items-center justify-between gap-4 flex-wrap">
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide flex items-center gap-2">
-            <History className="w-4 h-4" />
-            Flight History — {tail}
+          <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+            <History className="w-3.5 h-3.5" />
             {total > 0 && (
-              <span className="text-zinc-600 normal-case font-normal">
-                — {total} flights
+              <span>
+                {total} recent flights
               </span>
             )}
           </h2>
 
           <div className="flex items-center gap-2 flex-wrap">
             <span className="hidden sm:inline text-xs text-zinc-500 shrink-0">Sort by</span>
-            <FlightMenuSelect<SortField>
+            <MenuSelect<SortField>
               ariaLabel="Sort flights by"
               value={sortField}
               options={SORT_OPTIONS}
@@ -566,7 +512,7 @@ export default function FlightHistory({ active }: Props) {
                 <ArrowUpNarrowWide className="h-4 w-4" aria-hidden />
               )}
             </button>
-            <FlightMenuSelect<string>
+            <MenuSelect<string>
               ariaLabel="Filter by year"
               value={yearValue}
               options={yearOptions}
@@ -591,13 +537,13 @@ export default function FlightHistory({ active }: Props) {
 
         {loading && (
           <div
-            className="shrink-0 flex flex-col bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden min-w-0"
+            className={cn("shrink-0 flex flex-col rounded-xl overflow-hidden min-w-0", CARD_SURFACE_B)}
             aria-busy="true"
           >
             <div className="min-w-0">
               <div className="min-w-0 flex flex-col">
                 <div
-                  className="grid gap-x-2 sm:gap-x-3 gap-y-2 px-3 sm:px-4 py-2.5 border-b border-zinc-800 shrink-0 items-end bg-zinc-900/60"
+                  className="grid gap-x-2 sm:gap-x-3 gap-y-2 px-3 sm:px-4 py-2.5 border-b border-zinc-800/60 shrink-0 items-end"
                   style={FLIGHT_ROW_GRID_STYLE}
                 >
                   <span className="w-7" aria-hidden />
@@ -635,7 +581,12 @@ export default function FlightHistory({ active }: Props) {
         )}
 
         {error && (
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-red-950/20 border border-red-800/30 shrink-0">
+          <div
+            className={cn(
+              "flex items-center gap-3 p-4 rounded-xl shrink-0",
+              toneClasses("bad").bannerPanel
+            )}
+          >
             <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
             <p className="text-sm text-red-300">{error}</p>
           </div>
@@ -650,11 +601,11 @@ export default function FlightHistory({ active }: Props) {
         )}
 
         {!loading && !error && records.length > 0 && (
-          <div className="shrink-0 flex flex-col bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden min-w-0 max-w-full">
+          <div className={cn("shrink-0 flex flex-col rounded-xl overflow-hidden min-w-0 max-w-full", CARD_SURFACE_B)}>
             <div className="min-w-0 max-w-full">
               <div className="min-w-0 flex flex-col">
                 <div
-                  className="grid gap-x-2 sm:gap-x-3 gap-y-2 px-3 sm:px-4 py-2.5 border-b border-zinc-800 shrink-0 items-end bg-zinc-900/60"
+                  className="grid gap-x-2 sm:gap-x-3 gap-y-2 px-3 sm:px-4 py-2.5 border-b border-zinc-800/60 shrink-0 items-end"
                   style={FLIGHT_ROW_GRID_STYLE}
                 >
                   <span className="w-7" aria-hidden />
@@ -672,7 +623,7 @@ export default function FlightHistory({ active }: Props) {
                   ))}
                 </div>
 
-                <div className="divide-y divide-zinc-800/60">
+                <div className="divide-y divide-zinc-800/40">
                   {records.map((rec, idx) => {
                     const date = new Date(rec.timestamp).toLocaleDateString("en-US", {
                       month: "short",
@@ -692,8 +643,8 @@ export default function FlightHistory({ active }: Props) {
                           onClick={() => setExpandedIdx((e) => (e === idx ? null : idx))}
                           className={cn(
                             "w-full min-w-0 grid gap-x-2 sm:gap-x-3 gap-y-1 px-3 sm:px-4 py-3 text-sm items-center shrink-0 min-h-[52px] box-border text-left",
-                            "hover:bg-zinc-800/40 transition-colors",
-                            open && "bg-zinc-800/30"
+                            "hover:bg-zinc-800/60 transition-colors",
+                            open && "bg-zinc-800/50"
                           )}
                           style={FLIGHT_ROW_GRID_STYLE}
                         >

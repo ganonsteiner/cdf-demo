@@ -89,7 +89,7 @@ If any exhaust component is replaced, the replacement must be:
   - Leak-tested after installation per Cessna maintenance procedures
 
 Exhaust system component service life:
-  Lycoming O-320 exhaust risers and muffler: no hard TBO, but typically
+  Lycoming O-320 exhaust risers and muffler: no hard TBOH, but typically
   800–1,200 hours. Inspect condition annually and replace proactively.
 
 ================================================================================

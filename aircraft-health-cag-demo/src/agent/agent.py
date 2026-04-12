@@ -20,12 +20,22 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import sys
+from pathlib import Path
 from typing import Any, AsyncGenerator, Optional
 
 import anthropic
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+
+_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "scripts"
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+from dataset import (  # noqa: E402
+    N1156P_FAILURE_DAYS_BEFORE_ANCHOR,
+    format_n1156p_accident_month_year,
+)
 
 from .tools import (  # noqa: E402
     TOOL_DEFINITIONS,
@@ -37,13 +47,22 @@ from .tools import (  # noqa: E402
 MODEL = "claude-sonnet-4-5"
 MAX_ITERATIONS = 15
 
-SYSTEM_PROMPT = """You are an expert aviation mechanic and airworthiness advisor for Desert Sky Aviation, a flight school at KPHX operating four 1978 Cessna 172N Skyhawks. You have access to the fleet's complete knowledge graph in Cognite Data Fusion (CDF).
+_FLEET_N1156P_LINE = (
+    f"- N1156P: NOT AIRWORTHY — catastrophic engine failure in {format_n1156p_accident_month_year()} "
+    f"(~{N1156P_FAILURE_DAYS_BEFORE_ANCHOR} days before demo as-of) at ~520 SMOH (tach), "
+    "connecting rod failure from lean detonation, grounded"
+)
+
+SYSTEM_PROMPT = (
+    """You are an expert aviation mechanic and airworthiness advisor for Desert Sky Aviation, a flight school at KPHX operating four 1978 Cessna 172N Skyhawks. You have access to the fleet's complete knowledge graph in Cognite Data Fusion (CDF).
 
 **Fleet:**
-- N4798E: AIRWORTHY — 380 SMOH (tach), 1 minor open squawk (oil seep), next oil due in ~18 tach hours
-- N2251K: FERRY ONLY — 290 SMOH (tach), oil 1.2 tach hours overdue, ferry flight authorized per fleet policy
+- N4798E: AIRWORTHY — 380 SMOH (tach), 1 minor open squawk (oil seep), next oil due in ~18 tach hours; oil calendar leg current
+- N2251K: FERRY ONLY — 290 SMOH (tach), oil ~1.2 tach hours overdue (calendar leg current); single ferry to maintenance authorized per fleet policy
 - N8834Q: CAUTION — 198 SMOH (tach), elevated CHT #3 (40-60°F above others), rough left mag, requires A&P inspection
-- N1156P: NOT AIRWORTHY — catastrophic engine failure Oct 2025 at ~520 SMOH (tach), connecting rod failure from lean detonation, grounded
+"""
+    + _FLEET_N1156P_LINE
+    + """
 
 **Knowledge graph structure:**
 - Asset hierarchy: {TAIL} → {TAIL}-ENGINE → {TAIL}-ENGINE-CYLINDERS, {TAIL}-ENGINE-OIL, + PROPELLER, AIRFRAME, AVIONICS, FUEL-SYSTEM
@@ -66,8 +85,9 @@ SYSTEM_PROMPT = """You are an expert aviation mechanic and airworthiness advisor
 - For airworthiness questions, explicitly state the status and reason
 - For N1156P questions, use chronological flight and maintenance events plus search_fleet_for_similar_events — there are no PRECEDED symptom edges
 - For cross-fleet patterns, use get_engine_type_history and search results
-- Use aviation terminology (SMOH, TBO, TT, A&P/IA, CHT, EGT, etc.)
+- Use aviation terminology (SMOH, TBOH, TT, A&P/IA, CHT, EGT, etc.)
 - Be concise — answer the question directly with supporting evidence"""
+)
 
 
 def _summarize_result(tool_name: str, result: Any) -> str:

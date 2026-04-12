@@ -11,8 +11,10 @@ This mirrors exactly how Cognite's Atlas AI works.
 
 from __future__ import annotations
 
+import calendar
 import os
-from datetime import datetime, timezone
+from datetime import date, datetime
+from functools import lru_cache
 from typing import Any, Optional
 
 from dotenv import load_dotenv
@@ -21,21 +23,27 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "..", ".en
 
 from .tools import (  # noqa: E402
     client,
-    log_traversal,
     clear_traversal_log,
-    get_linked_documents,
-    symptom_fleet_deep_dive,
     fetch_aircraft_symptoms_payload,
+    get_fleet_policies,
+    get_linked_documents,
+    log_traversal,
+    symptom_fleet_deep_dive,
 )
 from ..aircraft_times import (  # noqa: E402
     current_hobbs_from_sdk,
     current_tach_from_sdk,
     next_due_tach_from_meta,
 )
-
-_NOW = datetime.now(timezone.utc)
+from ..date_only import calendar_days_until_iso  # noqa: E402
 
 TAILS = ("N4798E", "N2251K", "N8834Q", "N1156P")
+
+# Oil change airworthiness (tach + calendar legs; mirrors POLICY_OIL_GRACE in mock CDF).
+# More than this many tach hours overdue → NOT_AIRWORTHY (5.0 hr still FERRY_ONLY).
+OIL_TACH_HOURS_NOT_AIRWORTHY = 5.0
+OIL_TACH_HOURS_FERRY_MIN = 0.0
+OIL_CALENDAR_DAYS_NOT_AIRWORTHY = 14
 
 
 def _safe_float(val: Any, default: float = 0.0) -> float:
@@ -46,13 +54,41 @@ def _safe_float(val: Any, default: float = 0.0) -> float:
 
 
 def _days_until(date_str: str) -> Optional[int]:
-    if not date_str:
-        return None
+    """Calendar days until a YYYY-MM-DD due date (local date; matches client calendarDaysUntil)."""
+    return calendar_days_until_iso(date_str)
+
+
+@lru_cache(maxsize=1)
+def _oil_change_calendar_months_from_policy() -> int:
+    """
+    Parse oil_change_calendar_months from fleet OperationalPolicy rule (mock CDF).
+    Default 4 months — matches Desert Sky oil change policy when list fails.
+    Cached for /api/fleet (four context builds per request).
+    """
     try:
-        target = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-        return (target - _NOW).days
-    except ValueError:
-        return None
+        pol = get_fleet_policies()
+        for p in pol.get("policies", []):
+            rule = str(p.get("rule", "") or "")
+            if "oil_change_calendar_months=" not in rule:
+                continue
+            for part in rule.split(";"):
+                part = part.strip()
+                if part.startswith("oil_change_calendar_months="):
+                    return max(1, int(part.split("=", 1)[1].strip()))
+    except Exception:
+        pass
+    return 4
+
+
+def _date_after_calendar_months(date_str: str, months: int) -> str:
+    """ISO date YYYY-MM-DD for a calendar date plus N months (month-end clamped)."""
+    d = datetime.strptime(date_str.strip(), "%Y-%m-%d").date()
+    m0 = d.month - 1 + months
+    y = d.year + m0 // 12
+    mo = m0 % 12 + 1
+    last_day = calendar.monthrange(y, mo)[1]
+    day = min(d.day, last_day)
+    return date(y, mo, day).isoformat()
 
 
 def _maintenance_type_label(maint_type: str) -> str:
@@ -71,24 +107,42 @@ def _maintenance_type_label(maint_type: str) -> str:
 def _build_tach_maintenance_summary(
     maint_type: str,
     hours_until: float,
-    next_due_date: str,
     days_until: Optional[int],
 ) -> str:
+    """
+    One-line summary aligned with Maintenance tab cards: mention only overdue legs that
+    are overdue; both overdue uses 'hr / days'; not overdue uses 'hr / d' when calendar known.
+    """
     label = _maintenance_type_label(maint_type)
-    parts: list[str] = []
-    if hours_until < 0:
-        parts.append(f"{label} overdue by {abs(hours_until):.1f} hr")
-    else:
-        parts.append(f"{label} due in {hours_until:.1f} hr")
-    if next_due_date:
-        if days_until is not None:
-            if days_until < 0:
-                parts.append(f"calendar target {next_due_date} ({abs(days_until)} days ago)")
-            else:
-                parts.append(f"or by {next_due_date} ({days_until} days)")
-        else:
-            parts.append(f"or by {next_due_date}")
-    return " · ".join(parts)
+    hu_over = hours_until < 0
+    dd_over = days_until is not None and days_until < 0
+
+    if hu_over and not dd_over:
+        return f"{label} overdue by {abs(hours_until):.1f} hr"
+    if dd_over and not hu_over:
+        return f"{label} overdue by {abs(days_until)} days"
+    if hu_over and dd_over:
+        return f"{label} overdue by {abs(hours_until):.1f} hr / {abs(days_until)} days"
+    if days_until is not None:
+        return f"{label} due in {hours_until:.1f} hr / {days_until} d"
+    return f"{label} due in {hours_until:.1f} hr"
+
+
+def _effective_oil_calendar_due_date(meta: dict[str, Any]) -> str:
+    """
+    Calendar due for upcoming oil row: use next_due_date when present; otherwise
+    N months after service date per fleet policy (matches status/oilNextDueDate).
+    """
+    nd_date = str(meta.get("next_due_date", "") or "").strip()
+    if nd_date:
+        return nd_date
+    svc = str(meta.get("date", "") or "").strip()
+    if not svc:
+        return ""
+    try:
+        return _date_after_calendar_months(svc, _oil_change_calendar_months_from_policy())
+    except ValueError:
+        return ""
 
 
 def derive_upcoming_maintenance(
@@ -129,17 +183,20 @@ def derive_upcoming_maintenance(
         hours_until = next_due - current_tach
         if not (-overdue_lookback <= hours_until <= window_tach_hours):
             continue
-        nd_date = meta.get("next_due_date", "") or ""
+        if "oil_change" in (maint_type or "").lower():
+            nd_date = _effective_oil_calendar_due_date(meta)
+        else:
+            nd_date = str(meta.get("next_due_date", "") or "").strip()
         days_until = _days_until(nd_date) if nd_date else None
         upcoming.append({
             "component": component,
-            "summary": _build_tach_maintenance_summary(maint_type, hours_until, nd_date, days_until),
+            "summary": _build_tach_maintenance_summary(maint_type, hours_until, days_until),
             "description": event.get("description", maint_type),
             "maintenanceType": maint_type,
             "nextDueTach": round(next_due, 1),
             "nextDueHobbs": round(next_due, 1),
             "hoursUntilDue": round(hours_until, 1),
-            "isOverdue": hours_until < 0,
+            "isOverdue": hours_until < 0 or (days_until is not None and days_until < 0),
             "nextDueDate": nd_date,
             "daysUntilDue": days_until,
         })
@@ -167,9 +224,9 @@ def derive_upcoming_maintenance(
                 upcoming.append({
                     "component": component,
                     "summary": (
-                        f"Annual inspection due in {days_until} days ({nd_date})"
+                        f"Annual inspection due in {days_until} days"
                         if days_until >= 0
-                        else f"Annual inspection overdue by {abs(days_until)} days ({nd_date})"
+                        else f"Annual inspection overdue by {abs(days_until)} days"
                     ),
                     "description": last_annual.get("description", ""),
                     "maintenanceType": maint_type,
@@ -333,7 +390,7 @@ def assemble_aircraft_context(aircraft_id: str) -> dict[str, Any]:
         ndt = next_due_tach_from_meta(om)
         if ndt is not None:
             oil_next_due_tach = ndt
-        oil_next_due_date = str(om.get("next_due_date", "") or "")
+        oil_next_due_date = _effective_oil_calendar_due_date(om)
     oil_tach_hours_overdue = (
         max(0.0, round(current_tach - oil_next_due_tach, 1)) if oil_next_due_tach > 0 else 0.0
     )
@@ -358,12 +415,25 @@ def assemble_aircraft_context(aircraft_id: str) -> dict[str, Any]:
     # 11. Airworthiness determination
     annual_expired = annual_days_remaining is not None and annual_days_remaining < 0
     has_grounding_squawk = len(grounding_squawks) > 0
-    oil_5hr_overdue = oil_tach_hours_overdue > 5.0
-    oil_1hr_overdue = oil_tach_hours_overdue >= 1.0
+    oil_calendar_overdue_days = (
+        int(-oil_days_until_due)
+        if oil_days_until_due is not None and oil_days_until_due < 0
+        else 0
+    )
+    oil_tach_not_airworthy = oil_tach_hours_overdue > OIL_TACH_HOURS_NOT_AIRWORTHY
+    oil_calendar_not_airworthy = oil_calendar_overdue_days >= OIL_CALENDAR_DAYS_NOT_AIRWORTHY
+    oil_tach_ferry = (
+        oil_tach_hours_overdue > OIL_TACH_HOURS_FERRY_MIN
+        and not oil_tach_not_airworthy
+    )
+    oil_calendar_ferry = (
+        oil_calendar_overdue_days >= 1
+        and oil_calendar_overdue_days < OIL_CALENDAR_DAYS_NOT_AIRWORTHY
+    )
 
-    if has_grounding_squawk or annual_expired or oil_5hr_overdue:
+    if has_grounding_squawk or annual_expired or oil_tach_not_airworthy or oil_calendar_not_airworthy:
         airworthiness = "NOT_AIRWORTHY"
-    elif oil_1hr_overdue:
+    elif oil_tach_ferry or oil_calendar_ferry:
         airworthiness = "FERRY_ONLY"
     elif len(open_squawks) > 0 and len(sym_items) > 0:
         airworthiness = "CAUTION"
@@ -399,7 +469,6 @@ def assemble_aircraft_context(aircraft_id: str) -> dict[str, Any]:
         "oilTachHoursOverdue": oil_tach_hours_overdue,
         "upcomingMaintenance": upcoming,
         "symptoms": sym_items,
-        "conditions": [],
         "documents": aircraft_docs.get("documents", []) + engine_docs.get("documents", []),
         "airworthiness": airworthiness,
         "isAirworthy": airworthiness == "AIRWORTHY",

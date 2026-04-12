@@ -1,21 +1,104 @@
 import { useEffect, useState } from "react";
 import {
-  Clock,
+  Timer,
   Calendar,
+  SquareActivity,
   AlertTriangle,
-  Activity,
   CheckCircle,
-  XCircle,
-  Wrench,
+  Fan,
   Info,
+  XCircle,
+  Droplet,
+  Wrench,
   MessageSquare,
 } from "lucide-react";
-import { cn, formatDate, severityColor } from "../lib/utils";
+import {
+  cn,
+  CARD_SURFACE_B,
+  formatDate,
+  formatDateMMDDYYHyphen,
+  formatSignedOilHoursCompact,
+  MAIN_TAB_CONTENT_FRAME,
+  TAB_PAGE_READABLE_COLUMN,
+  TAB_PAGE_TOP_INSET,
+  severityPillClass,
+  severityRowClass,
+  toneClasses,
+  toneForAirworthiness,
+  toneForDue,
+  toneForOilLife,
+  toneForSquawks,
+  type ToneClasses,
+} from "../lib/utils";
 import { api } from "../lib/api";
 import { TAILS, type TailNumber } from "../lib/store";
 import type { AircraftStatus, Squawk } from "../lib/types";
 
+/** Inset from card edges; reserve matches bottom-2 + line + gap (~pb-8 after caller padding). */
+const ASSISTANT_FOOTER_ROW =
+  "pointer-events-none absolute left-2 bottom-2 z-10 inline-flex shrink-0 items-center gap-0.5 text-xs leading-none text-sky-400 opacity-0 transition-opacity duration-150 group-hover/card:pointer-events-auto group-hover/card:opacity-100";
+
 type AirworthinessState = "AIRWORTHY" | "FERRY_ONLY" | "CAUTION" | "NOT_AIRWORTHY" | "UNKNOWN";
+
+type OilLifeParts = {
+  tone: ToneClasses;
+  hasOilHorizon: boolean;
+  hoursLine: string;
+  daysLine: string;
+};
+
+function oilLifeParts(status: AircraftStatus): OilLifeParts {
+  const oilOver = Number(status.oilTachHoursOverdue ?? status.oilHoursOverdue) || 0;
+  const rawUntil = Number(status.oilTachHoursUntilDue);
+  const oilUntil = Number.isFinite(rawUntil) ? rawUntil : 0;
+  const oilDays = status.oilDaysUntilDue;
+
+  const signedOilHours = oilOver > 0 ? -oilOver : oilUntil;
+  const hasOilHorizon = oilOver > 0 || oilUntil !== 0 || oilDays !== null;
+
+  const nbsp = "\u00a0";
+  /** Compact "d" here only — annual and other copy still use full "days" where needed. */
+  const formatSignedDays = (d: number | null) => {
+    if (d === null) return `—${nbsp}d`;
+    const sign = d < 0 ? "-" : "";
+    return `${sign}${Math.abs(d)}${nbsp}d`;
+  };
+
+  const hoursLine = hasOilHorizon
+    ? formatSignedOilHoursCompact(signedOilHours, nbsp)
+    : `—${nbsp}hr`;
+  const daysLine = hasOilHorizon ? formatSignedDays(oilDays) : `—${nbsp}d`;
+
+  const tone = !hasOilHorizon
+    ? toneClasses("unknown")
+    : toneForOilLife({
+        oilHoursOverdue: oilOver,
+        oilTachHoursUntilDue: signedOilHours,
+        oilDaysUntilDue: oilDays,
+      });
+
+  return { tone, hasOilHorizon, hoursLine, daysLine };
+}
+
+/** Prefer one row (hours / d); flex-wrap only if the tile is too narrow. */
+function OilLifeMainValue({ parts }: { parts: OilLifeParts }) {
+  const c = parts.tone.tone === "unknown" ? "text-zinc-200" : parts.tone.text;
+  const nbsp = "\u00a0";
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-baseline min-w-0 w-full text-lg sm:text-xl font-bold tabular-nums leading-tight text-left",
+        c
+      )}
+    >
+      <span className="whitespace-nowrap">{parts.hoursLine}</span>
+      <span className="whitespace-nowrap">
+        {nbsp}/{nbsp}
+        {parts.daysLine}
+      </span>
+    </div>
+  );
+}
 
 function deriveAirworthiness(status: AircraftStatus): AirworthinessState {
   return (status.airworthiness as AirworthinessState) || "UNKNOWN";
@@ -24,30 +107,46 @@ function deriveAirworthiness(status: AircraftStatus): AirworthinessState {
 function formatBannerAnnual(status: AircraftStatus): string {
   const d = status.annualDaysRemaining;
   if (d === null) return "Annual unknown";
-  if (d < 0) return `Annual expired (${Math.abs(d)}d ago)`;
-  if (d <= 30) return `Annual due in ${d} days`;
+  if (d < 0) return "Annual expired";
+  if (d <= 30) return "Annual due soon";
   return "Annual current";
 }
 
 function formatBannerOil(status: AircraftStatus): string {
-  const over = status.oilTachHoursOverdue ?? status.oilHoursOverdue ?? 0;
-  const until = Math.max(0, status.oilTachHoursUntilDue ?? 0);
-  if (over > 0) return `Oil ${over.toFixed(1)} hr overdue`;
-  if (until > 0) return `Oil due in ${until.toFixed(1)} hr`;
-  return "Oil current";
+  const oilOver = Number(status.oilTachHoursOverdue ?? status.oilHoursOverdue) || 0;
+  const rawUntil = Number(status.oilTachHoursUntilDue);
+  const oilUntil = Number.isFinite(rawUntil) ? rawUntil : 0;
+  const oilDays = status.oilDaysUntilDue;
+
+  const signedOilHours = oilOver > 0 ? -oilOver : oilUntil;
+  const hasOilHorizon = oilOver > 0 || oilUntil !== 0 || oilDays !== null;
+  if (!hasOilHorizon) return "Oil unknown";
+
+  const tone = toneForOilLife({
+    oilHoursOverdue: oilOver,
+    oilTachHoursUntilDue: signedOilHours,
+    oilDaysUntilDue: oilDays,
+  });
+
+  if (signedOilHours < 0 || (oilDays !== null && oilDays < 0)) {
+    return tone.tone === "bad" ? "Oil overdue" : "Oil overdue (ferry only)";
+  }
+  if (signedOilHours === 0 || oilDays === 0) return "Oil due now";
+  return tone.tone === "warn" ? "Oil due soon" : "Oil current";
 }
 
 function formatBannerSquawks(status: AircraftStatus): string {
   const n = status.groundingSquawkCount;
   if (n <= 0) return "No grounding squawks";
-  return n === 1 ? "1 grounding squawk" : `${n} grounding squawks`;
+  if (n === 1) return "1 grounding squawk";
+  return `${n} grounding squawks`;
 }
 
 function buildAirworthinessBannerLine2(status: AircraftStatus): string {
   return `${formatBannerAnnual(status)} · ${formatBannerOil(status)} · ${formatBannerSquawks(status)}`;
 }
 
-/** Shared clickable panel wrapper — tooltip + hover affordance. */
+/** Shared clickable panel — AI hint only on hover, pinned bottom-left (same inset as stat tiles). */
 function ClickPanel({
   chatHint,
   onClick,
@@ -66,14 +165,15 @@ function ClickPanel({
       title={chatHint}
       aria-label={chatHint}
       className={cn(
-        "w-full text-left cursor-pointer group/panel transition-all",
-        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-500",
-        className
+        "relative block w-full min-w-0 text-left cursor-pointer group/card",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500",
+        className,
+        "pb-8"
       )}
     >
-      {children}
-      <div className="flex items-center gap-1 mt-2 opacity-0 group-hover/panel:opacity-60 transition-opacity text-xs text-sky-400">
-        <MessageSquare className="w-3 h-3" />
+      <div className="min-w-0">{children}</div>
+      <div className={ASSISTANT_FOOTER_ROW}>
+        <MessageSquare className="w-3 h-3 shrink-0" aria-hidden />
         <span>Ask in AI Assistant</span>
       </div>
     </button>
@@ -108,10 +208,15 @@ export default function StatusDashboard({ selectedAircraft, onSelectAircraft, on
   const open = onOpenAssistant ?? (() => {});
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="max-w-4xl mx-auto py-6 px-2 space-y-6">
+    <div
+      className={cn(
+        "flex flex-col flex-1 min-h-0 w-full min-w-0 pb-6",
+        MAIN_TAB_CONTENT_FRAME,
+        TAB_PAGE_TOP_INSET
+      )}
+    >
+      <div className={cn("shrink-0 mb-3", TAB_PAGE_READABLE_COLUMN)}>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-zinc-500">Aircraft:</span>
           <div className="flex gap-1 flex-wrap">
             {TAILS.map((t) => (
               <button
@@ -130,26 +235,28 @@ export default function StatusDashboard({ selectedAircraft, onSelectAircraft, on
             ))}
           </div>
         </div>
+      </div>
 
-        {error ? (
-          <ErrorState message={error} />
-        ) : loading || !status || status.tail !== tail ? (
-          <DashboardSkeleton />
-        ) : (
-          <DashboardContent tail={tail} status={status} squawks={squawks} onOpenAssistant={open} />
-        )}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain w-full min-w-0">
+        <div className={cn(TAB_PAGE_READABLE_COLUMN, "pb-6")}>
+          {error ? (
+            <ErrorState message={error} />
+          ) : loading || !status || status.tail !== tail ? (
+            <DashboardSkeleton />
+          ) : (
+            <DashboardContent status={status} squawks={squawks} onOpenAssistant={open} />
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
 function DashboardContent({
-  tail,
   status,
   squawks,
   onOpenAssistant,
 }: {
-  tail: string;
   status: AircraftStatus;
   squawks: Squawk[];
   onOpenAssistant: () => void;
@@ -160,108 +267,105 @@ function DashboardContent({
     smohPct >= 85 ? "bg-red-500" : smohPct >= 65 ? "bg-yellow-500" : "bg-emerald-500";
   const open = onOpenAssistant;
 
-  const oilSubParts: string[] = [];
-  if (status.oilNextDueTach > 0) {
-    oilSubParts.push(`Due at ${status.oilNextDueTach.toFixed(1)} tach`);
-  }
-  if (status.oilNextDueDate) {
-    const fd = formatDate(status.oilNextDueDate);
-    if (fd) oilSubParts.push(fd);
-  }
-  const oilSub = oilSubParts.length > 0 ? oilSubParts.join(" · ") : "Per maintenance log";
+  const nbsp = "\u00a0";
+  const tachPart =
+    status.oilNextDueTach > 0 ? `${status.oilNextDueTach.toFixed(1)}${nbsp}hr` : "—";
+  const datePart = status.oilNextDueDate
+    ? formatDateMMDDYYHyphen(status.oilNextDueDate) ?? "—"
+    : "—";
+  const oilSub =
+    status.oilNextDueTach > 0 || status.oilNextDueDate
+      ? `${tachPart} / ${datePart}`
+      : "Per maintenance log";
+
+  const oilLife = oilLifeParts(status);
+  const annualTone = toneForDue(status.annualDaysRemaining, "days");
+  const squawkTone = toneForSquawks(status.openSquawkCount, status.groundingSquawkCount);
 
   const annualSub =
     status.annualDaysRemaining === null
       ? "—"
       : status.annualDaysRemaining < 0
-      ? `${Math.abs(status.annualDaysRemaining)} days ago`
-      : `${status.annualDaysRemaining} days`;
+      ? `-${Math.abs(status.annualDaysRemaining)}${nbsp}days`
+      : `${status.annualDaysRemaining}${nbsp}days`;
 
   return (
     <div className="space-y-6">
-      <AirworthinessBanner
-        state={airworthiness}
-        tail={tail}
-        status={status}
-        onOpenAssistant={open}
-      />
+      <AirworthinessBanner state={airworthiness} status={status} onOpenAssistant={open} />
 
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <AircraftTimeCard hobbs={status.hobbs} tach={status.tach} onClick={open} />
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <NeutralTimeCard
+          icon={<Timer className="w-4 h-4" aria-hidden />}
+          title="Aircraft Time"
+          value={status.hobbs}
+          caption="Hobbs"
+          chatHint="Ask about Hobbs (rental / display) time in the AI Assistant"
+          onClick={open}
+        />
+        <NeutralTimeCard
+          icon={<Fan className="w-4 h-4" aria-hidden />}
+          title="Engine Time"
+          value={status.tach}
+          caption="Tach"
+          chatHint="Ask about tach (maintenance) time in the AI Assistant"
+          onClick={open}
+        />
         <StatCard
-          icon={<Wrench className="w-4 h-4" />}
+          icon={<Droplet className="w-4 h-4" aria-hidden />}
           label="Oil Life"
-          value={
-            (status.oilTachHoursOverdue ?? status.oilHoursOverdue) > 0
-              ? `${(status.oilTachHoursOverdue ?? status.oilHoursOverdue).toFixed(1)} hr overdue`
-              : status.oilNextDueTach > 0
-              ? `${Math.max(0, status.oilTachHoursUntilDue).toFixed(1)} hr`
-              : "—"
-          }
+          valueContent={<OilLifeMainValue parts={oilLife} />}
           sub={oilSub}
-          color={
-            (status.oilTachHoursOverdue ?? status.oilHoursOverdue) > 5
-              ? "red"
-              : (status.oilTachHoursOverdue ?? status.oilHoursOverdue) >= 1
-              ? "yellow"
-              : status.oilTachHoursUntilDue > 0 && status.oilTachHoursUntilDue <= 10
-              ? "yellow"
-              : "emerald"
-          }
+          tone={oilLife.tone}
           chatHint="Ask about oil change interval in the AI Assistant"
           onClick={open}
         />
         <StatCard
-          icon={<Calendar className="w-4 h-4" />}
+          icon={<Calendar className="w-4 h-4" aria-hidden />}
           label="Annual Due"
           value={formatDate(status.annualDueDate) ?? "Unknown"}
           sub={annualSub}
-          color={
-            status.annualDaysRemaining === null
-              ? "zinc"
-              : status.annualDaysRemaining < 0
-              ? "red"
-              : status.annualDaysRemaining <= 30
-              ? "red"
-              : status.annualDaysRemaining <= 60
-              ? "yellow"
-              : "emerald"
-          }
+          tone={annualTone}
           chatHint="Ask about annual inspection currency in the AI Assistant"
           onClick={open}
         />
         <StatCard
           icon={<AlertTriangle className="w-4 h-4" />}
-          label="Open Squawks"
-          value={`${status.openSquawkCount}`}
+          label="Squawks"
+          value={`${status.openSquawkCount}${nbsp}open`}
           sub={
             status.groundingSquawkCount > 0
-              ? `${status.groundingSquawkCount} GROUNDING`
-              : "None grounding"
+              ? `${status.groundingSquawkCount}${nbsp}grounding`
+              : `0${nbsp}grounding`
           }
-          color={
-            status.groundingSquawkCount > 0
-              ? "red"
-              : status.openSquawkCount > 0
-              ? "yellow"
-              : "emerald"
-          }
+          tone={squawkTone}
           chatHint="Ask about open squawks in the AI Assistant"
           onClick={open}
         />
       </div>
 
       <ClickPanel
-        chatHint="Ask about engine time, TBO, and H2AD maintenance in the AI Assistant"
+        chatHint="Ask about engine time, TBOH, and H2AD maintenance in the AI Assistant"
         onClick={open}
-        className="bg-zinc-900 rounded-xl border border-zinc-800 p-4 hover:border-zinc-600"
+        className={cn("rounded-xl p-4 hover:border-zinc-700", CARD_SURFACE_B)}
       >
-        <div className="flex justify-between items-center gap-3 mb-3">
-          <span className="text-sm font-medium text-zinc-300">
-            Engine life · Lycoming O-320-H2AD
-          </span>
-          <span className="text-sm text-zinc-500 tabular-nums shrink-0">
-            {status.engineSMOH.toFixed(0)} / {status.engineTBO} hr
+        <div className="flex justify-between items-baseline gap-3 mb-3">
+          <div className="min-w-0 flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-sm font-medium text-zinc-300 shrink-0">Engine Life</span>
+            <span className="text-xs text-zinc-500 shrink-0" aria-hidden>
+              ·
+            </span>
+            <span className="text-xs text-zinc-500 min-w-0 truncate" title="Lycoming O-320-H2AD">
+              Lycoming O-320-H2AD
+            </span>
+          </div>
+          <span className="text-sm tabular-nums shrink-0">
+            <span className="text-zinc-300 font-medium">
+              {status.engineSMOH.toFixed(0)} / {status.engineTBO} hr
+            </span>
+            <span className="text-zinc-500 font-normal">
+              {"\u00a0"}·{"\u00a0"}
+              {smohPct.toFixed(0)}%
+            </span>
           </span>
         </div>
         <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
@@ -270,69 +374,56 @@ function DashboardContent({
             style={{ width: `${smohPct}%` }}
           />
         </div>
-        <p className="text-xs text-zinc-500 mt-2">
-          H2AD · AD 80-04-03 R2 · {(status.engineTBO - status.engineSMOH).toFixed(0)} hr to TBO
-        </p>
       </ClickPanel>
 
       {squawks.length > 0 && (
-        <ClickPanel
-          chatHint="Ask about these squawks in the AI Assistant"
-          onClick={open}
-          className="bg-zinc-900 rounded-xl border border-zinc-800 p-4 hover:border-zinc-600"
-        >
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3 flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-yellow-400" />
+        <div className="space-y-2">
+          <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5 text-yellow-400/70" aria-hidden />
             Open Squawks
           </h2>
-          <div className="space-y-2">
-            {squawks.map((sq) => (
-              <div
-                key={sq.externalId}
-                className={cn(
-                  "flex items-start gap-3 p-3 rounded-lg border text-sm",
-                  severityColor(sq.severity)
-                )}
-              >
+          {squawks.map((sq) => (
+            <ClickPanel
+              key={sq.externalId}
+              chatHint={`Ask about squawk: ${sq.description}`}
+              onClick={open}
+              className={cn("p-3 text-sm", severityRowClass(sq.severity))}
+            >
+              <div className="flex items-start gap-3 w-full min-w-0">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium leading-snug">{sq.description}</p>
                   <p className="text-xs opacity-60 mt-0.5">
-                    {sq.component} · Identified {formatDate(sq.dateIdentified)}
+                    Reported {formatDate(sq.dateIdentified)}
                   </p>
                 </div>
                 <span
                   className={cn(
-                    "shrink-0 text-xs px-2 py-0.5 rounded-full border uppercase tracking-wide font-medium",
-                    severityColor(sq.severity)
+                    "shrink-0 self-start text-xs px-2 py-0.5 rounded-full border uppercase tracking-wide font-medium",
+                    severityPillClass(sq.severity)
                   )}
                 >
                   {sq.severity}
                 </span>
               </div>
-            ))}
-          </div>
-        </ClickPanel>
+            </ClickPanel>
+          ))}
+        </div>
       )}
 
       {(status.symptoms ?? []).length > 0 && (
-        <ClickPanel
-          chatHint="Ask about these symptoms and fleet-wide patterns in the AI Assistant"
-          onClick={open}
-          className="bg-zinc-900 rounded-xl border border-zinc-800 p-4 hover:border-zinc-600"
-        >
-          <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide mb-3 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-orange-400" />
+        <div className="space-y-2">
+          <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+            <SquareActivity className="w-3.5 h-3.5 text-yellow-400/70" aria-hidden />
             Observed Symptoms
           </h2>
-          <div className="space-y-2">
-            {(status.symptoms ?? []).map((sym) => (
-              <div
-                key={sym.externalId}
-                className={cn(
-                  "flex items-start gap-3 p-3 rounded-lg border text-sm",
-                  severityColor(sym.severity)
-                )}
-              >
+          {(status.symptoms ?? []).map((sym) => (
+            <ClickPanel
+              key={sym.externalId}
+              chatHint={`Ask about symptom: ${sym.title}`}
+              onClick={open}
+              className={cn("p-3 text-sm", severityRowClass(sym.severity))}
+            >
+              <div className="flex items-start gap-3 w-full min-w-0">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium leading-snug">{sym.title}</p>
                   <p className="text-zinc-300/90 mt-1 leading-snug">{sym.description}</p>
@@ -345,22 +436,22 @@ function DashboardContent({
                 </div>
                 <span
                   className={cn(
-                    "shrink-0 text-xs px-2 py-0.5 rounded-full border uppercase tracking-wide font-medium",
-                    severityColor(sym.severity)
+                    "shrink-0 self-start text-xs px-2 py-0.5 rounded-full border uppercase tracking-wide font-medium",
+                    severityPillClass(sym.severity)
                   )}
                 >
                   {sym.severity}
                 </span>
               </div>
-            ))}
-          </div>
-        </ClickPanel>
+            </ClickPanel>
+          ))}
+        </div>
       )}
 
       <ClickPanel
         chatHint="Ask about maintenance history and upcoming items in the AI Assistant"
         onClick={open}
-        className="bg-zinc-900 rounded-xl border border-zinc-800 p-4 hover:border-zinc-600"
+        className={cn("rounded-xl p-4 hover:border-zinc-700", CARD_SURFACE_B)}
       >
         <div className="flex items-center gap-2 mb-1">
           <Wrench className="w-4 h-4 text-zinc-500" />
@@ -368,9 +459,6 @@ function DashboardContent({
         </div>
         <p className="text-lg font-semibold text-zinc-200">
           {formatDate(status.lastMaintenanceDate)}
-        </p>
-        <p className="text-xs text-zinc-600 mt-1">
-          Data fresh: {new Date(status.dataFreshAt).toLocaleTimeString()}
         </p>
       </ClickPanel>
     </div>
@@ -387,47 +475,46 @@ const BANNER_HINTS: Record<AirworthinessState, string> = {
 
 const BANNER_STYLE: Record<
   AirworthinessState,
-  { Icon: typeof CheckCircle; line1: string; panel: string }
+  { Icon: typeof CheckCircle; line1: string; hoverBorder: string }
 > = {
   AIRWORTHY: {
     Icon: CheckCircle,
-    line1: "AIRWORTHY ✓",
-    panel: "bg-emerald-950/30 border-emerald-800/40 text-emerald-300 hover:border-emerald-700",
+    line1: "AIRWORTHY",
+    hoverBorder: "hover:border-emerald-700",
   },
   FERRY_ONLY: {
     Icon: Info,
     line1: "FERRY ONLY",
-    panel: "bg-yellow-950/30 border-yellow-700/40 text-yellow-300 hover:border-yellow-600",
+    hoverBorder: "hover:border-yellow-600",
   },
   CAUTION: {
     Icon: AlertTriangle,
-    line1: "CAUTION ⚠",
-    panel: "bg-orange-950/30 border-orange-700/40 text-orange-300 hover:border-orange-600",
+    line1: "CAUTION",
+    hoverBorder: "hover:border-yellow-600",
   },
   NOT_AIRWORTHY: {
     Icon: XCircle,
-    line1: "NOT AIRWORTHY ✗",
-    panel: "bg-red-950/30 border-red-700/40 text-red-300 hover:border-red-600",
+    line1: "NOT AIRWORTHY",
+    hoverBorder: "hover:border-red-600",
   },
   UNKNOWN: {
     Icon: Info,
     line1: "UNKNOWN",
-    panel: "bg-zinc-900/40 border-zinc-700 text-zinc-400 hover:border-zinc-600",
+    hoverBorder: "hover:border-zinc-600",
   },
 };
 
 function AirworthinessBanner({
   state,
-  tail,
   status,
   onOpenAssistant,
 }: {
   state: AirworthinessState;
-  tail: string;
   status: AircraftStatus;
   onOpenAssistant: () => void;
 }) {
   const cfg = BANNER_STYLE[state];
+  const tone = toneForAirworthiness(state);
   const Icon = cfg.Icon;
   const line2 = buildAirworthinessBannerLine2(status);
 
@@ -435,59 +522,69 @@ function AirworthinessBanner({
     <ClickPanel
       chatHint={BANNER_HINTS[state]}
       onClick={onOpenAssistant}
-      className={cn("flex items-start gap-3 p-4 rounded-xl border", cfg.panel)}
+      className={cn(
+        "p-4 rounded-xl transition-colors",
+        tone.bannerPanel,
+        tone.text,
+        cfg.hoverBorder
+      )}
     >
-      <Icon className="w-5 h-5 shrink-0 mt-0.5" />
-      <div className="min-w-0">
-        <p className="font-semibold text-sm">
-          {tail} — {cfg.line1}
-        </p>
-        <p className="text-xs opacity-70 mt-0.5 leading-snug">{line2}</p>
+      <div className="flex items-start gap-3">
+        <Icon className="w-5 h-5 shrink-0 mt-0.5" aria-hidden />
+        <div className="min-w-0">
+          <p className="font-semibold text-sm">{cfg.line1}</p>
+          <p className="text-xs opacity-70 mt-0.5 leading-snug">{line2}</p>
+        </div>
       </div>
     </ClickPanel>
   );
 }
 
-function AircraftTimeCard({
-  hobbs,
-  tach,
+/** Hobbs or tach reading — neutral (blue carries no meaning). */
+function NeutralTimeCard({
+  icon,
+  title,
+  value,
+  caption,
+  chatHint,
   onClick,
 }: {
-  hobbs: number;
-  tach: number;
+  icon: React.ReactNode;
+  title: string;
+  value: number;
+  caption: string;
+  chatHint: string;
   onClick: () => void;
 }) {
-  const hint = "Ask about Hobbs and tach time in the AI Assistant";
   return (
     <button
       type="button"
       onClick={onClick}
-      title={hint}
-      aria-label={hint}
+      title={chatHint}
+      aria-label={chatHint}
       className={cn(
-        "rounded-xl border p-4 text-left w-full cursor-pointer transition-all group/stat",
-        "bg-sky-500/10 border-sky-500/20 hover:border-sky-400/40",
-        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-500"
+        "relative flex flex-col rounded-xl p-3 text-left w-full min-h-0 h-full cursor-pointer transition-all group/card",
+        "items-stretch min-w-0",
+        CARD_SURFACE_B,
+        "hover:border-zinc-700",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-500",
+        "pb-8"
       )}
     >
-      <div className="flex items-center gap-2 mb-2 text-sky-400">
-        <Clock className="w-4 h-4" />
-        <span className="text-xs font-medium uppercase tracking-wide">Aircraft time</span>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <p className="text-xs text-zinc-500">Hobbs</p>
-          <p className="text-2xl font-bold tabular-nums text-sky-400 leading-tight">{hobbs.toFixed(1)}</p>
-          <p className="text-xs text-zinc-600">hr</p>
+      <div className="min-w-0 flex-1 flex flex-col min-h-0">
+        <div className="flex items-center gap-1.5 mb-1 text-zinc-400 w-full min-w-0">
+          {icon}
+          <span className="text-[10px] font-semibold uppercase tracking-wide truncate">{title}</span>
         </div>
-        <div>
-          <p className="text-xs text-zinc-500">Tach</p>
-          <p className="text-2xl font-bold tabular-nums text-sky-400 leading-tight">{tach.toFixed(1)}</p>
-          <p className="text-xs text-zinc-600">hr</p>
-        </div>
+        <p className="text-lg sm:text-xl font-bold tabular-nums text-zinc-200 leading-tight text-left w-full min-w-0 whitespace-nowrap">
+          {value.toFixed(1)}
+          {"\u00a0"}
+          hr
+        </p>
+        <p className="text-xs text-zinc-600 mt-0.5">{caption}</p>
       </div>
-      <div className="flex items-center gap-1 mt-1.5 opacity-0 group-hover/stat:opacity-60 transition-opacity text-xs text-sky-400">
-        <MessageSquare className="w-3 h-3" />
+      <div className={ASSISTANT_FOOTER_ROW}>
+        <MessageSquare className="w-3 h-3 shrink-0" aria-hidden />
         <span>Ask in AI Assistant</span>
       </div>
     </button>
@@ -498,34 +595,23 @@ function StatCard({
   icon,
   label,
   value,
+  valueContent,
+  valueClassName,
   sub,
-  color,
+  tone,
   chatHint,
   onClick,
 }: {
   icon: React.ReactNode;
   label: string;
-  value: string;
+  value?: string;
+  valueContent?: React.ReactNode;
+  valueClassName?: string;
   sub: string;
-  color: string;
+  tone: ToneClasses;
   chatHint: string;
   onClick: () => void;
 }) {
-  const colorMap: Record<string, string> = {
-    sky: "text-sky-400",
-    emerald: "text-emerald-400",
-    yellow: "text-yellow-400",
-    red: "text-red-400",
-    zinc: "text-zinc-400",
-  };
-  const bgMap: Record<string, string> = {
-    sky: "bg-sky-500/10 border-sky-500/20 hover:border-sky-400/40",
-    emerald: "bg-emerald-500/10 border-emerald-500/20 hover:border-emerald-400/40",
-    yellow: "bg-yellow-500/10 border-yellow-500/20 hover:border-yellow-400/40",
-    red: "bg-red-500/10 border-red-500/20 hover:border-red-400/40",
-    zinc: "bg-zinc-800 border-zinc-700 hover:border-zinc-500",
-  };
-
   return (
     <button
       type="button"
@@ -533,19 +619,33 @@ function StatCard({
       title={chatHint}
       aria-label={chatHint}
       className={cn(
-        "rounded-xl border p-4 text-left w-full cursor-pointer transition-all group/stat",
+        "relative flex flex-col rounded-xl p-3 text-left w-full min-h-0 h-full cursor-pointer transition-all group/card",
+        "items-stretch min-w-0",
+        tone.panel,
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-500",
-        bgMap[color] || bgMap["zinc"]
+        "pb-8"
       )}
     >
-      <div className={cn("flex items-center gap-2 mb-1", colorMap[color] || "text-zinc-400")}>
-        {icon}
-        <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
+      <div className="min-w-0 flex-1 flex flex-col min-h-0">
+        <div className={cn("flex items-center gap-1.5 mb-1 w-full min-w-0", tone.text)}>
+          {icon}
+          <span className="text-[10px] font-semibold uppercase tracking-wide truncate">{label}</span>
+        </div>
+        {valueContent ?? (
+          <p
+            className={cn(
+              valueClassName ?? "text-lg sm:text-xl font-bold tabular-nums leading-tight",
+              "text-left w-full min-w-0 whitespace-nowrap",
+              tone.tone === "unknown" ? "text-zinc-200" : tone.text
+            )}
+          >
+            {value}
+          </p>
+        )}
+        <p className="text-xs text-zinc-500 mt-0.5 text-left break-words">{sub}</p>
       </div>
-      <p className={cn("text-2xl font-bold", colorMap[color] || "text-zinc-200")}>{value}</p>
-      <p className="text-xs text-zinc-500 mt-0.5">{sub}</p>
-      <div className="flex items-center gap-1 mt-1.5 opacity-0 group-hover/stat:opacity-60 transition-opacity text-xs text-sky-400">
-        <MessageSquare className="w-3 h-3" />
+      <div className={ASSISTANT_FOOTER_ROW}>
+        <MessageSquare className="w-3 h-3 shrink-0" aria-hidden />
         <span>Ask in AI Assistant</span>
       </div>
     </button>
@@ -555,41 +655,28 @@ function StatCard({
 function DashboardSkeleton() {
   return (
     <div className="space-y-6" aria-busy="true">
-      <div className="rounded-xl border border-zinc-800/80 p-4 min-h-[5.5rem] bg-zinc-900/40">
+      <div className={cn("rounded-xl p-4 pb-8 min-h-[5.5rem]", CARD_SURFACE_B)}>
         <div className="flex gap-3 animate-pulse">
           <div className="w-5 h-5 rounded-full bg-zinc-800 shrink-0 mt-0.5" />
           <div className="flex-1 space-y-2 min-w-0">
-            <div className="h-4 bg-zinc-800 rounded w-48 max-w-full" />
+            <div className="h-4 bg-zinc-800 rounded w-40 max-w-full" />
             <div className="h-3 bg-zinc-800/80 rounded w-full max-w-md" />
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-zinc-800/60 p-4 min-h-[7.5rem] bg-zinc-900/40 animate-pulse">
-          <div className="h-3 bg-zinc-800 rounded w-24 mb-3" />
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <div className="h-2.5 bg-zinc-800/80 rounded w-10 mb-1" />
-              <div className="h-8 bg-zinc-800 rounded w-16" />
-            </div>
-            <div>
-              <div className="h-2.5 bg-zinc-800/80 rounded w-10 mb-1" />
-              <div className="h-8 bg-zinc-800 rounded w-16" />
-            </div>
-          </div>
-        </div>
-        {Array.from({ length: 3 }).map((_, i) => (
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-xl border border-zinc-800/60 p-4 min-h-[7rem] bg-zinc-900/40 animate-pulse"
+            className={cn("rounded-xl p-3 pb-8 min-h-[5.5rem] animate-pulse", CARD_SURFACE_B)}
           >
-            <div className="h-3 bg-zinc-800 rounded w-20 mb-3" />
-            <div className="h-8 bg-zinc-800 rounded w-24 mb-2" />
-            <div className="h-3 bg-zinc-800/80 rounded w-32" />
+            <div className="h-3 bg-zinc-800 rounded w-24 mb-2" />
+            <div className="h-8 bg-zinc-800 rounded w-28 mb-2" />
+            <div className="h-3 bg-zinc-800/80 rounded w-16" />
           </div>
         ))}
       </div>
-      <div className="rounded-xl border border-zinc-800 p-4 min-h-[6.5rem] bg-zinc-900/40 space-y-3 animate-pulse">
+      <div className={cn("rounded-xl p-4 min-h-[6.5rem] space-y-3 animate-pulse", CARD_SURFACE_B)}>
         <div className="flex justify-between gap-4">
           <div className="h-4 bg-zinc-800 rounded flex-1 max-w-xs" />
           <div className="h-4 bg-zinc-800 rounded w-28 shrink-0" />
@@ -597,7 +684,7 @@ function DashboardSkeleton() {
         <div className="h-3 bg-zinc-800 rounded-full w-full" />
         <div className="h-3 bg-zinc-800/80 rounded w-full max-w-lg" />
       </div>
-      <div className="rounded-xl border border-zinc-800 p-4 min-h-[5.5rem] bg-zinc-900/40 animate-pulse">
+      <div className={cn("rounded-xl p-4 min-h-[5.5rem] animate-pulse", CARD_SURFACE_B)}>
         <div className="h-4 bg-zinc-800 rounded w-36 mb-3" />
         <div className="h-6 bg-zinc-800 rounded w-28" />
         <div className="h-3 bg-zinc-800/80 rounded w-44 mt-2" />

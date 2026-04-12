@@ -13,8 +13,8 @@ import type {
 
 const BASE = "/api";
 
-async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`);
+async function get<T>(path: string, init?: { signal?: AbortSignal }): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, { signal: init?.signal });
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`${res.status} ${res.statusText}: ${text}`);
@@ -52,17 +52,27 @@ export const api = {
 
   maintenanceHistory: (
     tail: string,
-    opts: { page?: number; per_page?: number; component?: string; year?: number; maint_type?: string } = {}
-  ) =>
-    get<MaintenanceHistoryPage>(
+    opts: {
+      page?: number;
+      per_page?: number;
+      component?: string;
+      year?: number;
+      maint_type?: string;
+      signal?: AbortSignal;
+    } = {}
+  ) => {
+    const { signal, ...query } = opts;
+    return get<MaintenanceHistoryPage>(
       withTail("/maintenance/history", tail, {
-        page: opts.page,
-        per_page: opts.per_page,
-        component: opts.component,
-        year: opts.year,
-        maint_type: opts.maint_type,
-      })
-    ),
+        page: query.page,
+        per_page: query.per_page,
+        component: query.component,
+        year: query.year,
+        maint_type: query.maint_type,
+      }),
+      { signal }
+    );
+  },
 
   flights: (
     tail: string,
@@ -86,8 +96,8 @@ export const api = {
       })
     ),
 
-  components: (tail: string) =>
-    get<ComponentNode[]>(withTail("/components", tail)),
+  components: (tail: string, init?: { signal?: AbortSignal }) =>
+    get<ComponentNode[]>(withTail("/components", tail), init),
 
   graph: () => get<GraphData>("/graph"),
 };
