@@ -29,7 +29,7 @@ export default function SetupBanner({
           <BannerRow
             icon={<ServerOff className="w-4 h-4 shrink-0" />}
             color="yellow"
-            title="Mock CDF server offline (port 4000)"
+            title="Mock CDF server offline (port 4001)"
             detail="Start it: npm run mock-cdf"
           />
         )}
@@ -37,12 +37,12 @@ export default function SetupBanner({
           <BannerRow
             icon={<AlertTriangle className="w-4 h-4 shrink-0" />}
             color="yellow"
-            title="Mock CDF on port 4000 is not serving this project’s fleet data"
+            title="Mock CDF on port 4001 is not serving this project’s fleet data"
             detail={
               <>
-                Another process may be using port 4000 (check{" "}
+                Another process may be using port 4001 (check{" "}
                 <code className="font-mono text-yellow-300 bg-yellow-950/60 px-1 rounded">
-                  lsof -i :4000
+                  lsof -i :4001
                 </code>
                 ), stop it, then restart{" "}
                 <code className="font-mono text-yellow-300">npm run dev</code> so mock-cdf can start.

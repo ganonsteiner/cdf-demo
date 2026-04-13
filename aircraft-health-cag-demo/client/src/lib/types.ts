@@ -4,7 +4,7 @@ export interface HealthStatus {
   status: "ok" | "degraded" | "mock_cdf_offline" | "api_key_missing" | "api_key_invalid";
   anthropic_api_key_configured: boolean;
   mock_cdf_reachable: boolean;
-  /** False when /health responds but assets/byids returns no fleet (e.g. wrong process on port 4000). */
+  /** False when /health responds but assets/byids returns no fleet (e.g. wrong process on port 4001). */
   mock_cdf_fleet_ready?: boolean;
   store: Record<string, number>;
   checkedAt: string;

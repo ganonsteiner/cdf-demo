@@ -39,7 +39,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "..", ".en
 # ---------------------------------------------------------------------------
 
 _CDF_PROJECT = os.getenv("CDF_PROJECT", "desert_sky")
-_CDF_BASE_URL = os.getenv("CDF_BASE_URL", "http://localhost:4000")
+_CDF_BASE_URL = os.getenv("CDF_BASE_URL", "http://localhost:4001")
 _CDF_TOKEN = os.getenv("CDF_TOKEN", "mock-token")
 
 _config = ClientConfig(

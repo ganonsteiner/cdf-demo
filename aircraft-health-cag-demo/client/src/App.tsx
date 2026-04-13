@@ -147,7 +147,7 @@ export default function App() {
                     !health.mock_cdf_reachable
                       ? "Mock CDF offline"
                       : health.mock_cdf_fleet_ready === false
-                        ? "Port 4000 responds but fleet data missing — free port 4000 and restart npm run dev"
+                        ? "Mock CDF (port 4001) responds but fleet data missing — free port 4001 and restart npm run dev"
                         : `Knowledge graph online — ${(health.store?.assets ?? 0)} assets`
                   }
                 />

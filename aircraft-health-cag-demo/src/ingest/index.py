@@ -16,6 +16,7 @@ Usage:
 
 from __future__ import annotations
 
+import os
 import sys
 import time
 from pathlib import Path
@@ -53,7 +54,8 @@ def run_ingestion() -> None:
 
     # Signal the mock CDF server to reload its in-memory store from disk
     import urllib.request
-    mock_cdf_url = "http://localhost:4000/admin/reload"
+    cdf = os.getenv("CDF_BASE_URL", "http://localhost:4001").rstrip("/")
+    mock_cdf_url = f"{cdf}/admin/reload"
     try:
         req = urllib.request.Request(mock_cdf_url, method="POST", data=b"")
         with urllib.request.urlopen(req, timeout=3) as resp:

@@ -117,7 +117,7 @@ def get_download_links(body: DownloadLinkRequest) -> dict[str, Any]:
                 filename = f.metadata.get("filename", f.name)
                 items.append({
                     "externalId": ext_id,
-                    "downloadUrl": f"http://localhost:4000/documents/{filename}",
+                    "downloadUrl": f"http://localhost:4001/documents/{filename}",
                 })
     return {"items": items}
 

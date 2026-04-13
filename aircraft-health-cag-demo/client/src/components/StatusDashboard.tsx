@@ -661,7 +661,7 @@ function ErrorState({ message }: { message: string }) {
       <p className="font-medium text-zinc-300">Could not load aircraft status</p>
       <p className="text-sm mt-1 font-mono text-zinc-600 max-w-md text-center">{message}</p>
       <p className="text-xs mt-3 text-zinc-700">
-        Make sure the mock CDF server (port 4000) and API server (port 3000) are running.
+        Make sure the mock CDF server (port 4001) and API server (port 8080) are running.
       </p>
     </div>
   );

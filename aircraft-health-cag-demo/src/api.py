@@ -1,5 +1,5 @@
 """
-Application API Server — FastAPI on port 3000.
+Application API Server — FastAPI on port 8080.
 
 Desert Sky Aviation Fleet CAG Demo endpoints:
   POST /api/query           — SSE-streamed agent responses (body: {question, aircraft?})
@@ -56,7 +56,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[
+        "http://localhost:4000",
+        "http://127.0.0.1:4000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -77,7 +80,7 @@ class QueryRequest(BaseModel):
 # ---------------------------------------------------------------------------
 
 async def _check_mock_cdf() -> bool:
-    base_url = os.getenv("CDF_BASE_URL", "http://localhost:4000")
+    base_url = os.getenv("CDF_BASE_URL", "http://localhost:4001")
     try:
         async with httpx.AsyncClient(timeout=2.0) as http:
             resp = await http.get(f"{base_url}/health")
@@ -90,10 +93,10 @@ def _mock_cdf_fleet_ready_sync() -> bool:
     """
     True only if we can retrieve a fleet aircraft via the same byids path the SDK uses.
 
-    Port 4000 may be occupied by a non-mock process that still returns HTTP 200 on /health,
+    Port 4001 may be occupied by a non-mock process that still returns HTTP 200 on /health,
     which would make _check_mock_cdf True while assets.retrieve returns None.
     """
-    base_url = os.getenv("CDF_BASE_URL", "http://localhost:4000").rstrip("/")
+    base_url = os.getenv("CDF_BASE_URL", "http://localhost:4001").rstrip("/")
     project = os.getenv("CDF_PROJECT", "desert_sky")
     try:
         h = httpx.get(f"{base_url}/health", timeout=2.0)
@@ -123,7 +126,7 @@ async def _mock_cdf_fleet_ready() -> bool:
 
 def _get_store_counts() -> dict[str, int]:
     try:
-        base_url = os.getenv("CDF_BASE_URL", "http://localhost:4000")
+        base_url = os.getenv("CDF_BASE_URL", "http://localhost:4001")
         resp = httpx.get(f"{base_url}/health", timeout=2.0)
         if resp.status_code == 200:
             return resp.json().get("store", {})
@@ -729,7 +732,7 @@ def _sync_get_components(tail: str) -> list[dict[str, Any]]:
 async def get_policies() -> list[dict[str, Any]]:
     """GET /api/policies — list all fleet operational policies."""
     try:
-        base_url = os.getenv("CDF_BASE_URL", "http://localhost:4000")
+        base_url = os.getenv("CDF_BASE_URL", "http://localhost:4001")
         project = os.getenv("CDF_PROJECT", "desert_sky")
         async with httpx.AsyncClient(timeout=5.0) as http:
             resp = await http.post(
@@ -905,12 +908,12 @@ async def on_startup() -> None:
     mock_cdf_ok = await _check_mock_cdf()
     fleet_ready = await _mock_cdf_fleet_ready() if mock_cdf_ok else False
 
-    print("\n✈  Desert Sky Aviation Fleet CAG API — port 3000")
+    print("\n✈  Desert Sky Aviation Fleet CAG API — port 8080")
     print(f"   ANTHROPIC_API_KEY: {'✓ configured' if key_ok else '✗ MISSING — add ANTHROPIC_API_KEY to .env'}")
     print(f"   Mock CDF server:   {'✓ reachable' if mock_cdf_ok else '✗ not reachable'}")
     if mock_cdf_ok and not fleet_ready:
         print(
-            "   ⚠ Mock /health OK but fleet assets missing — port 4000 may be another app.\n"
-            "     Stop the process on 4000 and restart so `npm run mock-cdf` can bind."
+            "   ⚠ Mock /health OK but fleet assets missing — port 4001 may be another app.\n"
+            "     Stop the process on 4001 and restart so `npm run mock-cdf` can bind."
         )
     print("   Fleet: N4798E  N2251K  N8834Q  N1156P  (airworthiness derived at query time)\n")

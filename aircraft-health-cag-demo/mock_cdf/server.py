@@ -14,7 +14,7 @@ Extended routes for fleet-specific resource types (policies, fleet_owners) retur
 called via httpx from agent tools — matching the same mock CDF pattern
 without requiring SDK changes. Symptoms are standard CDF Events (Observation/Symptom).
 
-Runs on port 4000 (MOCK_CDF_PORT). Project: desert_sky.
+Runs on port 4001 (MOCK_CDF_PORT). Project: desert_sky.
 """
 
 import gzip
@@ -182,7 +182,7 @@ def create_app() -> FastAPI:
         return {
             "status": "ok",
             "store": counts,
-            "port": int(os.getenv("MOCK_CDF_PORT", "4000")),
+            "port": int(os.getenv("MOCK_CDF_PORT", "4001")),
             "project": PROJECT,
         }
 
@@ -196,7 +196,7 @@ def create_app() -> FastAPI:
 
     @_app.on_event("startup")
     def on_startup() -> None:
-        port = os.getenv("MOCK_CDF_PORT", "4000")
+        port = os.getenv("MOCK_CDF_PORT", "4001")
         counts = store.get_counts()
         print(f"\n✈  Mock CDF server — Desert Sky Aviation Fleet")
         print(f"   Port: {port}  Project: {PROJECT}")

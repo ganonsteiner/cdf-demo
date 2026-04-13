@@ -6,7 +6,6 @@ aircraft by traversing the knowledge graph. Used by /api/status and the
 agent's assemble_aircraft_context tool.
 
 Context is assembled by graph traversal only — no vector store, no embeddings.
-This mirrors exactly how Cognite's Atlas AI works.
 """
 
 from __future__ import annotations
@@ -264,7 +263,7 @@ def assemble_aircraft_context(aircraft_id: str) -> dict[str, Any]:
                 "error": (
                     f"Aircraft asset {aircraft_id} not found in CDF. "
                     "If npm run dev shows mock-cdf exiting with 'Address already in use', "
-                    "another process is bound to port 4000 — stop it so this project's mock "
+                    "another process is bound to port 4001 — stop it so this project's mock "
                     "CDF can start, then restart the stack."
                 ),
             }

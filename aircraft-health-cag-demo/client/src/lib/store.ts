@@ -1,15 +1,4 @@
-/**
- * Global Zustand store — Desert Sky Aviation Fleet CAG Demo.
- *
- * Manages:
- *   - selectedAircraft: currently focused tail number (null = fleet-wide)
- *   - chatMessages: conversation history, persists across tab and aircraft changes
- *   - isQuerying: agent is currently streaming a response
- *   - traversalEvents: graph nodes visited by the most recent query
- *   - replayNodes: traversal nodes for replay animation
- *   - floatingChatOpen: FAB chat popup (all tabs except AI Assistant)
- *   - graphDataSnapshot: last /api/graph payload — aligns traversal counts with highlights
- */
+/** Global Zustand store for the Desert Sky Aviation fleet demo. */
 
 import { create } from "zustand";
 import type { AgentEvent, ChatMessage, GraphData } from "./types";

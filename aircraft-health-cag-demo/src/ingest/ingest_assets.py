@@ -11,9 +11,6 @@ Desert_Sky_Aviation fleet owner node. Each aircraft has:
   {TAIL}-AIRFRAME         — fuselage, wings, empennage
   {TAIL}-AVIONICS         — avionics stack
   {TAIL}-FUEL-SYSTEM      — fuel system
-
-This mirrors how CDF represents an industrial asset hierarchy where each
-physical component becomes a node in the knowledge graph.
 """
 
 from __future__ import annotations

@@ -1,9 +1,15 @@
+# OS
+.DS_Store
+
 # Python
 aircraft-health-cag-demo/.venv/
 aircraft-health-cag-demo/venv/
 aircraft-health-cag-demo/**/__pycache__/
 aircraft-health-cag-demo/**/*.py[cod]
 aircraft-health-cag-demo/**/*.egg-info/
+aircraft-health-cag-demo/.ruff_cache/
+aircraft-health-cag-demo/.pytest_cache/
+aircraft-health-cag-demo/.mypy_cache/
 
 # Build / frontend
 aircraft-health-cag-demo/dist/
@@ -13,3 +19,5 @@ aircraft-health-cag-demo/client/node_modules/
 
 # Secrets
 aircraft-health-cag-demo/.env
+aircraft-health-cag-demo/client/.env.local
+aircraft-health-cag-demo/client/.env.*.local
